@@ -9,101 +9,979 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Nunito:wght@600;700;800&family=Source+Code+Pro:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --pe-hondo:#0f2d3a; --pe-base:#173f50; --pe-medio:#2a4e5e; --pe-claro:#346375;
-  --te-hondo:#8f3a1e; --te-base:#a8512f; --te-medio:#b55537; --te-claro:#e08a5f;
-  --cr-puro:#fffcf7; --cr-base:#f7f1e9; --cr-hondo:#efe6d8; --cr-borde:#e2d6c4; --si-rosa:#e4c5b5;
-  --ti-base:#3d2523; --ti-suave:#4a3f38;
-  --fam-titulo:'Lora', Georgia, serif;
-  --fam-cuerpo:'Nunito', 'Segoe UI', system-ui, sans-serif;
-  --fam-num:'Source Code Pro', Consolas, monospace;
-  --radio:14px;
-  --sombra:0 2px 8px rgba(15,45,58,.10), 0 8px 28px rgba(15,45,58,.08);
-  --sombra-alta:0 10px 28px rgba(15,45,58,.22), 0 28px 60px rgba(15,45,58,.28);
-  --sal:cubic-bezier(.22,.8,.25,1);
-  --dur:.58s;
+/* 01. Variables y sistema visual */
+:root {
+  --pe-hondo: #0f2d3a;
+  --pe-base: #173f50;
+  --pe-medio: #2a4e5e;
+  --pe-claro: #346375;
+  --te-hondo: #8f3a1e;
+  --te-base: #a8512f;
+  --te-medio: #b55537;
+  --te-claro: #e08a5f;
+  --cr-puro: #fffcf7;
+  --cr-base: #f7f1e9;
+  --cr-hondo: #efe6d8;
+  --cr-borde: #e2d6c4;
+  --si-rosa: #e4c5b5;
+  --ti-base: #3d2523;
+  --ti-suave: #4a3f38;
+  --fam-titulo: "Lora", Georgia, serif;
+  --fam-cuerpo: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --fam-num: "Source Code Pro", Consolas, monospace;
+  --fs-titulo: clamp(1.9rem, 4vw, 2.85rem);
+  --fs-seccion: clamp(1.45rem, 2.4vw, 1.85rem);
+  --fs-tarjeta: 1.2rem;
+  --fs-etiqueta: 0.72rem;
+  --fs-ui: 1rem;
+  --fs-aux: 0.94rem;
+  --fs-cifra: clamp(2rem, 4.4vw, 3.1rem);
+  --fs-cifra-sec: 0.95rem;
+  --radio: 14px;
+  --radio-pieza: 26px;
+  --radio-panel: 24px;
+  --sombra: 0 2px 8px rgba(15, 45, 58, 0.10), 0 8px 28px rgba(15, 45, 58, 0.08);
+  --sombra-alta: 0 14px 28px rgba(15, 45, 58, 0.22), 0 32px 64px rgba(8, 22, 30, 0.28);
+  --sombra-contacto: 0 18px 24px rgba(8, 22, 30, 0.28);
+  --sal: cubic-bezier(0.22, 0.8, 0.25, 1);
+  --ease-salida: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-rapida: 0.16s;
+  --dur-media: 0.32s;
+  --dur: 0.58s;
+  --dur-ambiente: 0.7s;
+  --perspectiva: 1400px;
+  --paso: 240px;
+  --ancho: 1120px;
+  --alto-escena: clamp(340px, 48vw, 480px);
+  --toque: 48px;
+  --z-barra: 40;
+  --z-escena: 1;
+  --z-pieza: 10;
+  --ambiente: rgba(224, 138, 95, 0.34);
+  --acento: #e08a5f;
 }
-*,*::before,*::after{box-sizing:border-box}
-html,body{margin:0;overflow-x:hidden}
-body{font-family:var(--fam-cuerpo);font-weight:600;color:var(--ti-base);background:var(--cr-base);line-height:1.5;-webkit-font-smoothing:antialiased}
-:focus-visible{outline:2px solid var(--te-claro);outline-offset:3px}
-.saltar{position:absolute;left:12px;top:0;z-index:80;transform:translateY(-130%);background:var(--cr-puro);color:var(--pe-hondo);padding:10px 16px;border-radius:0 0 12px 12px;font-weight:800;text-decoration:none}
-.saltar:focus{transform:none}
-.barra{position:sticky;top:0;z-index:40;background:rgba(23,63,80,.97);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid rgba(228,197,181,.16)}
-.barra-int{display:flex;align-items:center;gap:14px;min-height:70px;padding:12px clamp(18px,2vw,28px)}
-.marca{display:flex;align-items:center;gap:11px;text-decoration:none;min-width:0}
-.marca-icono{width:36px;height:36px;border-radius:12px;flex:0 0 auto;border:1px solid rgba(228,197,181,.28);overflow:hidden}
-.marca-icono img{width:100%;height:100%;display:block}
-.marca-txt{font-family:var(--fam-titulo);font-weight:700;font-size:1.22rem;color:var(--cr-base);white-space:nowrap}
-.contexto{margin:0;color:var(--si-rosa);font-size:.92rem;font-weight:700;white-space:nowrap}
-.volver{margin-left:auto;text-decoration:none;color:var(--si-rosa);font-weight:800;font-size:.98rem;padding:9px 14px;border-radius:9px;min-height:44px;display:inline-flex;align-items:center}
-.volver:hover{background:rgba(228,197,181,.13);color:var(--cr-puro)}
-.intro{padding:clamp(28px,4vw,48px) clamp(18px,4vw,40px) 8px;max-width:980px}
-.etiqueta{margin:0 0 8px;font-size:.72rem;letter-spacing:.14em;font-weight:800;color:var(--te-hondo)}
-h1{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.12;letter-spacing:-.02em;color:var(--pe-hondo)}
-h1 .resalte{color:var(--te-base)}
-.bajada{margin:12px 0 0;max-width:40rem;font-size:1.05rem;color:var(--ti-suave)}
-.escenario{position:relative;height:clamp(280px,42vw,420px);margin:8px 0 0;perspective:1200px;perspective-origin:50% 46%;overflow:hidden;touch-action:none;cursor:grab}
-.escenario:active{cursor:grabbing}
-.halo{position:absolute;left:50%;top:54%;width:min(46vw,420px);height:180px;transform:translate(-50%,-40%);background:radial-gradient(circle, rgba(168,81,47,.28), transparent 68%);pointer-events:none;filter:blur(6px)}
-.flujo{position:absolute;inset:0;transform-style:preserve-3d}
-.pieza{position:absolute;left:50%;top:50%;width:min(42vw,400px);height:min(54vw,268px);margin:0;padding:0;border:0;background:transparent;transform:translate(-50%,-54%) translateX(calc(var(--x) + var(--arrastre, 0px))) translateZ(var(--z)) rotateY(var(--ry)) scale(var(--s));opacity:var(--o);z-index:var(--pila);transition:transform var(--dur) var(--sal),opacity var(--dur) var(--sal),filter var(--dur) var(--sal);filter:blur(var(--blur));cursor:pointer}
-.pieza[hidden]{display:none}
-.cara{height:100%;border-radius:22px;background:linear-gradient(165deg,#24566a 0%,#173f50 62%,#123445 100%);color:var(--cr-puro);border:1px solid rgba(228,197,181,.2);box-shadow:0 16px 30px rgba(8,22,30,.22);display:flex;flex-direction:column;justify-content:space-between;padding:18px 18px 16px;overflow:hidden;position:relative}
-.pieza.activa .cara{box-shadow:var(--sombra-alta), 0 0 0 1px rgba(224,138,95,.45);border-color:rgba(224,138,95,.55)}
-.pieza.activa .cara::after{content:"";position:absolute;left:12%;right:12%;bottom:-18px;height:28px;background:radial-gradient(ellipse, rgba(224,138,95,.45), transparent 70%);filter:blur(6px);pointer-events:none}
-.mini-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--si-rosa);font-weight:800}
-.pronto{background:rgba(255,252,247,.12);border-radius:999px;padding:4px 8px;letter-spacing:.04em}
-.cifra{font-family:var(--fam-num);font-weight:700;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:.04em;line-height:1;color:var(--cr-puro)}
-.mini-nombre{font-family:var(--fam-titulo);font-size:1.15rem;font-weight:700;margin:8px 0 0}
-.anillo{width:74px;height:74px;border-radius:50%;border:6px solid rgba(228,197,181,.25);border-top-color:var(--acento, var(--te-claro));margin-left:auto}
-.barra-t,.semaforo{display:flex;gap:6px;align-items:flex-end;height:54px}
-.barra-t i{display:block;width:14px;border-radius:7px 7px 3px 3px;background:var(--acento, var(--te-claro));opacity:.85}
-.semaforo i{width:18px;height:18px;border-radius:50%;background:rgba(228,197,181,.25)}
-.semaforo i.on{background:var(--acento, var(--te-claro))}
-.equipos{display:flex;gap:8px}
-.equipos b{min-width:64px;padding:8px 10px;border-radius:12px;background:rgba(255,252,247,.08);font-family:var(--fam-num);font-size:.95rem}
-.controles{display:flex;align-items:center;justify-content:center;gap:16px;padding:0 18px 8px}
-.nav-btn{width:48px;height:48px;border-radius:999px;border:1px solid rgba(228,197,181,.45);background:#173f50;color:var(--cr-puro);cursor:pointer;font-size:1.3rem;line-height:1}
-.nav-btn:hover{background:#1d4c62}
-.posicion{min-width:5.5rem;text-align:center;font-family:var(--fam-num);font-weight:700;font-size:1.05rem;color:var(--pe-hondo)}
-.pista{width:min(280px,46vw);height:3px;border-radius:3px;background:var(--cr-borde);overflow:hidden}
-.pista span{display:block;height:100%;width:var(--avance);background:var(--te-base);transition:width var(--dur) var(--sal)}
-.pista-ayuda{margin:0;text-align:center;color:var(--ti-suave);font-size:.92rem}
-.panel{max-width:760px;margin:18px auto 8px;padding:22px 24px 20px;background:var(--cr-puro);border:1px solid var(--cr-borde);border-radius:22px;box-shadow:var(--sombra)}
-.panel.cambia{animation:entra .42s var(--sal)}
-@keyframes entra{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}
-.panel .cat{margin:0;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--te-hondo)}
-.panel h2{margin:6px 0 8px;font-family:var(--fam-titulo);font-size:clamp(1.5rem,3vw,2rem);color:var(--pe-hondo);line-height:1.15}
-.panel p{margin:0;color:var(--ti-suave)}
-.meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin:14px 0;font-family:var(--fam-num);font-size:.95rem;color:var(--pe-base)}
-.acciones{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border-radius:11px;border:0;background:var(--te-base);color:var(--cr-puro);font:800 1rem/1 var(--fam-cuerpo);text-decoration:none;cursor:pointer;box-shadow:0 4px 14px rgba(143,58,30,.32)}
-.btn:hover{background:var(--te-medio)}
-.btn-sec{background:transparent;color:var(--pe-hondo);border:2px solid rgba(143,58,30,.35);box-shadow:none}
-.btn-sec:hover{background:rgba(168,81,47,.08)}
-.quieto{display:inline-flex;align-items:center;min-height:48px;padding:0 4px;color:var(--ti-suave);font-weight:800}
-.todos{padding:36px clamp(18px,4vw,40px) 20px;max-width:1100px;margin:0 auto}
-.todos h2{font-family:var(--fam-titulo);font-size:1.6rem;margin:0 0 12px;color:var(--pe-hondo)}
-.filtros{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
-.filtros button{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--cr-borde);background:var(--cr-puro);color:var(--pe-base);font:800 .92rem/1 var(--fam-cuerpo);cursor:pointer}
-.filtros button[aria-pressed="true"]{background:var(--te-base);color:var(--cr-puro);border-color:transparent}
-.rejilla{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.rejilla button{width:100%;text-align:left;border:1px solid var(--cr-borde);background:var(--cr-puro);border-radius:18px;padding:14px 16px;cursor:pointer;color:inherit;font:inherit}
-.rejilla button[aria-current="true"]{border-color:var(--te-claro);box-shadow:0 0 0 2px rgba(224,138,95,.35)}
-.rejilla strong{display:block;font-family:var(--fam-titulo);font-size:1.05rem;color:var(--pe-hondo)}
-.rejilla span{display:block;margin-top:4px;color:var(--ti-suave);font-size:.92rem}
-.nota{max-width:760px;margin:8px auto 28px;padding:0 22px;color:var(--ti-suave);font-size:.95rem}
-.pie{padding:18px;text-align:center;color:var(--si-rosa);background:var(--pe-hondo);font-size:.9rem}
-.vivo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media(max-width:720px){
-  .contexto{display:none}
-  .escenario{height:300px}
-  .pieza{width:min(68vw,320px);height:210px}
-  .panel{margin-inline:16px}
+/* 02. Restablecimiento */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
-@media(prefers-reduced-motion:reduce){
-  .pieza,.pista span,.panel.cambia{transition:none;animation:none}
+html,
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+body {
+  font-family: var(--fam-cuerpo);
+  font-weight: 600;
+  color: var(--ti-base);
+  background:
+    radial-gradient(900px 420px at 12% -10%, rgba(224, 138, 95, 0.16), transparent 60%),
+    linear-gradient(180deg, #f3ebe1 0%, var(--cr-base) 28%, #efe4d6 100%);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+button,
+a {
+  font-family: inherit;
+}
+/* 03. Accesibilidad */
+:focus-visible {
+  outline: 2px solid var(--te-claro);
+  outline-offset: 3px;
+}
+.saltar {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  z-index: 80;
+  transform: translateY(-130%);
+  background: var(--cr-puro);
+  color: var(--pe-hondo);
+  padding: 10px 16px;
+  border-radius: 0 0 12px 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.saltar:focus {
+  transform: none;
+}
+.vivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+/* 04. Barra superior */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-barra);
+  background: rgba(23, 63, 80, 0.97);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid rgba(228, 197, 181, 0.16);
+}
+.barra-int {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 70px;
+  padding: 12px clamp(18px, 2vw, 28px);
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  min-width: 0;
+}
+.marca-icono {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(228, 197, 181, 0.28);
+  overflow: hidden;
+}
+.marca-icono img {
+  width: 100%;
+  height: 100%;
+}
+.marca-txt {
+  font-family: var(--fam-titulo);
+  font-weight: 700;
+  font-size: 1.22rem;
+  color: var(--cr-base);
+  white-space: nowrap;
+}
+.contexto {
+  margin: 0;
+  color: var(--si-rosa);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.volver {
+  margin-left: auto;
+  text-decoration: none;
+  color: var(--si-rosa);
+  font-weight: 800;
+  font-size: 0.98rem;
+  padding: 9px 14px;
+  border-radius: 9px;
+  min-height: var(--toque);
+  display: inline-flex;
+  align-items: center;
+}
+.volver:hover {
+  background: rgba(228, 197, 181, 0.13);
+  color: var(--cr-puro);
+}
+/* 05. Introducción */
+.intro {
+  position: relative;
+  padding: clamp(28px, 4vw, 46px) clamp(18px, 4vw, 40px) 6px;
+  max-width: var(--ancho);
+}
+.etiqueta {
+  margin: 0 0 8px;
+  font-size: var(--fs-etiqueta);
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  color: var(--te-hondo);
+  text-transform: uppercase;
+}
+h1 {
+  margin: 0;
+  font-family: var(--fam-titulo);
+  font-weight: 700;
+  font-size: var(--fs-titulo);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--pe-hondo);
+  max-width: 16ch;
+}
+h1 .resalte {
+  color: var(--te-base);
+}
+.bajada {
+  margin: 12px 0 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--ti-suave);
+}
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.leyenda li {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.72);
+  border: 1px solid var(--cr-borde);
+  color: var(--pe-base);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+.leyenda b {
+  font-family: var(--fam-num);
+  font-weight: 700;
+  margin-right: 6px;
+}
+/* 06. Escenario */
+.sala {
+  position: relative;
+  margin: 10px clamp(8px, 2vw, 24px) 0;
+  border-radius: 32px;
+  overflow: hidden;
+  background: #123445;
+  box-shadow: var(--sombra-alta);
+}
+.escenario {
+  position: relative;
+  height: var(--alto-escena);
+  perspective: var(--perspectiva);
+  perspective-origin: 50% 42%;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  z-index: var(--z-escena);
+}
+.escenario:active {
+  cursor: grabbing;
+}
+.escenario.gestando {
+  cursor: grabbing;
+}
+/* 07. Atmósfera */
+.fondo,
+.atmosfera,
+.horizonte,
+.plano {
+  position: absolute;
+  pointer-events: none;
+}
+.fondo {
+  inset: 0;
+  background:
+    radial-gradient(80% 70% at 50% 18%, #2c6278 0%, transparent 58%),
+    linear-gradient(180deg, #1b4c60 0%, #12384a 48%, #0f2d3a 100%);
+}
+.fondo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 252, 247, 0.05) 0.6px, transparent 0.6px);
+  background-size: 7px 7px;
+  opacity: 0.35;
+}
+.atmosfera {
+  left: 50%;
+  top: 46%;
+  width: min(62%, 640px);
+  height: 280px;
+  transform: translate(-50%, -42%);
+  background: radial-gradient(circle, var(--ambiente), transparent 68%);
+  filter: blur(8px);
+  transition: background var(--dur-ambiente) var(--sal);
+}
+.horizonte {
+  left: 8%;
+  right: 8%;
+  bottom: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(228, 197, 181, 0.35), transparent);
+}
+.plano {
+  left: 18%;
+  right: 18%;
+  bottom: 11%;
+  height: 54px;
+  background: radial-gradient(ellipse at center, rgba(8, 22, 30, 0.45), transparent 70%);
+  filter: blur(2px);
+}
+.flujo {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+/* 08. Cover Flow */
+.pieza {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(40vw, 390px);
+  height: min(48vw, 292px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform:
+    translate(-50%, -50%)
+    translate3d(calc(var(--x) + var(--arrastre, 0px)), var(--y), var(--z))
+    rotateY(var(--ry))
+    rotateX(var(--rx))
+    scale(var(--s));
+  opacity: var(--o);
+  z-index: var(--pila);
+  filter: blur(var(--blur)) saturate(var(--sat));
+  transition:
+    transform var(--dur) var(--ease-suave),
+    opacity var(--dur) var(--sal),
+    filter var(--dur) var(--sal);
+  cursor: pointer;
+}
+.pieza[hidden] {
+  display: none;
+}
+.escenario.gestando .pieza {
+  transition: none;
+}
+/* 09. Piezas */
+.marco {
+  display: block;
+  height: 100%;
+  padding: 8px;
+  border-radius: calc(var(--radio-pieza) + 6px);
+  background: linear-gradient(160deg, rgba(255, 252, 247, 0.22), rgba(15, 45, 58, 0.2) 40%, rgba(224, 138, 95, 0.18));
+  box-shadow: var(--sombra-contacto);
+}
+.superficie {
+  height: 100%;
+  border-radius: var(--radio-pieza);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.08), transparent 28%),
+    linear-gradient(165deg, #24566a 0%, #173f50 58%, #102f3d 100%);
+  color: var(--cr-puro);
+  border: 1px solid rgba(228, 197, 181, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 252, 247, 0.18), inset 0 -18px 24px rgba(8, 22, 30, 0.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 16px 14px;
+  overflow: hidden;
+  position: relative;
+}
+.superficie::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--acento, var(--te-claro));
+}
+.cabecera,
+.pantalla,
+.pie-pieza {
+  position: relative;
+  z-index: 1;
+}
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-etiqueta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--si-rosa);
+  font-weight: 800;
+}
+.pronto {
+  background: rgba(255, 252, 247, 0.12);
+  border-radius: 999px;
+  padding: 4px 8px;
+  letter-spacing: 0.04em;
+}
+.listo {
+  background: rgba(50, 122, 82, 0.28);
+  color: #e7f1ea;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+.cifra {
+  font-family: var(--fam-num);
+  font-weight: 700;
+  font-size: var(--fs-cifra);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--cr-puro);
+}
+.mini-nombre {
+  font-family: var(--fam-titulo);
+  font-size: var(--fs-tarjeta);
+  font-weight: 700;
+  margin: 8px 0 0;
+  line-height: 1.15;
+}
+.mini-sub {
+  display: block;
+  margin-top: 4px;
+  color: var(--si-rosa);
+  font-size: var(--fs-aux);
+  font-weight: 700;
+}
+/* 10. Variantes */
+.anillo {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  border: 7px solid rgba(228, 197, 181, 0.22);
+  border-top-color: var(--acento, var(--te-claro));
+  border-right-color: var(--acento, var(--te-claro));
+  margin-left: auto;
+  box-shadow: inset 0 0 0 6px rgba(15, 45, 58, 0.25);
+}
+.barra-t,
+.semaforo {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  height: 58px;
+}
+.barra-t i {
+  display: block;
+  width: 14px;
+  border-radius: 7px 7px 3px 3px;
+  background: var(--acento, var(--te-claro));
+  opacity: 0.9;
+}
+.semaforo i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(228, 197, 181, 0.25);
+}
+.semaforo i.on {
+  background: var(--acento, var(--te-claro));
+  box-shadow: 0 0 12px var(--acento, var(--te-claro));
+}
+.equipos {
+  display: flex;
+  gap: 8px;
+}
+.equipos b {
+  min-width: 68px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.08);
+  border: 1px solid rgba(228, 197, 181, 0.16);
+  font-family: var(--fam-num);
+  font-size: var(--fs-cifra-sec);
+}
+.pantalla {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pieza.activa .marco {
+  background: linear-gradient(165deg, rgba(255, 252, 247, 0.38), rgba(224, 138, 95, 0.28));
+  box-shadow: var(--sombra-alta), 0 22px 30px rgba(8, 22, 30, 0.28);
+}
+.pieza.activa .superficie {
+  border-color: rgba(224, 138, 95, 0.7);
+}
+.pieza.vecina {
+  cursor: pointer;
+}
+.pieza:hover .superficie,
+.pieza:focus-visible .superficie {
+  border-color: rgba(228, 197, 181, 0.55);
+}
+.pieza.activa:active .marco {
+  transform: translateY(1px);
+}
+/* 11. Controles */
+.controles {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 8px 18px 14px;
+}
+.nav-btn {
+  width: var(--toque);
+  height: var(--toque);
+  border-radius: 999px;
+  border: 1px solid rgba(228, 197, 181, 0.45);
+  background: #173f50;
+  color: var(--cr-puro);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(8, 22, 30, 0.22);
+  transition: background var(--dur-rapida) var(--sal), transform var(--dur-rapida) var(--sal);
+}
+.nav-btn svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+.nav-btn:hover {
+  background: #1d4c62;
+}
+.nav-btn:active {
+  transform: translateY(1px);
+}
+.nav-btn[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+.posicion {
+  min-width: 7.5rem;
+  text-align: center;
+  font-family: var(--fam-num);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--cr-puro);
+}
+.posicion small {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--fam-cuerpo);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--si-rosa);
+  font-weight: 800;
+}
+.pista {
+  width: min(280px, 46vw);
+  height: 3px;
+  margin: 8px auto 0;
+  border-radius: 3px;
+  background: rgba(228, 197, 181, 0.25);
+  overflow: hidden;
+}
+.pista span {
+  display: block;
+  height: 100%;
+  width: var(--avance);
+  background: var(--te-claro);
+  transition: width var(--dur) var(--sal);
+}
+.pista-ayuda {
+  margin: 0;
+  padding: 0 16px 16px;
+  text-align: center;
+  color: var(--si-rosa);
+  font-size: var(--fs-aux);
+}
+/* 13. Riel */
+.riel-caja {
+  padding: 0 16px 18px;
+}
+.riel {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  scroll-snap-type: x proximity;
+}
+.riel button {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  min-height: var(--toque);
+  min-width: 132px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(228, 197, 181, 0.22);
+  background: rgba(15, 45, 58, 0.35);
+  color: var(--cr-puro);
+  text-align: left;
+  cursor: pointer;
+}
+.riel button[aria-current="true"] {
+  background: var(--cr-puro);
+  color: var(--pe-hondo);
+  border-color: transparent;
+}
+.riel strong {
+  display: block;
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+.riel span {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--fam-num);
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+/* 12. Panel */
+.panel {
+  max-width: 860px;
+  margin: 22px auto 8px;
+  padding: 0;
+  background: var(--cr-puro);
+  border: 1px solid var(--cr-borde);
+  border-radius: var(--radio-panel);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+.panel.cambia .panel-cuerpo {
+  animation: entra var(--dur-media) var(--sal);
+}
+@keyframes entra {
+  from {
+    opacity: 0.4;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.panel-cinta {
+  height: 6px;
+  background: var(--acento, var(--te-base));
+}
+.panel-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
+  gap: 18px;
+  padding: 22px 24px 20px;
+}
+.panel .cat {
+  margin: 0;
+  font-size: var(--fs-etiqueta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--te-hondo);
+}
+.panel h2 {
+  margin: 6px 0 8px;
+  font-family: var(--fam-titulo);
+  font-size: clamp(1.55rem, 3vw, 2.05rem);
+  color: var(--pe-hondo);
+  line-height: 1.15;
+}
+.panel p {
+  margin: 0;
+  color: var(--ti-suave);
+  max-width: 42rem;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 14px 0 0;
+  font-family: var(--fam-num);
+  font-size: var(--fs-cifra-sec);
+  color: var(--pe-base);
+}
+.ficha-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f6efe6;
+  border: 1px solid var(--cr-borde);
+}
+.dato {
+  margin: 0;
+}
+.dato b {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--te-hondo);
+}
+.dato span {
+  font-family: var(--fam-num);
+  color: var(--pe-hondo);
+}
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--toque);
+  padding: 12px 20px;
+  border-radius: 11px;
+  border: 0;
+  background: var(--te-base);
+  color: var(--cr-puro);
+  font: 800 1rem/1 var(--fam-cuerpo);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(143, 58, 30, 0.32);
+}
+.btn:hover {
+  background: var(--te-medio);
+}
+.btn-sec {
+  background: transparent;
+  color: var(--pe-hondo);
+  border: 2px solid rgba(143, 58, 30, 0.35);
+  box-shadow: none;
+}
+.btn-sec:hover {
+  background: rgba(168, 81, 47, 0.08);
+}
+.quieto {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque);
+  padding: 0 4px;
+  color: var(--ti-suave);
+  font-weight: 800;
+}
+/* 14. Filtros */
+.todos {
+  padding: 42px clamp(18px, 4vw, 40px) 12px;
+  max-width: var(--ancho);
+  margin: 0 auto;
+}
+.todos h2 {
+  font-family: var(--fam-titulo);
+  font-size: var(--fs-seccion);
+  margin: 0 0 8px;
+  color: var(--pe-hondo);
+}
+.todos-intro {
+  margin: 0 0 14px;
+  color: var(--ti-suave);
+  max-width: 40rem;
+}
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.filtros button {
+  min-height: var(--toque);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--cr-borde);
+  background: var(--cr-puro);
+  color: var(--pe-base);
+  font: 800 0.92rem/1 var(--fam-cuerpo);
+  cursor: pointer;
+}
+.filtros button:hover {
+  border-color: var(--te-claro);
+}
+.filtros button[aria-pressed="true"] {
+  background: var(--te-base);
+  color: var(--cr-puro);
+  border-color: transparent;
+}
+.barra-filtro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.cuenta {
+  margin: 0;
+  font-family: var(--fam-num);
+  color: var(--pe-base);
+  font-size: 0.92rem;
+}
+.limpiar {
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--te-hondo);
+  font: 800 0.92rem/1 var(--fam-cuerpo);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.limpiar[hidden] {
+  display: none;
+}
+/* 15. Catálogo */
+.rejilla {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.rejilla button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--cr-borde);
+  background: var(--cr-puro);
+  border-radius: 18px;
+  padding: 14px 16px 16px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  box-shadow: var(--sombra);
+  border-top: 4px solid var(--acento, var(--te-claro));
+}
+.rejilla button:hover {
+  transform: translateY(-2px);
+}
+.rejilla button[aria-current="true"] {
+  box-shadow: 0 0 0 2px rgba(224, 138, 95, 0.45);
+}
+.rejilla .indice {
+  font-family: var(--fam-num);
+  font-size: 0.78rem;
+  color: var(--te-hondo);
+}
+.rejilla strong {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--fam-titulo);
+  font-size: 1.12rem;
+  color: var(--pe-hondo);
+}
+.rejilla .moda,
+.rejilla .sino {
+  display: block;
+  margin-top: 4px;
+  color: var(--ti-suave);
+  font-size: 0.92rem;
+}
+.vacio {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--cr-puro);
+  border: 1px solid var(--cr-borde);
+}
+.vacio[hidden] {
+  display: none;
+}
+.nota {
+  max-width: 760px;
+  margin: 8px auto 28px;
+  padding: 0 22px;
+  color: var(--ti-suave);
+  font-size: 0.95rem;
+}
+/* 17. Pie */
+.pie {
+  padding: 18px;
+  text-align: center;
+  color: var(--si-rosa);
+  background: var(--pe-hondo);
+  font-size: 0.9rem;
+}
+/* 18. Responsividad */
+@media (max-width: 420px) {
+  .marca-txt {
+    font-size: 1rem;
+  }
+  .pieza {
+    width: min(78vw, 300px);
+    height: 220px;
+  }
+  .escenario {
+    height: 300px;
+  }
+}
+@media (max-width: 720px) {
+  .contexto {
+    display: none;
+  }
+  .escenario {
+    height: 320px;
+  }
+  .pieza {
+    width: min(70vw, 320px);
+    height: 230px;
+  }
+  .panel {
+    margin-inline: 16px;
+  }
+  .panel-cuerpo {
+    grid-template-columns: 1fr;
+  }
+  .filtros {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+}
+@media (min-width: 721px) and (max-width: 1024px) {
+  .pieza {
+    width: min(42vw, 340px);
+  }
+}
+@media (min-width: 1400px) {
+  .sala {
+    margin-inline: auto;
+    max-width: 1280px;
+  }
+}
+@media (max-height: 760px) and (min-width: 900px) {
+  .escenario {
+    height: 300px;
+  }
+  .intro {
+    padding-top: 18px;
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .escenario {
+    height: 240px;
+  }
+  .bajada,
+  .leyenda {
+    display: none;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .rejilla button {
+    transition: transform var(--dur-rapida) var(--sal);
+  }
+}
+@media (pointer: coarse) {
+  .nav-btn,
+  .filtros button,
+  .riel button {
+    min-height: 48px;
+  }
+}
+@media (prefers-contrast: more) {
+  .superficie,
+  .panel,
+  .rejilla button {
+    border-width: 2px;
+  }
+}
+/* 20. Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .pieza,
+  .pista span,
+  .atmosfera,
+  .panel.cambia .panel-cuerpo,
+  .rejilla button {
+    transition: none;
+    animation: none;
+  }
 }
 </style>
 </head>
@@ -124,225 +1002,407 @@ h1 .resalte{color:var(--te-base)}
     <p class="etiqueta">Herramientas para el aula</p>
     <h1>Cronómetros para cada <span class="resalte">momento</span> de la clase</h1>
     <p class="bajada">Explora una colección de cronómetros diseñados para acompañar actividades, desafíos, pausas e intervalos de trabajo.</p>
+    <ul class="leyenda" id="leyenda"></ul>
   </section>
-  <div class="escenario" id="escenario" tabindex="0" aria-roledescription="carrusel" aria-label="Colección de cronómetros">
-    <div class="halo" aria-hidden="true"></div>
-    <div class="flujo" id="flujo"></div>
-  </div>
-  <div class="controles">
-    <button type="button" class="nav-btn" id="anterior" aria-label="Cronómetro anterior">‹</button>
-    <div>
-      <div class="posicion" id="posicion">01 / 08</div>
-      <div class="pista" aria-hidden="true"><span id="avance"></span></div>
+  <section class="sala" aria-label="Explorador">
+    <div class="escenario" id="escenario" tabindex="0" aria-roledescription="carrusel" aria-label="Colección de cronómetros">
+      <div class="fondo" aria-hidden="true"></div>
+      <div class="atmosfera" id="atmosfera" aria-hidden="true"></div>
+      <div class="horizonte" aria-hidden="true"></div>
+      <div class="plano" aria-hidden="true"></div>
+      <div class="flujo" id="flujo"></div>
     </div>
-    <button type="button" class="nav-btn" id="siguiente" aria-label="Cronómetro siguiente">›</button>
-  </div>
-  <p class="pista-ayuda">Desliza o usa las flechas para explorar.</p>
-  <section class="panel" id="panel" aria-live="polite"></section>
+    <div class="controles">
+      <button type="button" class="nav-btn" id="anterior" aria-label="Cronómetro anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 8.5 12l6 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div>
+        <div class="posicion" id="posicion">01 / 08<small id="pos-nombre"></small></div>
+        <div class="pista" aria-hidden="true"><span id="avance"></span></div>
+      </div>
+      <button type="button" class="nav-btn" id="siguiente" aria-label="Cronómetro siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15.5 12l-6 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <p class="pista-ayuda">Desliza o usa las flechas para explorar.</p>
+    <div class="riel-caja">
+      <div class="riel" id="riel" role="tablist" aria-label="Recorrido de la colección"></div>
+    </div>
+  </section>
+  <section class="panel" id="panel"></section>
   <p class="vivo" id="aviso" aria-live="polite"></p>
   <section class="todos" aria-labelledby="titulo-todos">
     <h2 id="titulo-todos">Todos los cronómetros</h2>
+    <p class="todos-intro">La misma colección, en una biblioteca para encontrar un cronómetro sin recorrer el escenario.</p>
     <div class="filtros" id="filtros" role="group" aria-label="Filtrar por categoría"></div>
+    <div class="barra-filtro">
+      <p class="cuenta" id="cuenta" aria-live="polite"></p>
+      <button type="button" class="limpiar" id="limpiar" hidden>Limpiar filtro</button>
+    </div>
+    <div class="vacio" id="vacio" hidden>
+      <p>Ningún cronómetro coincide con este filtro.</p>
+    </div>
     <ul class="rejilla" id="rejilla"></ul>
   </section>
   <p class="nota">Cada cronómetro se abre como una herramienta independiente y puede utilizarse en proyector, pizarra digital, tableta o pantalla.</p>
 </main>
 <footer class="pie">Secuencia321</footer>
+<noscript>
+  <p>La colección necesita JavaScript para el escenario. Los cronómetros de muestra son: clásico, cuenta regresiva, circular, desafío, equipos, semáforo, intervalos y ronda rápida. Todavía no tienen archivo propio.</p>
+</noscript>
 <script>
-(function(){
+(function () {
   /* Colección demostrativa.
      Cuando el HTML de un cronómetro exista, escribe su ruta relativa en `ruta`
      (por ejemplo "cronometro/clasico.html", junto a este índice) y cambia `estado` a "disponible".
-     Con `ruta` vacía no hay enlace: la pieza queda como «Próximamente». */
+     Con `ruta` vacía no hay enlace: la pieza queda como «Próximamente».
+     Campos opcionales (thumbnail, fases, uso) se muestran solo si existen. */
   var COLECCION = [
-    {id:"clasico", nombre:"Cronómetro clásico", subtitulo:"Cuenta que sigue", descripcion:"Marca el tiempo de una explicación o de una actividad que avanza sin un final fijo.", ruta:"", imagen:"", categoria:"ascendente", modalidad:"Cuenta ascendente", cifra:"00:00", acento:"#e08a5f", estado:"proximamente", forma:"digitos"},
-    {id:"regresiva", nombre:"Cuenta regresiva", subtitulo:"El cierre se ve", descripcion:"Una cuenta hacia cero para un desafío, una puesta en común o el final de una ronda.", ruta:"", imagen:"", categoria:"regresiva", modalidad:"Cuenta regresiva", cifra:"05:00", acento:"#a8512f", estado:"proximamente", forma:"anillo"},
-    {id:"circular", nombre:"Cronómetro circular", subtitulo:"La vuelta completa", descripcion:"El tiempo se lee en un anillo. Sirve cuando el grupo necesita ver cuánto falta de un vistazo.", ruta:"", imagen:"", categoria:"ascendente", modalidad:"Cuenta ascendente", cifra:"12:40", acento:"#e4c5b5", estado:"proximamente", forma:"anillo"},
-    {id:"desafio", nombre:"Reloj de desafío", subtitulo:"Una ronda corta", descripcion:"Pensado para un reto breve en el que el límite forma parte de la consigna.", ruta:"", imagen:"", categoria:"dinamicas", modalidad:"Dinámica rápida", cifra:"00:45", acento:"#e08a5f", estado:"proximamente", forma:"barra"},
-    {id:"equipos", nombre:"Temporizador por equipos", subtitulo:"Turnos visibles", descripcion:"Dos o más tiempos en paralelo para que cada equipo vea su propio turno.", ruta:"", imagen:"", categoria:"equipos", modalidad:"Trabajo por equipos", cifra:"03:00", acento:"#327a52", estado:"proximamente", forma:"equipos"},
-    {id:"semaforo", nombre:"Semáforo de tiempo", subtitulo:"Verde, ámbar, cierre", descripcion:"El color cambia con el tramo. Útil cuando el aviso no debe depender de leer la cifra.", ruta:"", imagen:"", categoria:"intervalos", modalidad:"Intervalos", cifra:"02:00", acento:"#b55537", estado:"proximamente", forma:"semaforo"},
-    {id:"intervalos", nombre:"Intervalos de trabajo", subtitulo:"Trabajo y pausa", descripcion:"Alterna un tramo de trabajo y una pausa corta, sin tener que reiniciar a mano.", ruta:"", imagen:"", categoria:"intervalos", modalidad:"Intervalos 25 / 05", cifra:"25:00", acento:"#674a60", estado:"proximamente", forma:"barra"},
-    {id:"ronda", nombre:"Ronda rápida", subtitulo:"Pocos segundos", descripcion:"Una ventana muy corta para responder, pasar la palabra o cerrar una idea.", ruta:"", imagen:"", categoria:"dinamicas", modalidad:"Dinámica rápida", cifra:"00:30", acento:"#e08a5f", estado:"proximamente", forma:"digitos"}
+    { id: "clasico", nombre: "Cronómetro clásico", subtitulo: "Cuenta que sigue", descripcion: "Marca el tiempo de una explicación o de una actividad que avanza sin un final fijo.", ruta: "", imagen: "", categoria: "ascendente", modalidad: "Cuenta ascendente", cifra: "00:00", acento: "#e08a5f", estado: "proximamente", forma: "digitos" },
+    { id: "regresiva", nombre: "Cuenta regresiva", subtitulo: "El cierre se ve", descripcion: "Una cuenta hacia cero para un desafío, una puesta en común o el final de una ronda.", ruta: "", imagen: "", categoria: "regresiva", modalidad: "Cuenta regresiva", cifra: "05:00", acento: "#a8512f", estado: "proximamente", forma: "anillo" },
+    { id: "circular", nombre: "Cronómetro circular", subtitulo: "La vuelta completa", descripcion: "El tiempo se lee en un anillo. Sirve cuando el grupo necesita ver cuánto falta de un vistazo.", ruta: "", imagen: "", categoria: "ascendente", modalidad: "Cuenta ascendente", cifra: "12:40", acento: "#e4c5b5", estado: "proximamente", forma: "anillo" },
+    { id: "desafio", nombre: "Reloj de desafío", subtitulo: "Una ronda corta", descripcion: "Pensado para un reto breve en el que el límite forma parte de la consigna.", ruta: "", imagen: "", categoria: "dinamicas", modalidad: "Dinámica rápida", cifra: "00:45", acento: "#e08a5f", estado: "proximamente", forma: "barra" },
+    { id: "equipos", nombre: "Temporizador por equipos", subtitulo: "Turnos visibles", descripcion: "Dos o más tiempos en paralelo para que cada equipo vea su propio turno.", ruta: "", imagen: "", categoria: "equipos", modalidad: "Trabajo por equipos", cifra: "03:00", acento: "#327a52", estado: "proximamente", forma: "equipos", fases: "2" },
+    { id: "semaforo", nombre: "Semáforo de tiempo", subtitulo: "Verde, ámbar, cierre", descripcion: "El color cambia con el tramo. Útil cuando el aviso no debe depender de leer la cifra.", ruta: "", imagen: "", categoria: "intervalos", modalidad: "Intervalos", cifra: "02:00", acento: "#b55537", estado: "proximamente", forma: "semaforo", fases: "3" },
+    { id: "intervalos", nombre: "Intervalos de trabajo", subtitulo: "Trabajo y pausa", descripcion: "Alterna un tramo de trabajo y una pausa corta, sin tener que reiniciar a mano.", ruta: "", imagen: "", categoria: "intervalos", modalidad: "Intervalos 25 / 05", cifra: "25:00", acento: "#674a60", estado: "proximamente", forma: "barra", fases: "2" },
+    { id: "ronda", nombre: "Ronda rápida", subtitulo: "Pocos segundos", descripcion: "Una ventana muy corta para responder, pasar la palabra o cerrar una idea.", ruta: "", imagen: "", categoria: "dinamicas", modalidad: "Dinámica rápida", cifra: "00:30", acento: "#e08a5f", estado: "proximamente", forma: "digitos" }
   ];
   var FILTROS = [
-    ["todas","Todas"],
-    ["ascendente","Cuenta ascendente"],
-    ["regresiva","Cuenta regresiva"],
-    ["intervalos","Intervalos"],
-    ["equipos","Trabajo por equipos"],
-    ["dinamicas","Dinámicas rápidas"]
+    ["todas", "Todas"],
+    ["ascendente", "Cuenta ascendente"],
+    ["regresiva", "Cuenta regresiva"],
+    ["intervalos", "Intervalos"],
+    ["equipos", "Trabajo por equipos"],
+    ["dinamicas", "Dinámicas rápidas"]
   ];
-  var filtro = "todas";
-  var activo = 0;
-  var arrastrando = false;
-  var origen = 0;
-  var delta = 0;
-  var salto = false;
-  var reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var Estado = {
+    filtro: "todas",
+    activo: 0,
+    arrastrando: false,
+    origen: 0,
+    delta: 0,
+    salto: false,
+    ultimo: 0,
+    velocidad: 0,
+    reducido: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  };
+  var Dom = {
+    escenario: document.getElementById("escenario"),
+    flujo: document.getElementById("flujo"),
+    panel: document.getElementById("panel"),
+    riel: document.getElementById("riel"),
+    rejilla: document.getElementById("rejilla"),
+    filtros: document.getElementById("filtros"),
+    posicion: document.getElementById("posicion"),
+    posNombre: document.getElementById("pos-nombre"),
+    avance: document.getElementById("avance"),
+    aviso: document.getElementById("aviso"),
+    cuenta: document.getElementById("cuenta"),
+    limpiar: document.getElementById("limpiar"),
+    vacio: document.getElementById("vacio"),
+    leyenda: document.getElementById("leyenda"),
+    raiz: document.documentElement
+  };
 
-  function lista(){
-    return filtro === "todas" ? COLECCION : COLECCION.filter(function(c){ return c.categoria === filtro; });
+  function lista() {
+    if (Estado.filtro === "todas") return COLECCION;
+    return COLECCION.filter(function (c) { return c.categoria === Estado.filtro; });
   }
-  function esc(s){
-    return String(s).replace(/[&<>"]/g, function(c){
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
       if (c === "&") return "&" + "amp;";
       if (c === "<") return "&" + "lt;";
       if (c === ">") return "&" + "gt;";
       return "&" + "quot;";
     });
   }
-  function cara(c){
-    var extra = "";
-    if (c.forma === "anillo") extra = '<div class="anillo" style="--acento:' + c.acento + '"></div>';
-    if (c.forma === "barra") extra = '<div class="barra-t" style="--acento:' + c.acento + '"><i style="height:46%"></i><i style="height:72%"></i><i style="height:100%"></i><i style="height:58%"></i></div>';
-    if (c.forma === "semaforo") extra = '<div class="semaforo" style="--acento:' + c.acento + '"><i class="on"></i><i></i><i></i></div>';
-    if (c.forma === "equipos") extra = '<div class="equipos"><b>A 03:00</b><b>B 03:00</b></div>';
-    var pronto = c.estado !== "disponible" || !c.ruta ? '<span class="pronto">Próximamente</span>' : "<span></span>";
-    return '<span class="cara" style="--acento:' + c.acento + '"><span class="mini-top"><span>' + esc(c.modalidad) + '</span>' + pronto + '</span><span><span class="cifra">' + esc(c.cifra) + '</span><span class="mini-nombre">' + esc(c.nombre) + '</span></span>' + extra + '</span>';
+  function abierto(c) {
+    return c.estado === "disponible" && !!c.ruta;
   }
-  function deltaDe(i, n){
-    var d = i - activo;
+  function visual(c) {
+    if (c.imagen) return '<img src="' + esc(c.imagen) + '" alt="">';
+    if (c.forma === "anillo") return '<span class="anillo" style="--acento:' + c.acento + '"></span>';
+    if (c.forma === "barra") return '<span class="barra-t" style="--acento:' + c.acento + '"><i style="height:46%"></i><i style="height:72%"></i><i style="height:100%"></i><i style="height:58%"></i></span>';
+    if (c.forma === "semaforo") return '<span class="semaforo" style="--acento:' + c.acento + '"><i class="on"></i><i></i><i></i></span>';
+    if (c.forma === "equipos") return '<span class="equipos"><b>A 03:00</b><b>B 03:00</b></span>';
+    return "";
+  }
+  function cara(c) {
+    var marca = abierto(c) ? '<span class="listo">Disponible</span>' : '<span class="pronto">Próximamente</span>';
+    return '<span class="marco"><span class="superficie" style="--acento:' + c.acento + '">'
+      + '<span class="cabecera"><span>' + esc(c.modalidad) + '</span>' + marca + '</span>'
+      + '<span class="pantalla"><span><span class="cifra">' + esc(c.cifra) + '</span></span>' + visual(c) + '</span>'
+      + '<span class="pie-pieza"><span class="mini-nombre">' + esc(c.nombre) + '</span><span class="mini-sub">' + esc(c.subtitulo) + '</span></span>'
+      + '</span></span>';
+  }
+  function deltaDe(i, n) {
+    var d = i - Estado.activo;
     if (d > n / 2) d -= n;
     if (d < -n / 2) d += n;
     return d;
   }
-  function medidas(){
-    var w = document.getElementById("escenario").clientWidth;
-    if (w < 640) return {paso:w * 0.46, giro:34, fondo:90, lejos:1.15};
-    if (w < 980) return {paso:w * 0.30, giro:40, fondo:120, lejos:1.55};
-    return {paso:Math.min(w * 0.24, 250), giro:46, fondo:150, lejos:1.72};
+  function medidas() {
+    var w = Dom.escenario.clientWidth;
+    var alto = window.innerHeight;
+    if (w < 420) return { paso: w * 0.52, giro: 26, fondo: 70, hundir: 8, corte: 1 };
+    if (w < 720) return { paso: w * 0.46, giro: 32, fondo: 90, hundir: 10, corte: 1 };
+    if (alto < 760 && w > 900) return { paso: Math.min(w * 0.22, 220), giro: 40, fondo: 120, hundir: 6, corte: 2 };
+    if (w < 1100) return { paso: w * 0.28, giro: 42, fondo: 130, hundir: 12, corte: 2 };
+    return { paso: Math.min(w * 0.22, 250), giro: 48, fondo: 160, hundir: 14, corte: 2 };
   }
-  function colocar(){
+  function pose(d, m) {
+    var abs = Math.abs(d);
+    var signo = d < 0 ? -1 : d > 0 ? 1 : 0;
+    var x = d === 0 ? 0 : signo * (m.paso + (abs - 1) * m.paso * 0.72);
+    return {
+      x: x,
+      y: abs * m.hundir,
+      z: -abs * m.fondo,
+      ry: signo * Math.min(abs, 3) * (m.giro * 0.62),
+      rx: abs === 0 ? 0 : 5,
+      s: Math.max(0.58, 1 - abs * 0.15),
+      o: abs > m.corte ? 0 : Math.max(0.36, 1 - abs * 0.22),
+      blur: abs >= 2 && !Estado.reducido ? Math.min(1.1, (abs - 1) * 0.4) : 0,
+      sat: abs === 0 ? 1.05 : Math.max(0.75, 1 - abs * 0.08),
+      pila: 40 - abs,
+      visible: abs <= m.corte
+    };
+  }
+  function colorAmbiente(hex) {
+    var n = hex.replace("#", "");
+    var r = parseInt(n.slice(0, 2), 16);
+    var g = parseInt(n.slice(2, 4), 16);
+    var b = parseInt(n.slice(4, 6), 16);
+    return "rgba(" + r + "," + g + "," + b + ",0.42)";
+  }
+  function panelHtml(c) {
+    var abrir = abierto(c)
+      ? '<a class="btn" href="' + esc(c.ruta) + '">Abrir cronómetro</a>'
+      : '<span class="quieto">Próximamente</span>';
+    var fases = c.fases ? '<p class="dato"><b>Fases</b><span>' + esc(c.fases) + '</span></p>' : "";
+    return '<div class="panel-cinta" style="background:' + c.acento + '"></div><div class="panel-cuerpo">'
+      + '<div><p class="cat">' + esc(c.modalidad) + '</p><h2>' + esc(c.nombre) + '</h2><p>' + esc(c.descripcion) + '</p>'
+      + '<div class="meta"><span>' + esc(c.cifra) + '</span><span>' + esc(c.subtitulo) + '</span></div></div>'
+      + '<div class="ficha-lateral">' + fases
+      + '<p class="dato"><b>Estado</b><span>' + (abierto(c) ? "Disponible" : "Próximamente") + '</span></p>'
+      + '<div class="acciones">' + abrir + '<button type="button" class="btn btn-sec" id="ver-detalle">Ver detalles</button></div>'
+      + '</div></div>';
+  }
+  function colocar() {
     var items = lista();
     var n = items.length;
+    if (!n) {
+      Dom.vacio.hidden = false;
+      Dom.rejilla.hidden = true;
+      Dom.cuenta.textContent = "0";
+      return;
+    }
+    Dom.vacio.hidden = true;
+    Dom.rejilla.hidden = false;
     var m = medidas();
-    var piezas = document.querySelectorAll("#flujo .pieza");
-    piezas.forEach(function(el, i){
+    var piezas = Dom.flujo.querySelectorAll(".pieza");
+    piezas.forEach(function (el, i) {
       var d = deltaDe(i, n);
-      var abs = Math.abs(d);
-      var signo = d < 0 ? -1 : 1;
-      var x = d === 0 ? 0 : signo * (m.paso + (abs - 1) * m.paso * 0.78);
-      var visible = abs <= (window.innerWidth < 640 ? 1 : 2);
-      el.style.setProperty("--x", x + "px");
-      el.style.setProperty("--z", (-abs * m.fondo) + "px");
-      el.style.setProperty("--ry", (signo * Math.min(abs, 2) * m.giro * 0.55) + "deg");
-      el.style.setProperty("--s", String(Math.max(0.62, 1 - abs * 0.16)));
-      el.style.setProperty("--o", visible ? String(Math.max(0.38, 1 - abs * 0.24)) : "0");
-      el.style.setProperty("--blur", abs >= 2 && !reducido ? "0.6px" : "0px");
-      el.style.setProperty("--pila", String(30 - abs));
+      var p = pose(d, m);
+      el.style.setProperty("--x", p.x + "px");
+      el.style.setProperty("--y", p.y + "px");
+      el.style.setProperty("--z", p.z + "px");
+      el.style.setProperty("--ry", p.ry + "deg");
+      el.style.setProperty("--rx", p.rx + "deg");
+      el.style.setProperty("--s", String(p.s));
+      el.style.setProperty("--o", String(p.o));
+      el.style.setProperty("--blur", p.blur + "px");
+      el.style.setProperty("--sat", String(p.sat));
+      el.style.setProperty("--pila", String(p.pila));
       el.classList.toggle("activa", d === 0);
-      el.hidden = !visible && abs > 2;
+      el.classList.toggle("vecina", Math.abs(d) === 1);
+      el.hidden = !p.visible && Math.abs(d) > m.corte;
       el.tabIndex = d === 0 ? 0 : -1;
       el.setAttribute("aria-current", d === 0 ? "true" : "false");
     });
-    var c = items[activo];
-    var panel = document.getElementById("panel");
-    var abrir = c.estado === "disponible" && c.ruta
-      ? '<a class="btn" href="' + esc(c.ruta) + '">Abrir cronómetro</a>'
-      : '<span class="quieto">Próximamente</span>';
-    panel.innerHTML = '<p class="cat">' + esc(c.modalidad) + '</p><h2>' + esc(c.nombre) + '</h2><p>' + esc(c.descripcion) + '</p><div class="meta"><span>' + esc(c.cifra) + '</span><span>' + esc(c.subtitulo) + '</span></div><div class="acciones">' + abrir + '<button type="button" class="btn btn-sec" id="ver-detalle">Ver detalles</button></div>';
-    panel.classList.remove("cambia");
-    if (!reducido){ void panel.offsetWidth; panel.classList.add("cambia"); }
-    var nro = String(activo + 1).padStart(2, "0");
+    var c = items[Estado.activo];
+    Dom.raiz.style.setProperty("--ambiente", colorAmbiente(c.acento));
+    Dom.raiz.style.setProperty("--acento", c.acento);
+    Dom.panel.innerHTML = panelHtml(c);
+    Dom.panel.classList.remove("cambia");
+    if (!Estado.reducido) {
+      void Dom.panel.offsetWidth;
+      Dom.panel.classList.add("cambia");
+    }
+    var nro = String(Estado.activo + 1).padStart(2, "0");
     var total = String(n).padStart(2, "0");
-    document.getElementById("posicion").textContent = nro + " / " + total;
-    document.getElementById("avance").style.setProperty("--avance", ((activo + 1) / n * 100) + "%");
-    document.getElementById("aviso").textContent = c.nombre + ". " + nro + " de " + total + ".";
-    document.querySelectorAll("#rejilla button").forEach(function(b){
+    Dom.posicion.firstChild.textContent = nro + " / " + total;
+    Dom.posNombre.textContent = c.nombre;
+    Dom.avance.style.setProperty("--avance", ((Estado.activo + 1) / n * 100) + "%");
+    Dom.aviso.textContent = c.nombre + ". " + nro + " de " + total + ". " + (abierto(c) ? "Disponible." : "Próximamente.");
+    Dom.cuenta.textContent = (n === 1 ? "1 cronómetro" : n + " cronómetros");
+    Dom.rejilla.querySelectorAll("button").forEach(function (b) {
       b.setAttribute("aria-current", b.dataset.id === c.id ? "true" : "false");
     });
-    var ver = document.getElementById("ver-detalle");
-    if (ver) ver.addEventListener("click", function(){
-      var destino = document.querySelector('#rejilla button[data-id="' + c.id + '"]');
-      if (destino){ destino.scrollIntoView({block:"nearest", behavior: reducido ? "auto" : "smooth"}); destino.focus(); }
+    Dom.riel.querySelectorAll("button").forEach(function (b) {
+      var on = Number(b.dataset.i) === Estado.activo;
+      b.setAttribute("aria-current", on ? "true" : "false");
+      if (on) b.scrollIntoView({ inline: "center", block: "nearest", behavior: Estado.reducido ? "auto" : "smooth" });
     });
   }
-  function pintarFlujo(){
+  function pintar() {
     var items = lista();
-    if (activo >= items.length) activo = 0;
-    document.getElementById("flujo").innerHTML = items.map(function(c, i){
-      return '<button type="button" class="pieza" data-i="' + i + '" aria-label="' + esc(c.nombre) + '">' + cara(c) + '</button>';
+    if (Estado.activo >= items.length) Estado.activo = 0;
+    Dom.flujo.innerHTML = items.map(function (c, i) {
+      return '<button type="button" class="pieza" data-i="' + i + '" data-id="' + c.id + '" aria-label="' + esc(c.nombre) + '">' + cara(c) + "</button>";
     }).join("");
-    document.getElementById("rejilla").innerHTML = items.map(function(c){
-      return '<li><button type="button" data-id="' + c.id + '"><strong>' + esc(c.nombre) + '</strong><span>' + esc(c.modalidad) + '</span></button></li>';
+    Dom.riel.innerHTML = items.map(function (c, i) {
+      return '<button type="button" role="tab" data-i="' + i + '" aria-label="' + esc(c.nombre) + '"><strong>' + esc(c.nombre) + '</strong><span>' + esc(c.cifra) + '</span></button>';
     }).join("");
-    document.querySelectorAll("#flujo .pieza").forEach(function(el){
-      el.addEventListener("click", function(){
-        if (salto) return;
-        ir(Number(el.dataset.i));
-      });
-    });
-    document.querySelectorAll("#rejilla button").forEach(function(el){
-      el.addEventListener("click", function(){
-        var items = lista();
-        var i = items.findIndex(function(c){ return c.id === el.dataset.id; });
-        if (i >= 0){ ir(i); document.getElementById("escenario").scrollIntoView({block:"nearest", behavior: reducido ? "auto" : "smooth"}); }
-      });
-    });
+    Dom.rejilla.innerHTML = items.map(function (c, i) {
+      return '<li><button type="button" data-id="' + c.id + '" style="--acento:' + c.acento + '"><span class="indice">' + String(i + 1).padStart(2, "0") + '</span><strong>' + esc(c.nombre) + '</strong><span class="moda">' + esc(c.modalidad) + '</span><span class="sino">' + esc(c.descripcion) + '</span></button></li>';
+    }).join("");
     colocar();
   }
-  function ir(i){
+  function ir(i) {
     var n = lista().length;
-    activo = (i + n) % n;
+    if (!n) return;
+    Estado.activo = (i + n) % n;
     colocar();
   }
-  document.getElementById("anterior").addEventListener("click", function(){ ir(activo - 1); });
-  document.getElementById("siguiente").addEventListener("click", function(){ ir(activo + 1); });
-  document.getElementById("escenario").addEventListener("keydown", function(e){
-    if (e.key === "ArrowRight"){ e.preventDefault(); ir(activo + 1); }
-    if (e.key === "ArrowLeft"){ e.preventDefault(); ir(activo - 1); }
+  function leyenda() {
+    var familias = {};
+    COLECCION.forEach(function (c) { familias[c.categoria] = (familias[c.categoria] || 0) + 1; });
+    var chips = '<li><b>' + COLECCION.length + '</b> en la colección</li>';
+    FILTROS.forEach(function (f) {
+      if (f[0] === "todas" || !familias[f[0]]) return;
+      chips += "<li><b>" + familias[f[0]] + "</b> " + f[1].toLowerCase() + "</li>";
+    });
+    Dom.leyenda.innerHTML = chips;
+  }
+  function persistir() {
+    try { sessionStorage.setItem("s321-crono-filtro", Estado.filtro); } catch (e) {}
+  }
+  function restaurar() {
+    try {
+      var guardado = sessionStorage.getItem("s321-crono-filtro");
+      if (guardado && FILTROS.some(function (f) { return f[0] === guardado; })) Estado.filtro = guardado;
+    } catch (e) {}
+  }
+  Dom.flujo.addEventListener("click", function (e) {
+    var el = e.target.closest(".pieza");
+    if (!el || Estado.salto) return;
+    ir(Number(el.dataset.i));
   });
-  var escenario = document.getElementById("escenario");
-  escenario.addEventListener("pointerdown", function(e){
+  Dom.riel.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-i]");
+    if (!el) return;
+    ir(Number(el.dataset.i));
+  });
+  Dom.rejilla.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-id]");
+    if (!el) return;
+    var i = lista().findIndex(function (c) { return c.id === el.dataset.id; });
+    if (i < 0) return;
+    ir(i);
+    Dom.escenario.scrollIntoView({ block: "nearest", behavior: Estado.reducido ? "auto" : "smooth" });
+  });
+  Dom.panel.addEventListener("click", function (e) {
+    if (!e.target.closest("#ver-detalle")) return;
+    var c = lista()[Estado.activo];
+    var destino = Dom.rejilla.querySelector('[data-id="' + c.id + '"]');
+    if (!destino) return;
+    destino.scrollIntoView({ block: "nearest", behavior: Estado.reducido ? "auto" : "smooth" });
+    destino.focus();
+  });
+  document.getElementById("anterior").addEventListener("click", function () { ir(Estado.activo - 1); });
+  document.getElementById("siguiente").addEventListener("click", function () { ir(Estado.activo + 1); });
+  Dom.escenario.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { e.preventDefault(); ir(Estado.activo + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); ir(Estado.activo - 1); }
+  });
+  Dom.escenario.addEventListener("pointerdown", function (e) {
     if (e.button !== undefined && e.button !== 0) return;
-    arrastrando = true;
-    origen = e.clientX;
-    delta = 0;
-    salto = false;
-    escenario.setPointerCapture(e.pointerId);
+    Estado.arrastrando = true;
+    Estado.origen = e.clientX;
+    Estado.delta = 0;
+    Estado.velocidad = 0;
+    Estado.ultimo = e.clientX;
+    Estado.salto = false;
+    Dom.escenario.classList.add("gestando");
+    Dom.escenario.setPointerCapture(e.pointerId);
   });
-  escenario.addEventListener("pointermove", function(e){
-    if (!arrastrando) return;
-    delta = e.clientX - origen;
-    if (Math.abs(delta) > 8) salto = true;
-    escenario.style.setProperty("--arrastre", (delta * 0.35) + "px");
-    document.querySelectorAll("#flujo .pieza").forEach(function(el){
-      el.style.setProperty("--arrastre", (delta * 0.35) + "px");
+  Dom.escenario.addEventListener("pointermove", function (e) {
+    if (!Estado.arrastrando) return;
+    Estado.delta = e.clientX - Estado.origen;
+    Estado.velocidad = e.clientX - Estado.ultimo;
+    Estado.ultimo = e.clientX;
+    if (Math.abs(Estado.delta) > 8) Estado.salto = true;
+    var empuje = Estado.delta * 0.28;
+    Dom.flujo.querySelectorAll(".pieza").forEach(function (el) {
+      el.style.setProperty("--arrastre", empuje + "px");
+      if (el.classList.contains("activa")) el.style.setProperty("--rx", (Estado.delta / 80) + "deg");
     });
   });
-  function soltar(){
-    if (!arrastrando) return;
-    arrastrando = false;
-    document.querySelectorAll("#flujo .pieza").forEach(function(el){ el.style.setProperty("--arrastre", "0px"); });
-    if (delta < -56) ir(activo + 1);
-    else if (delta > 56) ir(activo - 1);
-    setTimeout(function(){ salto = false; }, 40);
+  function soltar() {
+    if (!Estado.arrastrando) return;
+    Estado.arrastrando = false;
+    Dom.escenario.classList.remove("gestando");
+    Dom.flujo.querySelectorAll(".pieza").forEach(function (el) {
+      el.style.setProperty("--arrastre", "0px");
+    });
+    var pasos = 0;
+    if (Estado.delta < -56 || Estado.velocidad < -18) pasos = Estado.velocidad < -28 && Estado.delta < -120 ? 2 : 1;
+    if (Estado.delta > 56 || Estado.velocidad > 18) pasos = Estado.velocidad > 28 && Estado.delta > 120 ? -2 : -1;
+    if (pasos) ir(Estado.activo + pasos);
+    setTimeout(function () { Estado.salto = false; }, 40);
   }
-  escenario.addEventListener("pointerup", soltar);
-  escenario.addEventListener("pointercancel", soltar);
-  escenario.addEventListener("wheel", function(e){
+  Dom.escenario.addEventListener("pointerup", soltar);
+  Dom.escenario.addEventListener("pointercancel", soltar);
+  Dom.escenario.addEventListener("wheel", function (e) {
     var horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey;
     if (!horizontal) return;
     e.preventDefault();
     var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (Math.abs(dx) < 12 || escenario.dataset.rueda) return;
-    escenario.dataset.rueda = "1";
-    if (dx > 0) ir(activo + 1); else ir(activo - 1);
-    setTimeout(function(){ delete escenario.dataset.rueda; }, 460);
-  }, {passive:false});
-  document.getElementById("filtros").innerHTML = FILTROS.map(function(f){
-    return '<button type="button" data-filtro="' + f[0] + '" aria-pressed="' + (f[0] === "todas" ? "true" : "false") + '">' + f[1] + '</button>';
+    if (Math.abs(dx) < 12 || Dom.escenario.dataset.rueda) return;
+    Dom.escenario.dataset.rueda = "1";
+    if (dx > 0) ir(Estado.activo + 1);
+    else ir(Estado.activo - 1);
+    setTimeout(function () { delete Dom.escenario.dataset.rueda; }, 460);
+  }, { passive: false });
+  Dom.filtros.innerHTML = FILTROS.map(function (f) {
+    var on = f[0] === Estado.filtro;
+    return '<button type="button" data-filtro="' + f[0] + '" aria-pressed="' + (on ? "true" : "false") + '">' + f[1] + "</button>";
   }).join("");
-  document.getElementById("filtros").addEventListener("click", function(e){
+  Dom.filtros.addEventListener("click", function (e) {
     var b = e.target.closest("[data-filtro]");
     if (!b) return;
-    filtro = b.dataset.filtro;
-    activo = 0;
-    document.querySelectorAll("#filtros button").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-    pintarFlujo();
+    Estado.filtro = b.dataset.filtro;
+    Estado.activo = 0;
+    Dom.limpiar.hidden = Estado.filtro === "todas";
+    Dom.filtros.querySelectorAll("button").forEach(function (x) {
+      x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    });
+    persistir();
+    pintar();
   });
-  window.addEventListener("resize", colocar);
-  pintarFlujo();
+  Dom.limpiar.addEventListener("click", function () {
+    Estado.filtro = "todas";
+    Estado.activo = 0;
+    Dom.limpiar.hidden = true;
+    Dom.filtros.querySelectorAll("button").forEach(function (x) {
+      x.setAttribute("aria-pressed", x.dataset.filtro === "todas" ? "true" : "false");
+    });
+    persistir();
+    pintar();
+  });
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () { colocar(); }).observe(Dom.escenario);
+  } else {
+    window.addEventListener("resize", colocar);
+  }
+  document.addEventListener("visibilitychange", function () {
+    Dom.escenario.style.visibility = document.hidden ? "hidden" : "visible";
+  });
+  restaurar();
+  Dom.limpiar.hidden = Estado.filtro === "todas";
+  leyenda();
+  pintar();
 })();
 </script>
 </body>
