@@ -218,43 +218,11 @@ h1 .resalte {
   line-height: 1.45;
   color: var(--ti-suave);
 }
-.leyenda {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 8px;
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.leyenda li {
-  min-height: 0;
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: transparent;
-  border: 0;
-  color: #6d6258;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-.leyenda li.total {
-  background: rgba(23, 63, 80, 0.06);
-  color: var(--pe-hondo);
-  font-weight: 800;
-  padding: 4px 10px;
-}
-.leyenda b {
-  font-family: var(--fam-num);
-  font-weight: 700;
-  margin-right: 5px;
-}
 /* 06. Escenario */
 .sala {
   position: relative;
   max-width: 1280px;
-  margin: 42px auto 0;
+  margin: 32px auto 0;
   border-radius: 24px;
   overflow: hidden;
   background: #143848;
@@ -352,6 +320,7 @@ h1 .resalte {
     opacity var(--dur) var(--sal),
     filter var(--dur) var(--sal);
   cursor: pointer;
+  overflow: hidden;
 }
 .pieza[hidden] {
   display: none;
@@ -367,6 +336,7 @@ h1 .resalte {
   border-radius: 18px;
   background: transparent;
   box-shadow: var(--sombra-contacto);
+  overflow: hidden;
 }
 .superficie {
   height: 100%;
@@ -403,6 +373,7 @@ h1 .resalte {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   font-size: var(--fs-etiqueta);
   letter-spacing: 0.02em;
   text-transform: none;
@@ -410,11 +381,17 @@ h1 .resalte {
   font-weight: 700;
 }
 .cabecera > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .pronto,
 .listo {
+  flex: 0 0 auto;
+  white-space: nowrap;
   border-radius: 999px;
   padding: 1px 7px;
   font-size: 0.62rem;
@@ -442,13 +419,30 @@ h1 .resalte {
   font-weight: 700;
   margin: 0;
   line-height: 1.15;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .mini-sub {
   display: block;
-  margin-top: 4px;
+  margin-top: 2px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--si-rosa);
   font-size: var(--fs-aux);
   font-weight: 700;
+}
+.pieza.hacia-izq .cabecera {
+  flex-direction: row-reverse;
+}
+.pieza:not(.activa) .anillo,
+.pieza:not(.activa) .barra-t,
+.pieza:not(.activa) .semaforo,
+.pieza:not(.activa) .equipos {
+  display: none;
 }
 /* 10. Variantes */
 .anillo {
@@ -523,11 +517,12 @@ h1 .resalte {
 .controles {
   position: relative;
   z-index: 3;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: var(--toque) minmax(9rem, 16rem) var(--toque);
   justify-content: center;
-  gap: 16px;
-  padding: 2px 18px 8px;
+  align-items: center;
+  column-gap: 28px;
+  padding: 8px 22px 10px;
   background: linear-gradient(180deg, rgba(16, 47, 60, 0), #102f3c 28%);
   border-top: 1px solid rgba(228, 197, 181, 0.1);
 }
@@ -560,8 +555,17 @@ h1 .resalte {
   opacity: 0.45;
   cursor: default;
 }
+.mando {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
 .posicion {
-  min-width: 7.5rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   text-align: center;
   font-family: var(--fam-num);
   font-weight: 700;
@@ -571,6 +575,10 @@ h1 .resalte {
 .posicion small {
   display: block;
   margin-top: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--fam-cuerpo);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -578,9 +586,9 @@ h1 .resalte {
   font-weight: 800;
 }
 .pista {
-  width: min(148px, 28vw);
+  width: min(100%, 9.5rem);
   height: 2px;
-  margin: 6px auto 0;
+  margin: 0;
   border-radius: 3px;
   background: rgba(228, 197, 181, 0.25);
   overflow: hidden;
@@ -592,43 +600,26 @@ h1 .resalte {
   background: var(--te-claro);
   transition: width var(--dur) var(--sal);
 }
-.pista-ayuda {
-  margin: 0;
-  padding: 0 16px 6px;
-  text-align: center;
-  color: var(--si-rosa);
-  font-size: 0.8rem;
-  background: #102f3c;
-}
 .riel-caja {
   position: relative;
-  padding: 0 28px 12px;
+  padding: 0 18px 10px;
   background: #102f3c;
-}
-.riel-caja::before,
-.riel-caja::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 12px;
-  width: 28px;
-  pointer-events: none;
-  z-index: 1;
-}
-.riel-caja::before {
-  left: 0;
-  background: linear-gradient(90deg, #102f3c, transparent);
-}
-.riel-caja::after {
-  right: 0;
-  background: linear-gradient(270deg, #102f3c, transparent);
 }
 .riel {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
-  padding: 2px 2px 6px;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 2px 2px;
   scroll-snap-type: x proximity;
+}
+.riel::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 .riel.corto {
   justify-content: center;
@@ -636,14 +627,14 @@ h1 .resalte {
 .riel button {
   flex: 0 0 auto;
   scroll-snap-align: center;
-  min-height: 40px;
+  min-height: 32px;
   min-width: 0;
-  max-width: 168px;
-  padding: 5px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(228, 197, 181, 0.16);
-  background: rgba(255, 252, 247, 0.05);
-  color: var(--cr-puro);
+  max-width: 132px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(228, 197, 181, 0.1);
+  background: rgba(255, 252, 247, 0.04);
+  color: rgba(255, 252, 247, 0.78);
   text-align: left;
   cursor: pointer;
 }
@@ -654,18 +645,12 @@ h1 .resalte {
 }
 .riel strong {
   display: block;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   line-height: 1.2;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.riel span {
-  display: block;
-  margin-top: 1px;
-  font-family: var(--fam-num);
-  font-size: 0.7rem;
-  opacity: 0.8;
 }
 /* 12. Panel */
 .panel {
@@ -966,7 +951,7 @@ h1 .resalte {
     max-width: 340px;
   }
   .sala {
-    margin-top: 28px;
+    margin-top: 22px;
     border-radius: 18px;
   }
   .panel {
@@ -1012,8 +997,7 @@ h1 .resalte {
   .escenario {
     height: 240px;
   }
-  .bajada,
-  .leyenda {
+  .bajada {
     display: none;
   }
 }
@@ -1024,9 +1008,11 @@ h1 .resalte {
 }
 @media (pointer: coarse) {
   .nav-btn,
-  .filtros button,
-  .riel button {
+  .filtros button {
     min-height: 48px;
+  }
+  .riel button {
+    min-height: 36px;
   }
 }
 @media (prefers-contrast: more) {
@@ -1066,7 +1052,6 @@ h1 .resalte {
     <p class="etiqueta">Herramientas para el aula</p>
     <h1>Cronómetros para cada <span class="resalte">momento</span> de la clase</h1>
     <p class="bajada">Explora una colección de cronómetros diseñados para acompañar actividades, desafíos, pausas e intervalos de trabajo.</p>
-    <ul class="leyenda" id="leyenda"></ul>
   </section>
   <section class="sala" aria-label="Explorador">
     <div class="escenario" id="escenario" tabindex="0" aria-roledescription="carrusel" aria-label="Colección de cronómetros">
@@ -1080,7 +1065,7 @@ h1 .resalte {
       <button type="button" class="nav-btn" id="anterior" aria-label="Cronómetro anterior">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 8.5 12l6 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div>
+      <div class="mando">
         <div class="posicion" id="posicion">01 / 08<small id="pos-nombre"></small></div>
         <div class="pista" aria-hidden="true"><span id="avance"></span></div>
       </div>
@@ -1088,7 +1073,7 @@ h1 .resalte {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15.5 12l-6 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
-    <p class="pista-ayuda">Desliza o usa las flechas para explorar.</p>
+    <p class="vivo">Desliza o usa las flechas del teclado para explorar la colección.</p>
     <div class="riel-caja">
       <div class="riel" id="riel" role="tablist" aria-label="Recorrido de la colección"></div>
     </div>
@@ -1164,7 +1149,6 @@ h1 .resalte {
     cuenta: document.getElementById("cuenta"),
     limpiar: document.getElementById("limpiar"),
     vacio: document.getElementById("vacio"),
-    leyenda: document.getElementById("leyenda"),
     raiz: document.documentElement
   };
 
@@ -1299,6 +1283,8 @@ h1 .resalte {
       el.style.setProperty("--pila", String(p.pila));
       el.classList.toggle("activa", d === 0);
       el.classList.toggle("vecina", Math.abs(d) === 1);
+      el.classList.toggle("hacia-izq", d < 0);
+      el.classList.toggle("hacia-der", d > 0);
       el.hidden = !p.visible && Math.abs(d) > m.corte;
       el.tabIndex = d === 0 ? 0 : -1;
       el.setAttribute("aria-current", d === 0 ? "true" : "false");
@@ -1326,7 +1312,10 @@ h1 .resalte {
     Dom.riel.querySelectorAll("button").forEach(function (b) {
       var on = Number(b.dataset.i) === Estado.activo;
       b.setAttribute("aria-current", on ? "true" : "false");
-      if (on) b.scrollIntoView({ inline: "center", block: "nearest", behavior: Estado.reducido ? "auto" : "smooth" });
+      if (on) {
+        var izquierda = b.offsetLeft - (Dom.riel.clientWidth - b.offsetWidth) / 2;
+        Dom.riel.scrollTo({ left: Math.max(0, izquierda), behavior: Estado.reducido ? "auto" : "smooth" });
+      }
     });
   }
   function pintar() {
@@ -1336,7 +1325,7 @@ h1 .resalte {
       return '<button type="button" class="pieza" data-i="' + i + '" data-id="' + c.id + '" aria-label="' + esc(c.nombre) + '">' + cara(c) + "</button>";
     }).join("");
     Dom.riel.innerHTML = items.map(function (c, i) {
-      return '<button type="button" role="tab" data-i="' + i + '" aria-label="' + esc(c.nombre) + '"><strong>' + esc(c.nombre) + '</strong><span>' + esc(c.cifra) + '</span></button>';
+      return '<button type="button" role="tab" data-i="' + i + '" aria-label="' + esc(c.nombre) + ", " + esc(c.cifra) + '"><strong>' + esc(c.nombre) + "</strong></button>";
     }).join("");
     Dom.rejilla.innerHTML = items.map(function (c, i) {
       return '<li><button type="button" data-id="' + c.id + '" style="--acento:' + c.acento + '"><span class="indice">' + String(i + 1).padStart(2, "0") + '</span><strong>' + esc(c.nombre) + '</strong><span class="moda">' + esc(c.modalidad) + '</span><span class="sino">' + esc(c.descripcion) + '</span></button></li>';
@@ -1348,16 +1337,6 @@ h1 .resalte {
     if (!n) return;
     Estado.activo = (i + n) % n;
     colocar();
-  }
-  function leyenda() {
-    var familias = {};
-    COLECCION.forEach(function (c) { familias[c.categoria] = (familias[c.categoria] || 0) + 1; });
-    var chips = '<li class="total"><b>' + COLECCION.length + '</b> en la colección</li>';
-    FILTROS.forEach(function (f) {
-      if (f[0] === "todas" || !familias[f[0]]) return;
-      chips += "<li><b>" + familias[f[0]] + "</b> " + f[1].toLowerCase() + "</li>";
-    });
-    Dom.leyenda.innerHTML = chips;
   }
   function persistir() {
     try { sessionStorage.setItem("s321-crono-filtro", Estado.filtro); } catch (e) {}
@@ -1485,7 +1464,6 @@ h1 .resalte {
   });
   restaurar();
   Dom.limpiar.hidden = Estado.filtro === "todas";
-  leyenda();
   pintar();
 })();
 </script>
