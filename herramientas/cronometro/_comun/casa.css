@@ -1,0 +1,639 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Secuencia321 · La casa de los cronómetros · estilo común
+   Lo que comparten todos: los tokens de la marca, la barra, la carga, el
+   escenario, la pieza, el panel de información, el reloj, los mandos, los
+   menús, los ajustes, pantalla completa, el modo documento y el
+   movimiento reducido.
+   NO SE RETOCA PARA UN CRONÓMETRO. Lo que solo usa uno va en su propio.css.
+   Se corrige aquí y se vuelven a construir todos.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · Tokens de la marca ─────────────────────────────────────────────
+   Cada tono tiene un oficio: tinta que se lee, terracota que se toca,
+   petróleo que ordena. Donde el sitio difiere, manda la marca. */
+:root{
+  /* superficies */
+  --su-fondo:#f7f1e9; --su-hondo:#efe6d8; --su-papel:#fffcf7;
+  --su-realce:#f9f3ea; --su-linea:#e2d6c4; --su-calido:#e4c5b5;
+  /* tinta: negro cálido, nunca gris */
+  --ti-fuerte:#1b1512; --ti-media:#2e2622; --ti-tenue:#4a3f38;
+  --ti-guia:#7a6d62;            /* solo marcadores de posición */
+  --ti-sep:#8a7c70;             /* los dos puntos de la cifra */
+  /* terracota: la acción */
+  --te-hondo:#8f3a1e; --te-base:#b04a2a; --te-vivo:#c85f3c;
+  --te-suave:#b6583b; --te-velo:#f0dccf; --te-claro:#e08a5f;
+  /* petróleo: la estructura */
+  --pe-hondo:#0f2d3a; --pe-base:#173f50; --pe-caja:#2a4e5e;
+  --pe-claro:#2c5c70; --pe-velo:#eaf0f2;
+  /* ciruela: la ocasión especial (confirmar el reinicio) */
+  --ci-caja:#674a60;
+  /* sobre el suelo petróleo */
+  --no-titular:#f7f1e9; --no-cuerpo:#e4c5b5;
+
+  --fam-titulo:'Lora', Georgia, 'Times New Roman', serif;
+  --fam-cuerpo:'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --fam-num:'Source Code Pro', Consolas, monospace;
+
+  --barra-h:65px;               /* 64 de barra + 1 de línea, como en el sitio */
+  --sal:cubic-bezier(.22,.8,.25,1);
+  --resorte:cubic-bezier(.25,.46,.45,.94);
+  --sombra-menu:0 6px 18px rgba(15,45,58,.16), 0 18px 48px rgba(15,45,58,.14);
+  color-scheme:light;
+}
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce){
+  @view-transition { navigation: none; }
+}
+/* Entrar y salir de pantalla completa cambia media pieza de sitio. En vez de
+   un salto, la pieza y la cifra se mueven de un estado al otro: el navegador
+   las reconoce por su nombre y anima la caja; el resto se cruza. */
+::view-transition-group(root),::view-transition-group(s321-barra),
+::view-transition-group(s321-pieza),::view-transition-group(s321-cifra){
+  animation-duration:.34s;animation-timing-function:cubic-bezier(.22,.8,.25,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-size:16px}
+/* en un proyector grande, la pieza entera crece con la cifra: todo proporcionado.
+   La barra, las migas y el pie van en px y no cambian, como en el sitio. */
+@media (min-width:1500px) and (min-height:820px){
+  html{font-size:17.5px}
+}
+@media (min-width:1800px) and (min-height:940px){
+  html{font-size:19px}
+}
+@media (min-width:2400px) and (min-height:1300px){
+  html{font-size:23px}
+}
+body{margin:0;font-family:var(--fam-cuerpo);font-weight:600;color:var(--ti-fuerte);
+  background:var(--pe-hondo);-webkit-font-smoothing:antialiased;line-height:1.45}
+button,input,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--te-claro);outline-offset:2px}
+.num{font-family:var(--fam-num);font-weight:600;font-variant-numeric:tabular-nums}
+.oculto{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;border:0;
+  overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.ico{width:1.25em;height:1.25em;flex:0 0 auto;display:block}
+/* ── 2 · La carga de la casa ───────────────────────────────────────────
+   Copiada del documento de carga de las secuencias (segmentedDocument):
+   el suelo con su halo, el isotipo que se compone, el nombre, la frase y
+   la raya que recorre. Queda bajo la barra, que no se mueve. */
+.carga{position:fixed;left:0;right:0;bottom:0;top:var(--barra-h);z-index:60;
+  display:grid;place-items:center;padding:24px;text-align:center;
+  background:radial-gradient(900px 480px at 50% -10%,#24576b 0%,transparent 62%),
+    linear-gradient(168deg,#1b485c 0%,#173f50 46%,#0f2d3a 100%);
+  color:#e4c5b5;font:600 15px/1.5 var(--fam-cuerpo);
+  opacity:1;transition:opacity .25s ease}
+.carga.fuera{opacity:0;pointer-events:none}
+/* red de seguridad: si el guion no llegara a retirarla, la carga se va sola a los 6 s */
+.carga{animation:carga-segura .3s ease 6s forwards}
+@keyframes carga-segura{to{opacity:0;visibility:hidden;pointer-events:none}}
+.carga-int{display:flex;flex-direction:column;align-items:center;gap:22px}
+.carga .iso{width:88px;height:88px}
+.carga .iso rect{transform-origin:50% 50%;animation:pieza 2.1s cubic-bezier(.22,.8,.25,1) infinite both}
+.carga .iso .p1{animation-delay:0s}
+.carga .iso .p2{animation-delay:.12s}
+.carga .iso .p3{animation-delay:.24s}
+.carga .iso .u1{animation-delay:.40s}
+.carga .iso .u2{animation-delay:.50s}
+.carga .iso .u3{animation-delay:.60s}
+.carga .iso .u4{animation-delay:.70s}
+@keyframes pieza{
+  0%{opacity:0;transform:scale(.55)}
+  22%{opacity:1;transform:scale(1)}
+  72%{opacity:1;transform:scale(1)}
+  100%{opacity:.18;transform:scale(.92)}
+}
+.carga-marca{font-family:var(--fam-titulo);font-weight:700;font-size:19.5px;color:#f7f1e9;letter-spacing:.01em}
+.carga-marca sup{font-size:.55em}
+.carga-dice{margin:0;font-size:14.4px;opacity:.85}
+.carga-raya{width:180px;height:3px;border-radius:3px;background:rgba(228,197,181,.2);overflow:hidden}
+.carga-raya i{display:block;height:100%;width:40%;border-radius:3px;background:#e08a5f;
+  animation:recorre 1.5s cubic-bezier(.22,.8,.25,1) infinite}
+@keyframes recorre{from{transform:translateX(-110%)}to{transform:translateX(360%)}}
+/* ── 3 · La barra: fiel a la del sitio ─────────────────────────────────
+   El sitio pondrá aquí su barra común con los menús. */
+.barra{position:sticky;top:0;z-index:70;flex:0 0 auto;
+  background:rgba(23,63,80,.97);-webkit-backdrop-filter:saturate(140%) blur(8px);backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid rgba(228,197,181,.16);view-transition-name:s321-barra}
+.barra-int{display:flex;align-items:center;gap:16px;min-height:64px;
+  padding-left:clamp(18px,2vw,28px);padding-right:clamp(18px,2vw,28px)}
+.marca{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto;min-width:0}
+.marca-icono{width:36px;height:36px;border-radius:12px;flex:0 0 auto;border:1px solid rgba(228,197,181,.28)}
+.marca-icono img{display:block;width:100%;height:100%;border-radius:inherit}
+.marca-txt{font-family:var(--fam-titulo);font-weight:700;font-size:17px;color:#f7f1e9;
+  min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.marca-txt sup{font-size:.55em}
+@media(max-width:860px){
+  .marca-txt{font-size:15.2px}
+}
+@media(max-width:400px){
+  .marca-txt{font-size:13.8px}
+  .marca-icono{width:32px;height:32px}
+}
+/* ── 4 · El escenario ───────────────────────────────────────────────────
+   Suelo petróleo con halo y cifras de la marca al 6 %, como la portada. */
+html,body{height:100%}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.escenario{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;isolation:isolate;
+  background:radial-gradient(1100px 520px at 82% -8%,#24576b 0%,transparent 62%),
+    linear-gradient(168deg,#1b485c 0%,#173f50 46%,#0f2d3a 100%)}
+.cifras-fondo{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.cifras-fondo span{position:absolute;font-family:var(--fam-num);font-weight:700;line-height:1;color:#e4c5b5;
+  opacity:.06;user-select:none;animation:flotar 22s ease-in-out infinite}
+@keyframes flotar{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-26px) rotate(3deg)}}
+/* migas: una fila fina bajo la barra */
+.migas{flex:0 0 auto;display:flex;align-items:center;gap:14px;min-height:44px;
+  padding:4px clamp(18px,2vw,28px);font-size:13.4px;font-weight:700;color:var(--no-cuerpo)}
+.volver{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:5px 15px 5px 9px;
+  border-radius:999px;text-decoration:none;color:#f7f1e9;font-weight:800;white-space:nowrap;
+  background:rgba(228,197,181,.10);border:1px solid rgba(228,197,181,.32);
+  transition:background .18s var(--sal),border-color .18s var(--sal),transform .3s var(--sal)}
+.volver::before{content:"";position:absolute;inset:-5px -2px}
+.volver .ico{width:17px;height:17px;color:var(--te-claro)}
+.volver:hover{background:rgba(228,197,181,.18);border-color:#e4c5b5}
+.rastro{min-width:0;display:flex;align-items:center;gap:14px}
+/* la rayita solo separaba de «Cronómetros»: sin ese botón, no hace falta */
+.volver + .rastro::before{content:"";width:1px;height:18px;background:rgba(228,197,181,.28);flex:0 0 auto}
+.rastro ol{list-style:none;display:flex;align-items:center;flex-wrap:nowrap;gap:0;margin:0;padding:0;min-width:0;overflow:hidden}
+.rastro li{display:flex;align-items:center;white-space:nowrap;min-width:0}
+.rastro li+li::before{content:"›";margin:0 9px;color:var(--te-claro);font-weight:800}
+.rastro a{position:relative;color:#f7f1e9;text-decoration:none;border-radius:6px;padding:4px 2px}
+.rastro a::before{content:"";position:absolute;inset:-9px -4px}
+/* 44 px de superficie */
+.rastro a:hover{text-decoration:underline;text-underline-offset:3px}
+.rastro .aqui{color:#f7f1e9;font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.rastro .sin-enlace{color:var(--no-cuerpo)}
+/* la mesa sostiene la pieza */
+.mesa{flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:stretch;
+  padding:clamp(2px,.8vh,10px) clamp(12px,3vw,56px) clamp(6px,1.2vh,14px)}
+.pie{flex:0 0 auto;margin:0;text-align:center;padding:0 16px clamp(6px,1vh,10px);
+  font-size:12.2px;font-weight:700;letter-spacing:.02em;color:var(--no-cuerpo)}
+/* ── 5 · La pieza ──────────────────────────────────────────────────────── */
+.pieza{position:relative;width:100%;max-width:1480px;min-height:0;view-transition-name:s321-pieza;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  background:var(--su-papel);border-radius:32px;
+  padding:clamp(12px,2.4vh,26px) clamp(18px,2.2vw,34px) clamp(8px,1.5vh,16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(5,20,27,.26),0 26px 64px rgba(5,20,27,.40);
+  container:pieza/inline-size}
+/* Entrar y salir de pantalla completa cambia el recorte de la pieza. Sin
+   transición de vista de por medio, lo suaviza el CSS: solo la forma, que
+   es lo único que se puede interpolar. */
+.pieza{transition:padding .26s var(--sal),border-radius .26s var(--sal)}
+/* el halo de la meta cumplida */
+.pieza::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 6px var(--te-velo);opacity:0;transition:opacity .45s ease-out}
+.pieza.halo::after{opacity:1;transition:opacity .15s ease-out}
+/* cabecera: ícono, nombre e instrucción; a la derecha, los dos botones */
+.p-cab{position:relative;z-index:3;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"icono textos botones";align-items:center;column-gap:clamp(12px,1.3cqi,18px);
+  padding-bottom:clamp(8px,1.5vh,15px)}
+.p-icono{grid-area:icono;display:block;width:clamp(3.125rem,min(4.2cqi,8.4vh),3.75rem);aspect-ratio:1;border-radius:28%;
+  box-shadow:0 4px 12px rgba(15,45,58,.26),0 1px 2px rgba(15,45,58,.22)}
+.p-icono svg{display:block;width:100%;height:100%}
+.p-textos{grid-area:textos;min-width:0}
+/* el nombre de la herramienta hace de antetítulo; debajo, el de la dinámica */
+.p-tool{margin:0 0 1px;font-family:var(--fam-num);font-weight:600;line-height:1.2;color:var(--pe-base);
+  font-size:clamp(.72rem,min(.84cqi,1.7vh),.84rem);letter-spacing:.15em;text-transform:uppercase}
+.p-botones{grid-area:botones;position:relative;display:flex;gap:.625rem}
+/* botones con forma y color de ícono de aplicación */
+.b-app{position:relative;width:2.875rem;height:2.875rem;border-radius:.9375rem;border:0;padding:0;display:grid;place-items:center;
+  color:#f7f1e9;background:linear-gradient(180deg,#30657b 0%,#1d4557 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 8px rgba(15,45,58,.28),0 1px 2px rgba(15,45,58,.24);
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),filter .3s var(--sal)}
+.b-app::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 52%)}
+.b-app .ico{width:1.375rem;height:1.375rem;position:relative}
+.b-app:hover{transform:translateY(-2px);filter:brightness(1.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -1px 0 rgba(0,0,0,.2),0 8px 18px rgba(15,45,58,.30),0 2px 4px rgba(15,45,58,.24)}
+.b-app:active{transform:translateY(0) scale(.96);transition-duration:.1s}
+.b-app[aria-expanded="true"],.b-app[aria-pressed="true"]{box-shadow:inset 0 0 0 2px rgba(224,138,95,.95),0 3px 8px rgba(15,45,58,.28)}
+/* nombre de la dinámica */
+.rotulo{display:block;margin:0 0 1px;font-family:var(--fam-num);font-weight:600;font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ti-tenue)}
+.dinamica-campo{display:flex;align-items:flex-end;gap:8px;max-width:min(100%,46rem)}
+.dinamica{flex:1 1 auto;min-width:0;display:block;margin:0;padding:1px 0 4px;resize:none;overflow:hidden;
+  border:0;border-bottom:2px dashed var(--su-calido);border-radius:0;background:transparent;outline:none;
+  font-family:var(--fam-titulo);font-weight:700;line-height:1.2;color:var(--pe-hondo);
+  font-size:var(--f-dinamica,clamp(1.32rem,min(2.4cqi,4.6vh),2.5rem));
+  transition:border-color .2s var(--sal)}
+/* «Actividad» de guía: solo para saber dónde se escribe. Se queda con
+   el mismo gris apagado de todo marcador de la casa —«--ti-guia»,
+   pensado justo para esto—; bajarle más la opacidad lo hunde por debajo
+   de lo que se puede leer (lo mide la prueba de contraste), así que la
+   transparencia que pedía Miguel es la que ya trae ese gris frente al
+   texto oscuro de cuando se escribe, no una capa extra. Desaparece del
+   todo en cuanto hay una letra o el campo tiene el foco. */
+.dinamica::placeholder{color:var(--ti-guia);opacity:1}
+.dinamica:hover{border-bottom-color:var(--te-suave)}
+.dinamica:focus{border-bottom-style:solid;border-bottom-color:var(--te-base)}
+.dinamica-campo.lleno .dinamica:not(:focus):not(:hover){border-bottom-color:transparent}
+/* ── 6 · El cuerpo: la lista a la izquierda y el reloj ───────────────────
+   Sin marcas, la columna de la lista mide cero y el reloj va al centro.
+   Con la primera marca, la columna crece y el reloj se corre. */
+.p-cuerpo{min-height:0;display:grid;grid-template-columns:var(--col-lista,0px) minmax(0,1fr) var(--col-info,0px);
+  column-gap:var(--col-gap,0px);padding-top:clamp(6px,1.2vh,12px);
+  transition:grid-template-columns .35s var(--sal),column-gap .35s var(--sal)}
+.p-cuerpo.con-lista{--col-lista:clamp(16.25rem,28%,23.75rem);--col-gap:clamp(16px,2cqi,30px)}
+.p-cuerpo.con-info{--col-info:clamp(16.5rem,28%,24rem);--col-gap:clamp(16px,2cqi,30px)}
+/* la información sale sobre el mismo lienzo, sin recuadro aparte */
+.info{min-width:0;min-height:0;overflow:hidden;display:flex;
+  opacity:0;visibility:hidden;transform:translateX(22px);
+  transition:opacity .28s var(--sal),transform .35s var(--sal),visibility 0s linear .35s}
+.p-cuerpo.con-info .info{opacity:1;visibility:visible;transform:none;
+  transition:opacity .3s var(--sal) .06s,transform .35s var(--sal),visibility 0s}
+.info-int{flex:1 1 auto;min-width:15rem;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:clamp(8px,1.3vh,14px);
+  padding:1px 4px 6px clamp(16px,1.8cqi,26px);border-left:1px solid var(--su-linea);
+  scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.info-int.hay-abajo{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+.info-int.hay-arriba{-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px)}
+.info-int.hay-arriba.hay-abajo{-webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent)}
+.info-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;line-height:1.25;color:var(--pe-hondo);
+  font-size:clamp(1.06rem,min(1.5cqi,2.8vh),1.34rem);text-wrap:balance}
+.info-bloque{display:flex;flex-direction:column;gap:3px}
+.info-bloque p{margin:0;font-weight:600;line-height:1.5;color:var(--ti-media);
+  font-size:clamp(.86rem,min(.98cqi,1.8vh),.97rem)}
+.info-bloque b{font-weight:800;color:var(--ti-fuerte)}
+.info-ideas{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.info-ideas li{position:relative;padding-left:17px;font-weight:600;line-height:1.5;color:var(--ti-media);
+  font-size:clamp(.84rem,min(.95cqi,1.75vh),.95rem)}
+.info-ideas li::before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--te-base)}
+.info-ideas b{font-weight:800;color:var(--ti-fuerte)}
+/* la lista de marcas */
+.lista{min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;
+  background:var(--su-hondo);border-radius:22px;
+  opacity:0;visibility:hidden;transform:translateX(-22px);
+  transition:opacity .28s var(--sal),transform .35s var(--sal),visibility 0s linear .35s}
+.p-cuerpo.con-lista .lista{opacity:1;visibility:visible;transform:none;
+  transition:opacity .3s var(--sal) .06s,transform .35s var(--sal),visibility 0s}
+.lista-int{display:flex;flex-direction:column;min-width:14.75rem;min-height:0;height:100%;padding:10px 8px 10px 12px}
+.lista-cab{display:flex;align-items:center;gap:2px;padding:0 4px 6px 2px;min-width:0}
+.lista-titulo{margin:0;min-width:0;display:flex;align-items:center}
+.lista-titulo-b{min-width:0;max-width:100%;min-height:2.5rem;padding:4px 6px;border:0;border-radius:10px;background:transparent;
+  font-family:var(--fam-titulo);font-weight:700;font-size:1.12rem;line-height:1.2;color:var(--pe-hondo);text-align:left;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lista-titulo-b:hover{background:rgba(255,252,247,.7)}
+.lista-titulo-campo{width:100%;min-width:0;min-height:2.5rem;padding:4px 10px;border:2px solid var(--te-base);border-radius:12px;
+  background:var(--su-papel);font-family:var(--fam-titulo);font-weight:700;font-size:1.08rem;color:var(--pe-hondo);outline:none}
+.lista-titulo-campo::placeholder{color:var(--ti-guia);opacity:1}
+.lista-lapiz{position:relative;flex:0 0 auto;width:2.125rem;height:2.125rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--ti-tenue)}
+.lista-lapiz::before{content:"";position:absolute;inset:-5px}
+.lista-lapiz .ico{width:1.125rem;height:1.125rem}
+.lista-lapiz:hover{background:rgba(255,252,247,.7);color:var(--pe-hondo)}
+/* el menú de las rondas guardadas, donde antes iba la cuenta de marcas */
+.lista-menu{position:relative;width:2.125rem;height:2.125rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:var(--pe-velo);color:var(--pe-hondo)}
+.lista-menu::before{content:"";position:absolute;inset:-5px}
+.lista-menu .ico{width:1.125rem;height:1.125rem}
+.lista-menu:hover,.lista-menu[aria-expanded="true"]{background:var(--pe-claro);color:#fbf6ef}
+/* una ronda guardada se mira, no se toca */
+.lista-plegar{display:none}
+/* si hay más marcas de las que caben, el borde se desvanece: se lee que la lista sigue */
+/* una marca en edición */
+/* ── 7 · El reloj ───────────────────────────────────────────────────────
+   La cifra toma el tamaño del sitio que le toca: el menor entre el ancho
+   de su columna y el alto que dejan la píldora, la meta y los mandos. */
+.reloj{min-width:0;min-height:0;display:flex;container:reloj/size;
+  --em:3.43;            /* ancho de la cifra en em, lo pone el guion */
+  --k:.72;              /* parte del ancho que puede ocupar la cifra */
+  --lh:.92;             /* alto de la caja de la cifra, en em */
+  --m-meta:clamp(24px,6cqh,42px);     /* de la cifra a la barra de la meta */
+  --m-mandos:clamp(12px,3.2cqh,26px); /* de la meta a los mandos */
+  /* lo que ocupan la píldora, la meta y los mandos: el resto es de la cifra */
+  --fijo:calc(var(--m-meta) + 2.375rem + var(--m-mandos) + 3.625rem + .375rem)}
+.p-cuerpo.con-lista .reloj{--k:.84}
+.reloj-int{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.estado{display:inline-flex;align-items:center;gap:.5rem;height:1.875rem;margin:0 0 .375rem;padding:0 .875rem 0 .6875rem;border-radius:999px;
+  background:var(--su-hondo);color:var(--ti-media);font-weight:800;font-size:.9rem;white-space:nowrap;
+  transition:background-color .3s var(--sal)}
+/* La nota de «listo / en marcha» ya no se ve: queda solo para quien usa
+   lector de pantalla, con la técnica de .oculto. Su propio alto, relleno
+   y separación pesarían igual que los de .oculto y —por ir después en la
+   hoja— ganarían ellos; con las dos clases juntas la especificidad es
+   mayor y sí se queda en 1px. */
+.estado.oculto{height:1px;margin:-1px;padding:0;gap:0}
+.estado .punto{width:.5625rem;height:.5625rem;border-radius:50%;background:var(--ti-tenue);flex:0 0 auto}
+.estado .ico{width:.9375rem;height:.9375rem;display:none;color:var(--te-hondo)}
+.pieza[data-e="marcha"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="marcha"] .estado .punto{background:var(--te-base);animation:latido 1.3s ease-in-out infinite}
+.pieza[data-e="final"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="final"] .estado .punto{background:var(--te-hondo);animation:latido 1s ease-in-out infinite}
+.pieza[data-e="cumplida"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="cumplida"] .estado .punto{display:none}
+.pieza[data-e="cumplida"] .estado .ico{display:block}
+@keyframes latido{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.55}}
+.cifra-caja{position:relative;display:flex;justify-content:center;max-width:100%;view-transition-name:s321-cifra;
+  font-size:min(calc(var(--k) * 100cqi / var(--em)),calc((100cqh - var(--fijo)) / var(--lh)))}
+.cifra{margin:0;font-family:var(--fam-num);font-weight:600;line-height:var(--lh);white-space:nowrap;
+  color:var(--ti-fuerte);font-variant-numeric:tabular-nums;transform-origin:50% 55%;
+  transition:color .35s var(--sal)}
+.cifra .sep{color:var(--ti-sep);margin:0 -.07em}
+.cifra .frac{font-size:.46em;color:var(--ti-tenue);margin-left:.02em}
+.sombra{position:absolute;left:50%;top:50%;height:.6em;width:.6em;margin:-.3em 0 0 -.3em;opacity:0;pointer-events:none;
+  color:var(--ti-fuerte)}
+.sombra svg{display:block;width:100%;height:100%}
+/* la meta: una barra fina, lejos de la cifra */
+/* los mandos */
+.mandos{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:var(--m-mandos)}
+.b-principal,.b-marca,.b-suave{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  border-radius:999px;font-weight:800;white-space:nowrap;
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),background-color .2s var(--sal),border-color .2s var(--sal),color .2s var(--sal)}
+.b-principal{height:3.625rem;min-width:11.5rem;padding:0 1.875rem 0 1.625rem;border:0;background:var(--te-base);color:#f7f1e9;
+  font-size:1.2rem;letter-spacing:.01em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 6px 16px rgba(143,58,30,.34),0 2px 4px rgba(143,58,30,.26)}
+.b-principal .ico{width:1.375rem;height:1.375rem}
+.b-principal:hover{background:var(--te-vivo);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 22px rgba(143,58,30,.40),0 2px 4px rgba(143,58,30,.26)}
+.b-marca{height:3.25rem;padding:0 1.375rem 0 1.125rem;border:2px solid var(--te-suave);background:var(--su-papel);color:var(--te-hondo);font-size:1.06rem}
+.b-marca .ico{width:1.25rem;height:1.25rem}
+.b-marca:hover:not(:disabled){background:var(--te-velo);transform:translateY(-2px);box-shadow:0 6px 14px rgba(143,58,30,.16)}
+.b-marca:disabled{border-color:var(--su-calido);color:var(--ti-guia);cursor:default}
+.b-suave{height:3.25rem;padding:0 1.25rem 0 1rem;border:2px solid var(--su-linea);background:var(--su-papel);color:var(--ti-media);font-size:1.06rem}
+.b-suave .ico{width:1.25rem;height:1.25rem}
+.b-suave:hover{border-color:var(--su-calido);background:var(--su-realce);transform:translateY(-2px);box-shadow:0 6px 14px rgba(27,21,18,.08)}
+.b-suave.confirmar{background:var(--ci-caja);border-color:var(--ci-caja);color:#f7f1e9}
+.b-principal:active,.b-marca:active:not(:disabled),.b-suave:active{transform:scale(.98);transition-duration:.1s}
+/* una etiqueta que cambia no mueve los botones vecinos */
+.apila{display:grid}
+.apila>span{grid-area:1/1;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-align:center}
+.apila>span:not(.ve){visibility:hidden}
+/* columna angosta —la lista y la información abiertas a la vez—: los mandos
+   se reparten en dos filas, como en el teléfono, y la cifra cuenta con ello */
+@container reloj (max-width: 560px){
+  .mandos{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem}
+  .b-principal{grid-column:1 / -1;width:100%;min-width:0;padding:0 1rem}
+  .b-marca,.b-suave{width:100%;padding-left:1rem;padding-right:1rem}
+  .reloj-int{--fijo:calc(var(--m-meta) + 2.375rem + var(--m-mandos) + 3.625rem + 3.85rem + .375rem)}
+}
+@container reloj (max-width: 420px){
+  .mandos{grid-template-columns:minmax(0,1fr) auto}
+  .b-marca,.b-suave{font-size:.98rem;padding-left:.8rem;padding-right:.8rem}
+}
+/* el clip de las marcas, junto a Reiniciar */
+.clip-caja{position:relative;display:flex}
+.b-clip{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:.6875rem;padding:0;display:grid;place-items:center;
+  background:var(--su-hondo);color:var(--ti-media);transition:background-color .18s var(--sal),transform .3s var(--sal)}
+.b-clip::before{content:"";position:absolute;inset:-4px}
+/* 44 px de superficie */
+.b-clip .ico{width:1.1875rem;height:1.1875rem}
+.b-clip:hover{background:var(--su-calido)}
+.b-clip[aria-expanded="true"]{background:var(--su-calido)}
+.b-clip .clip-n{position:absolute;top:-7px;right:-9px;min-width:21px;height:21px;padding:0 5px;border-radius:999px;display:grid;place-items:center;
+  background:var(--pe-claro);color:#f7f1e9;font-family:var(--fam-num);font-weight:600;font-size:.72rem;box-shadow:0 0 0 2px var(--su-papel)}
+/* con las marcas guardadas, el botón se tiñe: hay algo ahí dentro */
+.b-clip.oculta{background:var(--te-velo);color:var(--te-hondo)}
+.b-clip.oculta:hover{background:var(--su-calido)}
+.b-clip.late{animation:clip-late .45s var(--sal)}
+@keyframes clip-late{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+.menu{position:absolute;z-index:40;min-width:236px;padding:6px;margin:0;list-style:none;
+  background:var(--su-papel);border:1px solid var(--su-linea);border-radius:18px;box-shadow:var(--sombra-menu);
+  animation:menu-entra .2s var(--sal) both}
+.clip-menu{right:-6px;bottom:calc(100% + 10px);transform-origin:bottom right}
+.menu button{display:flex;align-items:center;gap:11px;width:100%;min-height:44px;padding:9px 14px 9px 12px;border:0;border-radius:12px;
+  background:none;text-align:left;font-weight:800;font-size:.97rem;color:var(--ti-fuerte);white-space:nowrap}
+.menu button .ico{width:19px;height:19px;color:var(--pe-claro)}
+.menu button.peligro .ico{color:var(--te-hondo)}
+.menu button:hover,.menu button:focus-visible{background:var(--su-realce)}
+@keyframes menu-entra{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+/* lo que entra suave también sale suave: nada desaparece de un tirón */
+.saliendo{pointer-events:none}
+.clip-menu.saliendo{animation:menu-sale .17s var(--sal) both}
+.menu-cab.saliendo,.ajustes.saliendo{animation:menu-sale-arriba .17s var(--sal) both}
+@keyframes menu-sale{from{opacity:1;transform:none}to{opacity:0;transform:translateY(6px) scale(.98)}}
+/* un menú colgado de la cabecera de la lista: la casa lo coloca, cada
+   cronómetro le pone dentro lo suyo */
+.cab-caja{position:relative;margin-left:auto;flex:0 0 auto}
+.menu-cab{right:-6px;top:calc(100% + 9px);transform-origin:top right;max-height:min(20rem,52vh);overflow-y:auto;overscroll-behavior:contain;
+  animation:menu-entra-arriba .2s var(--sal) both;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+@keyframes menu-sale-arriba{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-7px) scale(.98)}}
+/* Los atajos viven en el panel de ajustes, no al pie de la pieza: en la
+   pizarra esa tira de frases era ruido —ahí se toca, no se teclea— y
+   quien tiene teclado los busca donde se busca todo lo demás. Van en el
+   hueco que deja la columna más corta, así que no cuestan altura, y solo
+   los que no se adivinan: el espacio para iniciar y pausar lo sabe todo
+   el mundo y se llevaba un renglón. */
+.aj-teclado{margin-top:auto;padding-top:10px}
+/* En los visores más bajos del parque —638 px de alto— el panel se recoge:
+   menos aire entre filas y entre grupos. Con eso entra entero y no hace
+   falta desplazarlo, que era lo que lo hacía parecer enorme. */
+@media (max-height: 700px){
+  .ajustes{padding:12px 18px 14px}
+  .aj-cab{padding-bottom:8px;margin-bottom:9px}
+  .aj-rejilla{gap:10px 26px}
+  .aj-grupo{gap:7px}
+  .aj-fila{min-height:2.375rem}
+  .aj-teclado{padding-top:7px}
+  .aj-teclado .aj-rotulo{margin-bottom:4px}
+  .teclas{gap:4px 14px}
+}
+.aj-teclado .aj-rotulo{margin-bottom:6px}
+/* en dos columnas, no en una tira que se parte donde cabe: así las
+   teclas quedan alineadas y se leen de un vistazo */
+.teclas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,auto));
+  justify-content:start;gap:5px 16px;
+  font-size:.82rem;font-weight:700;line-height:1.35;color:var(--ti-tenue)}
+.teclas li{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.teclas kbd{flex:0 0 auto;min-width:2.25rem;padding:1px 7px;border-radius:7px;text-align:center;
+  border:1px solid var(--su-linea);border-bottom-width:2px;
+  background:var(--su-fondo);font-family:var(--fam-num);font-weight:600;font-size:.74rem;line-height:1.5;color:var(--ti-media)}
+/* en una pantalla de dedo no hay teclado que explicar: se va el grupo
+   entero, rótulo incluido, no solo la lista */
+@media (hover:none) and (pointer:coarse){
+  .aj-teclado{display:none}
+}
+/* el aviso que ofrece deshacer */
+.aviso{position:absolute;left:50%;bottom:clamp(6px,1.2vh,12px);z-index:35;display:flex;align-items:center;gap:12px;
+  max-width:calc(100% - 32px);padding:6px 6px 6px 18px;border-radius:999px;background:var(--pe-caja);color:#f7f1e9;
+  font-weight:800;font-size:.93rem;white-space:nowrap;box-shadow:0 10px 26px rgba(15,45,58,.30);
+  transform:translateX(-50%);animation:aviso-entra .25s var(--sal) both}
+.aviso-txt{overflow:hidden;text-overflow:ellipsis}
+.aviso button{position:relative;flex:0 0 auto;min-height:36px;padding:4px 14px;border:0;border-radius:999px;background:rgba(247,241,233,.14);
+  color:#f7f1e9;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.aviso button:hover{background:rgba(247,241,233,.24)}
+.aviso button::before{content:"";position:absolute;inset:-4px -2px}
+@keyframes aviso-entra{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+/* ── 7-bis · Comparar rondas ───────────────────────────────────────────── */
+/* la hoja se ajusta a lo que lleva dentro y solo crece hasta donde cabe */
+/* ── 7-bis · Comparar: la hoja que cruza lo guardado ───────────────────────────────────────────── */
+.cmp-velo{position:absolute;inset:0;z-index:58;border-radius:inherit;background:rgba(15,45,58,.34);
+  animation:velo-entra .2s var(--sal) both}
+@keyframes velo-entra{from{opacity:0}to{opacity:1}}
+/* la hoja se ajusta a lo que lleva dentro y solo crece hasta donde cabe */
+.comparar{position:absolute;z-index:59;left:50%;top:50%;
+  width:min(58rem,calc(100% - clamp(18px,4.4vw,56px)));
+  max-height:calc(100% - clamp(14px,4vh,40px));
+  display:flex;flex-direction:column;min-height:0;
+  padding:clamp(12px,1.8vh,20px) clamp(14px,1.8vw,24px) clamp(10px,1.4vh,16px);
+  background:var(--su-papel);border:1px solid var(--su-linea);border-radius:22px;box-shadow:var(--sombra-menu);
+  transform:translate(-50%,-50%);animation:cmp-entra .22s var(--sal) both}
+@keyframes cmp-entra{from{opacity:0;transform:translate(-50%,-50%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.cmp-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding-bottom:10px;margin-bottom:2px;border-bottom:1px solid var(--su-linea)}
+.cmp-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:clamp(1.1rem,1.5cqi,1.35rem);color:var(--pe-hondo)}
+.cmp-sub{margin:2px 0 0;font-weight:600;font-size:.88rem;color:var(--ti-tenue)}
+.cmp-cerrar{position:relative;flex:0 0 auto;width:2.5rem;height:2.5rem;border:0;border-radius:12px;padding:0;
+  display:grid;place-items:center;background:var(--su-hondo);color:var(--ti-media)}
+.cmp-cerrar::before{content:"";position:absolute;inset:-3px}
+.cmp-cerrar:hover{background:var(--su-calido);color:var(--pe-hondo)}
+.cmp-marco{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;margin:0 -4px;padding:0 4px;
+  scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.cmp-marco:focus-visible{outline:3px solid var(--te-claro);outline-offset:-3px;border-radius:12px}
+.cmp{width:100%;border-collapse:separate;border-spacing:0;font-size:clamp(.84rem,.95cqi,.95rem)}
+.cmp th,.cmp td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--su-linea)}
+.cmp thead th{position:sticky;top:0;z-index:2;background:var(--su-papel);
+  font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ti-tenue);
+  border-bottom:1px solid var(--su-calido)}
+.cmp th.cmp-quien,.cmp td.cmp-quien{position:sticky;left:0;z-index:1;background:var(--su-papel);
+  text-align:left;font-weight:800;color:var(--ti-fuerte);max-width:11rem;overflow:hidden;text-overflow:ellipsis}
+.cmp thead th.cmp-quien{z-index:3}
+.cmp tbody tr:hover td{background:var(--su-realce)}
+.cmp tbody tr:hover td.cmp-quien{background:var(--su-realce)}
+.cmp td.cmp-t{font-family:var(--fam-num);font-weight:600;font-variant-numeric:tabular-nums;color:var(--ti-media)}
+.cmp td.cmp-vacia{color:var(--ti-guia)}
+.cmp td.cmp-mejor{color:var(--pe-hondo);font-weight:700}
+.cmp td.cmp-cambio{font-family:var(--fam-num);font-weight:700;font-variant-numeric:tabular-nums;
+  border-left:1px solid var(--su-linea);color:var(--ti-tenue)}
+.cmp td.cmp-cambio.baja{color:var(--pe-claro)}
+.cmp td.cmp-cambio.sube{color:var(--te-hondo)}
+.cmp tbody tr:last-child th,.cmp tbody tr:last-child td{border-bottom:0}
+.cmp-nota{margin:9px 0 0;font-weight:600;font-size:.83rem;line-height:1.45;color:var(--ti-tenue)}
+.cmp-nada{margin:22px 0;text-align:center;font-weight:700;color:var(--ti-tenue)}
+.comparar.saliendo{animation:cmp-sale .19s var(--sal) both}
+@keyframes cmp-sale{from{opacity:1;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(-50%,-50%) scale(.97)}}
+.cmp-velo.saliendo{animation:velo-sale .19s var(--sal) both}
+@keyframes velo-sale{from{opacity:1}to{opacity:0}}
+
+/* ── 8 · Ajustes: menú desplegable ─────────────────────────────────────── */
+.ajustes{position:absolute;top:calc(100% + 12px);right:0;z-index:50;width:min(40rem,calc(100vw - 28px));
+  max-height:var(--aj-alto,76vh);overflow:auto;overscroll-behavior:contain;
+  padding:14px 18px 18px;background:var(--su-papel);border:1px solid var(--su-linea);border-radius:22px;
+  box-shadow:var(--sombra-menu);animation:menu-entra-arriba .2s var(--sal) both;transform-origin:top right}
+@keyframes menu-entra-arriba{from{opacity:0;transform:translateY(-7px) scale(.98)}to{opacity:1;transform:none}}
+.aj-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;margin-bottom:12px;border-bottom:1px solid var(--su-linea)}
+.aj-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:1.2rem;color:var(--pe-hondo)}
+.aj-cerrar{position:relative;width:2.5rem;height:2.5rem;border:0;border-radius:12px;padding:0;display:grid;place-items:center;background:var(--su-hondo);color:var(--ti-media)}
+.aj-cerrar::before{content:"";position:absolute;inset:-3px}
+.aj-cerrar .ico{width:20px;height:20px}
+.aj-cerrar:hover{background:var(--su-calido)}
+.aj-rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 26px}
+.aj-grupo{min-width:0;display:flex;flex-direction:column;gap:10px}
+.aj-grupo+.aj-grupo{border-left:1px solid var(--su-linea);padding-left:24px}
+.aj-rotulo{margin:0;font-family:var(--fam-num);font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ti-tenue)}
+.aj-fila{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:2.75rem}
+.aj-fila label{font-weight:800;font-size:1rem;color:var(--ti-fuerte);cursor:pointer}
+.aj-nota{margin:0;font-size:.86rem;font-weight:700;line-height:1.4;color:var(--ti-tenue)}
+.aj-sep{height:1px;background:var(--su-linea);margin:2px 0}
+/* interruptor: una casilla con forma de interruptor */
+.interruptor{-webkit-appearance:none;appearance:none;position:relative;flex:0 0 auto;width:3.25rem;height:1.875rem;margin:0;border-radius:999px;
+  border:2px solid var(--ti-guia);background:var(--su-hondo);cursor:pointer;transition:background-color .2s var(--sal),border-color .2s var(--sal)}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:calc(1.875rem - 10px);height:calc(1.875rem - 10px);border-radius:50%;background:var(--ti-guia);
+  transition:transform .22s var(--sal),background-color .2s var(--sal)}
+.interruptor:checked{background:var(--pe-claro);border-color:var(--pe-claro)}
+.interruptor:checked::after{transform:translateX(1.375rem);background:#fffcf7}
+/* la meta: minutos y segundos */
+.campo-num{width:4.5rem;height:2.875rem;padding:0 8px;border:2px solid var(--su-linea);border-radius:12px;background:var(--su-fondo);
+  text-align:center;font-family:var(--fam-num);font-weight:600;font-size:1.25rem;color:var(--ti-fuerte);outline:none}
+.campo-num:focus{border-color:var(--te-base);background:var(--su-papel)}
+.campo-num:disabled{color:var(--ti-guia);background:var(--su-realce);border-style:dashed}
+.aj-unidad{font-weight:800;font-size:.98rem;color:var(--ti-media);margin-right:8px}
+/* la precisión: cuatro opciones con su muestra */
+/* ── 9 · Las señales de la meta ─────────────────────────────────────────
+   Aviso: la cifra respira. Final: se pone terracota honda y palpita una
+   vez por segundo. Meta cumplida: se queda quieta en terracota honda.
+   En pausa, nada se mueve. */
+.pieza.corre[data-tramo="aviso"] .cifra{animation:respira 2.4s ease-in-out infinite}
+.pieza.corre[data-tramo="final"] .cifra{animation:palpita 1s cubic-bezier(.33,0,.3,1) infinite;animation-delay:var(--fase,0ms)}
+/* ── 10 · Pantalla completa ─────────────────────────────────────────────
+   Solo la herramienta: sin barra, sin migas, sin pie y sin la línea de
+   teclas. La pieza crema a todo lo ancho, que en un aula con luz se lee
+   mejor. Del panel de la cabecera y de los mandos solo queda lo esencial:
+   pausar/reanudar, siguiente/terminar y, cuando hace falta, las etapas;
+   Información y Ajustes se cierran solos si estaban abiertos. */
+html.pc,html.pc body{background:var(--su-papel)}
+html.pc .barra,html.pc .migas,html.pc .pie,html.pc .cifras-fondo{display:none!important}
+html.pc #btn-info,html.pc #btn-ajustes,html.pc #btn-reiniciar,html.pc .ajustes{display:none!important}
+html.pc .info{display:none!important}
+html.pc .p-cuerpo.con-info{--col-info:0px}
+html.pc .escenario{background:var(--su-papel)}
+html.pc .mesa{padding:0}
+html.pc .pieza{max-width:none;border-radius:0;box-shadow:none;
+  padding:clamp(14px,2.6vh,30px) clamp(20px,2.6vw,48px) clamp(8px,1.5vh,16px)}
+html.pc .pieza::after{box-shadow:inset 0 0 0 6px var(--te-velo)}
+html.pc .p-icono{width:2.875rem}
+html.pc .reloj{--k:.78}
+html.pc .p-cuerpo.con-lista .reloj{--k:.86}
+html.pc .meta{--meta-ancho:47.5rem}
+html.pc .carga{top:0}
+/* Pasado un rato sin tocar nada, con el reloj corriendo, los mandos que
+   quedan (pausar/reanudar, siguiente y el de las etapas) se atenúan un
+   60%: no compiten con la clase mientras se mira el reloj, pero siguen
+   enteros —tocar uno de ellos o cualquier punto de la pantalla los
+   despierta de golpe—. Nada de esto ocurre fuera de pantalla completa
+   ni con el reloj en pausa. */
+html.pc .mandos{transition:opacity .7s ease}
+html.pc.latente .mandos{opacity:.4}
+/* ── 11 · Modo documento ────────────────────────────────────────────────
+   Solo en vertical y en el teléfono girado: la orientación decide, no el
+   ancho. Una pizarra 4:3 de 1024 px sigue siendo un aula. */
+@media (orientation: portrait), (max-height: 480px){
+  html,body{height:auto}
+  body{height:auto;min-height:100vh;min-height:100dvh;overflow-x:hidden;overflow-y:auto}
+  .escenario{flex:1 0 auto}
+  .mesa{padding:6px 10px 12px;align-items:flex-start}
+  .pieza{display:block;border-radius:26px;padding:16px 16px 12px}
+  .p-cuerpo{display:flex;flex-direction:column;gap:14px;padding-top:12px}
+  .reloj{container:reloj/inline-size;display:block}
+  .reloj-int{padding:6px 0 4px}
+  .cifra-caja{font-size:min(calc(var(--k) * 100cqi / var(--em)),22vh,12rem)}
+  .reloj{--k:.9}
+  .p-cuerpo.con-lista .reloj{--k:.9}
+  .mandos{flex-wrap:wrap;margin-top:18px}
+  .lista{order:2;transform:none;max-height:none;border-radius:20px}
+  .info{order:3;transform:none;overflow:visible}
+  .p-cuerpo:not(.con-info) .info{display:none}
+  .info-int{min-width:0;overflow:visible;border-left:0;border-top:1px solid var(--su-linea);padding:14px 2px 8px;-webkit-mask-image:none;mask-image:none}
+  .p-cuerpo:not(.con-lista) .lista{display:none}
+  .lista-int{min-width:0;height:auto}
+  .lista-plegar{display:grid;position:relative;flex:0 0 auto;width:40px;height:40px;margin-left:4px;border:0;border-radius:12px;padding:0;place-items:center;
+    background:rgba(255,252,247,.7);color:var(--ti-media)}
+  .lista-plegar .ico{width:20px;height:20px;transition:transform .25s var(--sal)}
+  .lista.plegada .lista-plegar .ico{transform:rotate(-90deg)}
+  .aviso{position:fixed;bottom:16px}
+  .lista.plegada .lista-marcas{display:none}
+  .lista.plegada .lista-cab{padding-bottom:0}
+  html.pc .pieza{border-radius:0}
+}
+@media (orientation: portrait) and (max-width: 600px){
+  .migas .rastro{display:none}
+  .p-cab{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"icono . botones" "textos textos textos";row-gap:12px}
+  .p-icono{width:54px}
+  .mandos{display:grid;grid-template-columns:1fr auto auto;width:100%;gap:10px}
+  .b-principal{grid-column:1 / -1;width:100%}
+  .b-marca,.b-suave{width:100%}
+  .mandos .clip-caja{justify-self:end}
+  .ajustes{position:fixed;left:10px;right:10px;top:auto;width:auto}
+    .aj-rejilla{grid-template-columns:1fr}
+  .aj-grupo+.aj-grupo{border-left:0;padding-left:0;border-top:1px solid var(--su-linea);padding-top:12px}
+}
+@media (max-width: 720px){
+  .aj-rejilla{grid-template-columns:1fr}
+  .aj-grupo+.aj-grupo{border-left:0;padding-left:0;border-top:1px solid var(--su-linea);padding-top:12px}
+  .ajustes{width:min(420px,calc(100vw - 20px))}
+}
+@media (max-width: 380px){
+  .mandos{grid-template-columns:1fr 1fr}
+  .mandos .clip-caja{grid-column:1 / -1;justify-self:center}
+}
+/* ── 12 · Movimiento reducido ───────────────────────────────────────────
+   Ni latido, ni respiración, ni pulso, ni sombra, ni deslizamientos: solo
+   cambia el color. El isotipo de la carga aparece quieto y sin raya. */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+  .carga .iso rect{animation:none!important;opacity:1}
+  .carga-raya{display:none}
+  .cifras-fondo span{animation:none!important}
+}

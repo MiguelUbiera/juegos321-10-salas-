@@ -1,0 +1,187 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Secuencia321 · Cronómetro 4 · Minutos en bloques · propio.css
+   Fuente de index.html: se corrige aquí y se vuelve a construir con
+   construir.py. Lo que comparte con los demás cronómetros vive en
+   _comun/casa.css y no se repite aquí — solo lo que es propio de este:
+   la rueda, la bandeja y su composición a dos columnas.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── el cuerpo: sin columna de lista ───────────────────────────────────
+   La casa reparte el cuerpo en tres columnas (lista · centro · info) para
+   los cronómetros que llevan una lista de marcas o etapas. Este no lleva
+   ninguna — «acumula, sin más» — así que su cuerpo va a dos: lo principal
+   y, cuando se abre, la información. */
+.p-cuerpo{grid-template-columns:minmax(0,1fr) var(--col-info,0px)}
+
+.principal{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,1.6vh,20px);padding-block:4px}
+
+/* ── el nombre de la actividad, sin la línea de la casa ────────────────
+   Pedido explícito: «quita la línea debajo del nombre de la actividad».
+   Actividad y Etapas sí llevan ese guion punteado (`.dinamica` de
+   `casa.css`) — aquí se retira a propósito, así que esto es una
+   divergencia real del patrón compartido, no un matiz. Quien copie el
+   campo de actividad de otro cronómetro para uno nuevo debe saber que
+   este es la excepción. */
+.dinamica{border-bottom:0;padding:0;line-height:1.28}
+.dinamica:hover,.dinamica:focus{border-bottom-color:transparent}
+/* alineado a la base del ícono, no al centro de la fila (tres vueltas de
+   ajuste: ver traspaso-bloques.md, «Qué cambié») */
+.p-textos{align-self:end;margin-bottom:-2px}
+
+/* ── la rueda y la bandeja, lado a lado ─────────────────────────────── */
+.bl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:center;
+  gap:clamp(18px,3.2cqi,40px);width:100%}
+@container pieza (max-width:640px){.bl-grid{grid-template-columns:1fr}}
+/* el estado («Listo» / «En marcha» / …) va a la izquierda de la rueda, no
+   encima — y el margin-left:auto de la caja empuja la rueda hacia el
+   espacio libre de la derecha, en vez de dejarla centrada sola */
+.reloj-col{display:flex;align-items:center;gap:clamp(10px,2cqi,22px);min-width:0}
+.reloj-col .estado{margin:0;flex-shrink:0}
+/* en vh, no en cqh: `.pieza` solo declara contención de ancho
+   (inline-size, en casa.css), así que cqh no tiene de dónde leer una
+   altura real y cae en el alto de la ventana — de ahí que la rueda se
+   viera más grande de lo que el tope en píxeles debía permitir, con
+   espacios inconsistentes según la ventana */
+.bl-rueda-caja{position:relative;width:min(100%,46vh,380px);margin-left:auto}
+.bl-rueda{display:block;width:100%;height:auto}
+/* seis grupos de diez, con los dos tonos de la marca */
+.cuenta{fill:var(--su-hondo);transition:fill .18s var(--sal)}
+.cuenta.llena{fill:var(--te-base)}
+.cuenta.llena.par{fill:var(--pe-claro)}
+.pieza[data-e="final"] .cuenta.llena{fill:var(--te-hondo)}
+.bl-cifra{font-family:var(--fam-num);font-weight:600;fill:var(--ti-fuerte);text-anchor:middle;dominant-baseline:central;font-size:40px}
+.bl-cifra .sep{fill:var(--ti-sep)}
+.pieza[data-e="final"] .bl-cifra{animation:palpita 1s cubic-bezier(.33,0,.3,1) infinite}
+@keyframes palpita{0%,100%{transform:scale(1)}44%{transform:scale(1.05)}}
+
+.bandeja-col{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:center}
+.bl-meta-txt{font-size:.92rem;font-weight:800;color:var(--ti-tenue)}
+.bl-meta-txt b{color:var(--pe-hondo)}
+/* sin borde ni ancho fijo: la caja es solo un fondo suave, y su ancho lo
+   calcula el guion según cuántos bloques le tocan a la meta configurada */
+.bandeja{display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;
+  min-height:2.3rem;padding:10px;border-radius:16px;background:var(--su-hondo)}
+/* los bloques llevan el mismo lenguaje de botón con relieve que ya usan
+   `.b-app` y los mandos de la casa — no un cuadrado plano */
+.bl-bloque{width:2.3rem;height:2.3rem;flex:0 0 auto;border-radius:9px;
+  background:linear-gradient(180deg,var(--pe-claro) 0%,var(--pe-base) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.16),0 2px 5px rgba(15,45,58,.22);
+  animation:bloque-entra .32s var(--sal) both}
+@keyframes bloque-entra{from{opacity:0;transform:translateY(3px) scale(.9)}to{opacity:1;transform:none}}
+.bl-bloque.impar{background:linear-gradient(180deg,var(--pe-base) 0%,var(--pe-hondo) 100%)}
+/* el último —el que cumple la meta— siempre en terracota: se nota de un
+   vistazo cuál cerró la meta */
+.bl-bloque.ultimo{background:linear-gradient(180deg,var(--te-vivo) 0%,var(--te-base) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.16),0 3px 7px rgba(143,58,30,.3)}
+.bl-bloque.cierra-grupo{margin-right:10px}
+/* en pantalla completa, rueda y bloques crecen un 10 % más de lo que ya
+   habían crecido en la vuelta anterior */
+.pieza.pc .bl-rueda-caja{width:min(100%,63vh,572px)}
+.pieza.pc .bl-bloque{width:2.8rem;height:2.8rem;border-radius:11px}
+
+/* el modo Estaciones: solo una tira de cifras, memoria visual de la
+   clase de hoy — no abre panel, no compara, no se guarda entre sesiones */
+.tira-estaciones{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:32rem}
+.tira-estaciones span{font-size:.78rem;font-weight:800;color:var(--pe-claro);background:var(--pe-velo);
+  padding:3px 10px;border-radius:999px}
+
+/* ── los mandos: solo ícono, como ya son los tres de la cabecera ───────
+   Un círculo grande en terracota para iniciar/pausar (la proporción de
+   `.b-app`, escalada) y uno más chico en el tono neutro para reiniciar —
+   así la función se reconoce por el ícono, como pedía el encargo, y
+   sigue siendo accesible porque el `aria-label` no desaparece, solo el
+   texto visible. */
+.mandos{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-top:clamp(14px,2.4vh,26px)}
+.b-principal-ico,.b-suave-ico{position:relative;border:0;border-radius:50%;display:grid;place-items:center;
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),background-color .2s var(--sal),border-color .2s var(--sal),color .2s var(--sal)}
+.b-principal-ico{width:3.4rem;height:3.4rem;background:var(--te-base);color:#f7f1e9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 6px 16px rgba(143,58,30,.34),0 2px 4px rgba(143,58,30,.26)}
+.b-principal-ico .ico{width:1.4rem;height:1.4rem}
+.b-principal-ico:hover{background:var(--te-vivo);transform:translateY(-2px)}
+.b-principal-ico:active{transform:scale(.97);transition-duration:.1s}
+.b-suave-ico{width:2.6rem;height:2.6rem;border:2px solid var(--su-linea);background:var(--su-papel);color:var(--ti-media);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 3px 8px rgba(60,44,34,.16),0 1px 2px rgba(60,44,34,.10)}
+.b-suave-ico .ico{width:1.05rem;height:1.05rem}
+.b-suave-ico:hover{border-color:var(--su-calido);background:var(--su-realce);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 6px 14px rgba(60,44,34,.20),0 2px 4px rgba(60,44,34,.14)}
+.b-suave-ico:active{transform:scale(.96);transition-duration:.1s;
+  box-shadow:inset 0 2px 4px rgba(60,44,34,.24)}
+/* reiniciar pide un segundo toque en tres segundos, igual que en Etapas —
+   con su propia sombra, más honda, para que se note que quedó «armado» */
+.b-suave-ico.confirmar{background:var(--ci-caja);border-color:var(--ci-caja);color:#f7f1e9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 6px 16px rgba(43,29,40,.36),0 2px 4px rgba(43,29,40,.26)}
+/* la aclaración de que hace falta un segundo toque ya no es un mensaje
+   del sistema (un title del navegador, que se ve y se siente ajeno): es
+   una burbuja propia, con la paleta y el aire de la casa —el mismo
+   lenguaje que el aviso de deshacer (`.aviso`, en casa.css)—, que
+   aparece y desaparece con el propio estado «confirmar» del botón. */
+.pista-reinicio{position:absolute;left:50%;bottom:calc(100% + 11px);z-index:5;
+  padding:6px 13px;border-radius:999px;background:var(--ci-caja);color:#f7f1e9;
+  font-size:.76rem;font-weight:800;white-space:nowrap;pointer-events:none;
+  box-shadow:0 8px 18px rgba(15,45,58,.26);
+  opacity:0;transform:translate(-50%,5px) scale(.92);
+  transition:opacity .16s var(--sal),transform .16s var(--sal)}
+.pista-reinicio::after{content:"";position:absolute;top:100%;left:50%;width:9px;height:9px;
+  background:var(--ci-caja);transform:translate(-50%,-50%) rotate(45deg);border-radius:2px}
+.b-suave-ico.confirmar .pista-reinicio{opacity:1;transform:translate(-50%,0) scale(1)}
+@media (prefers-reduced-motion:reduce){.pista-reinicio{transition:opacity .1s linear}}
+
+/* ── los segmentados de Ajustes: duración, meta, agrupar, modo ─────────
+   No hay una `.segmentado` común en `casa.css` —cada cronómetro arma la
+   suya—; esta copia la que ya usa Semáforo: una pista honda con la
+   opción activa «flotando» en un botón propio, sombra incluida, para
+   que se note al toque que quedó pulsada y no que es un botón de
+   sistema sin estado. */
+.segmentado{display:inline-flex;padding:3px;border-radius:.75rem;background:var(--su-hondo);gap:2px}
+.segmentado button{border:0;background:transparent;border-radius:.5625rem;padding:.375rem .75rem;
+  font-weight:800;font-size:.86rem;color:var(--ti-tenue);white-space:nowrap;
+  transition:background-color .18s var(--sal),color .18s var(--sal),box-shadow .18s var(--sal),transform .1s}
+.segmentado button[aria-pressed="true"]{background:var(--su-papel);color:var(--pe-hondo);box-shadow:0 2px 5px rgba(27,21,18,.18)}
+.segmentado button:hover:not([aria-pressed="true"]){color:var(--ti-fuerte)}
+.segmentado button:active{transform:scale(.93)}
+/* la columna izquierda un poco más ancha —lo que pide «1 min · 5 min ·
+   Otra» para no partirse en dos líneas—; ya no compite con las teclas de
+   atajo, que se quitaron del panel (se explican solas: Espacio, R, P). */
+.aj-rejilla{grid-template-columns:minmax(0,calc(1fr + 3.4rem)) minmax(0,1fr)}
+
+/* ── información propia: «Aprendizajes relacionados» ───────────────────
+   Lo que ya arma `panel_info()` (para qué, cómo funciona, ideas) sale
+   solo de ficha.json — esto es lo único de más que pide este cronómetro,
+   y por eso vive aquí y no en la casa: una fila de etiquetas, no una
+   lista con viñeta, porque son términos sueltos para reconocer, no
+   consejos para leer. */
+.info-aprende{margin:0;padding:0;list-style:none;display:flex;flex-direction:row;flex-wrap:wrap;gap:6px}
+.info-aprende li{font-size:.78rem;font-weight:800;color:var(--pe-claro);background:var(--pe-velo);padding:3px 10px;border-radius:999px}
+
+/* ── pantalla completa: la misma composición, solo más grande ──────────
+   La casa esconde «i», ajustes y reiniciar en pantalla completa en todos
+   los cronómetros (`_comun/casa.css`, sección 10) — aquí se pidió lo
+   contrario dos veces: «querías la misma composición, solo con la rueda
+   más grande». Así que esto no es un matiz de Bloques: es la única
+   excepción de los cinco cronómetros a una regla que, en todos los
+   demás, se deja tal cual. */
+html.pc #btn-info,html.pc #btn-ajustes,html.pc #btn-reiniciar{display:grid!important}
+html.pc .ajustes:not([hidden]){display:block!important}
+html.pc .info{display:flex!important}
+html.pc .p-cuerpo.con-info{--col-info:clamp(16.5rem,28%,23rem)!important}
+/* el aire de arriba y abajo de la pieza, parejo — antes quedaba más aire
+   arriba que abajo, y el bloque entero (estado, rueda, bandeja, mandos)
+   se veía empujado hacia arriba */
+html.pc .pieza{padding-top:clamp(20px,4vh,44px);padding-bottom:clamp(20px,4vh,44px)}
+
+@media (prefers-reduced-motion:reduce){
+  .bl-bloque{animation:none}
+}
+
+/* El enlace al manual: texto subrayado, en terracota claro y discreto, a la
+   derecha de las migas (en pantalla completa las migas no se ven). */
+.manual{position:relative;margin-left:auto;flex:0 0 auto;padding:4px 2px;border-radius:4px;
+  color:color-mix(in srgb,var(--te-claro) 82%,#f7f1e9);font-weight:700;font-size:13.4px;line-height:1.3;
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,currentColor 55%,transparent);
+  transition:color .2s var(--sal),text-decoration-color .2s var(--sal)}
+.manual::before{content:"";position:absolute;inset:-9px -8px}
+.manual:hover{color:#f4b99d;text-decoration-color:currentColor}
+.manual:focus-visible{outline:2px solid var(--te-claro);outline-offset:3px}
+html.pc .manual{display:none}

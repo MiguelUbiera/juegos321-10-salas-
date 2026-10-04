@@ -1,0 +1,339 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Cronómetro por etapas · lo suyo
+   Va después de casa.css: el reparto (la barra de las etapas), la lista
+   de etapas y el editor de los ajustes. Todo lo demás lo pone la casa.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Los colores de las etapas salen de la paleta, en el orden de las
+   misiones: terracota, verde, petróleo, ciruela, y dos hondos si alguien
+   llega a seis. Ninguno inventado. */
+:root{
+  --e1:#b04a2a; --e2:#327a52; --e3:#2c5c70;
+  --e4:#5a3a52; --e5:#8f3a1e; --e6:#0f2d3a;
+}
+
+/* ── El reparto: una sola barra, a todo el ancho ─────────────────────────
+   El punteado encierra lo previsto; el relleno dice lo que va corrido. Una
+   etapa que se pasa llena su tramo y se tiñe: no crece, porque el reparto
+   es el mapa de lo planeado y ese mapa no se mueve. */
+/* el reparto es lo que este cronómetro tiene que decir de lejos, así que
+   la barra pesa más que la de la meta y se le reserva su sitio */
+.reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + var(--m-mandos) + 3.625rem + .375rem)}
+.reparto{width:100%;margin-top:var(--m-meta)}
+.rep-pista{display:flex;width:100%;height:1.125rem;gap:3px}
+.rep-tramo{position:relative;min-width:4px;border-radius:6px;overflow:hidden;
+  border:1.5px dashed color-mix(in srgb,var(--c) 74%,transparent);
+  background:color-mix(in srgb,var(--c) 15%,var(--su-fondo));
+  transition:flex-grow .4s var(--sal)}
+.rep-lleno{position:absolute;left:-1.5px;top:-1.5px;bottom:-1.5px;width:0;border-radius:inherit;background:var(--c)}
+.rep-tramo.corre .rep-lleno{transition:width .22s linear}
+/* una etapa que se pasó llena su tramo y se raya: el mapa no se estira */
+.rep-tramo.pasada{border-style:solid;border-color:var(--te-hondo)}
+.rep-tramo.pasada .rep-lleno{background:repeating-linear-gradient(115deg,var(--c) 0 13px,color-mix(in srgb,#fffcf7 34%,var(--c)) 13px 19px)}
+.rep-tramo.hecha{border-style:solid}
+
+.rep-pie{display:flex;justify-content:space-between;align-items:center;gap:.875rem;margin-top:.5625rem;
+  font-weight:800;font-size:1rem;line-height:1.3;color:var(--ti-media);white-space:nowrap}
+.rep-izq{display:inline-flex;align-items:center;gap:7px}
+.rep-izq .ico{width:1.125rem;height:1.125rem;color:var(--pe-claro)}
+.rep-der{display:inline-flex;align-items:center;gap:8px;color:var(--ti-tenue)}
+.rep-der .num{font-size:1.1em;color:var(--ti-fuerte)}
+.rep-der.pasada .num{color:var(--te-hondo)}
+
+/* ── La lista de etapas ─────────────────────────────────────────────── */
+.et-lista.hay-abajo{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+.et-lista.hay-arriba{-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px)}
+.et-lista.hay-arriba.hay-abajo{-webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent)}
+.et-lista{list-style:none;margin:0;padding:2px 4px 4px 0;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+
+.et{position:relative;display:grid;grid-template-columns:1.75rem minmax(0,1fr) auto;align-items:center;column-gap:9px;
+  padding:7px 12px 7px 9px;border-radius:14px;background:var(--su-papel);border:1px solid var(--su-linea);
+  box-shadow:0 1px 2px rgba(27,21,18,.04)}
+.et-n{width:1.75rem;height:1.75rem;border-radius:.5625rem;display:grid;place-items:center;background:var(--c);color:#fffaf4;
+  font-family:var(--fam-num);font-weight:600;font-size:.9rem}
+.et-textos{min-width:0;display:flex;flex-direction:column;gap:1px}
+.et-nombre{min-width:0;font-weight:800;font-size:1rem;line-height:1.25;color:var(--pe-hondo);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-donde{font-family:var(--fam-num);font-weight:600;font-size:.76rem;line-height:1.2;color:var(--ti-tenue)}
+.et-cifras{display:flex;flex-direction:column;align-items:flex-end;gap:1px;text-align:right}
+.et-t{font-family:var(--fam-num);font-weight:600;font-size:1rem;line-height:1.25;color:var(--ti-fuerte)}
+.et-dif{font-family:var(--fam-num);font-weight:600;font-size:.78rem;line-height:1.2;color:var(--ti-tenue)}
+.et-dif.sube{color:var(--te-hondo)}
+.et-dif.baja{color:var(--pe-claro)}
+
+/* tocar una etapa la elige; lo que la reinicia es el botón de siempre */
+.et{-webkit-user-select:none;user-select:none}
+.et.tocable{cursor:pointer}
+.et.tocable:hover{background:var(--su-realce);border-color:var(--su-calido)}
+.et:focus-visible{outline:3px solid var(--te-claro);outline-offset:2px}
+.et.elegida{border-color:var(--c);background:var(--su-realce);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.et.quieta{cursor:default;-webkit-user-select:auto;user-select:auto}
+.et.quieta:hover{background:var(--su-papel);border-color:var(--su-linea)}
+.lista.mirando .lista-titulo-b{color:var(--te-hondo)}
+/* Los dos íconos del encabezado van discretos, del color de la tinta y
+   sin caja: son ayudas, no mandos. Al sombrearlos se ve que responden.
+   La lista despliega los eventos guardados y la comparación; el menos
+   **quita el panel de en medio** —lo mismo que «Ocultar» de abajo— y le
+   devuelve el sitio al reloj. */
+.lista-menu{background:transparent;color:var(--ti-tenue)}
+.lista-menu:hover,.lista-menu[aria-expanded="true"]{background:rgba(255,252,247,.75);color:var(--pe-hondo)}
+.lista-plegar{display:grid;position:relative;flex:0 0 auto;width:2.125rem;height:2.125rem;margin-left:2px;
+  border:0;border-radius:10px;padding:0;place-items:center;background:transparent;color:var(--ti-tenue)}
+.lista-plegar::before{content:"";position:absolute;inset:-5px}
+.lista-plegar .ico{width:1.125rem;height:1.125rem;transition:none}
+.lista-plegar:hover{background:rgba(255,252,247,.75);color:var(--pe-hondo)}
+
+/* la X de cada evento guardado, al final de su renglón */
+.menu-cab .r-fila{display:flex;align-items:center;gap:2px}
+.menu-cab .r-fila>button[data-evento]{flex:1 1 auto;min-width:0;width:auto}
+/* `.menu button{width:100%}` vive en la casa y ganaba por especificidad:
+   la X salía del ancho entero y se montaba encima del nombre */
+.menu-cab .r-fila .r-quitar{position:relative;flex:0 0 auto;width:1.875rem;height:1.875rem;border:0;border-radius:9px;padding:0;
+  display:grid;place-items:center;background:transparent;color:var(--ti-tenue);
+  transition:background-color .16s var(--sal),color .16s var(--sal)}
+.r-quitar::before{content:"";position:absolute;inset:-6px -4px}
+.r-quitar .ico{width:.875rem;height:.875rem}
+.r-quitar:hover,.r-quitar:focus-visible{background:var(--te-velo);color:var(--te-hondo)}
+
+/* la X: solo cuando se está mirando un evento guardado, que es lo único
+   que hay que poder eliminar desde aquí */
+.lista-quitar{color:var(--te-hondo)}
+.lista-quitar:hover{background:var(--te-velo);color:var(--te-hondo)}
+.lista-quitar .ico{width:1rem;height:1rem}
+
+/* el lápiz de cada fila: cambiar el nombre o el tiempo sin salir de aquí */
+.et{grid-template-columns:1.75rem minmax(0,1fr) auto auto auto}
+/* Las flechas solo salen en la etapa elegida: elegir una es tomarla, y
+   una vez tomada se puede llevar a otro sitio de la columna. En las
+   demás no estorban. */
+.et-mover{display:none;flex-direction:column;gap:1px}
+.et.elegida .et-mover{display:flex}
+.et-flecha{position:relative;width:1.5rem;height:1.25rem;border:0;border-radius:7px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--c)}
+.et-flecha::before{content:"";position:absolute;inset:-4px -6px}
+.et-flecha .ico{width:1rem;height:1rem}
+.et-flecha:hover:not(:disabled){background:color-mix(in srgb,var(--c) 16%,transparent)}
+.et-flecha:disabled{color:var(--ti-guia);cursor:default}
+.et.editando .et-mover{display:none}
+.et-lapiz{position:relative;width:2rem;height:2rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--ti-tenue)}
+.et-lapiz::before{content:"";position:absolute;inset:-5px}
+.et-lapiz .ico{width:1.0625rem;height:1.0625rem}
+.et-lapiz:hover{background:var(--su-hondo);color:var(--pe-hondo)}
+.et.quieta .et-lapiz{display:none}
+
+/* El nombre se lleva su propia línea. Compartiéndola con los minutos y
+   los dos botones se quedaba en veintidós píxeles en el visor estrecho:
+   un campo donde no cabe lo que se escribe no es un campo. */
+.et.editando{grid-template-columns:1.75rem minmax(0,1fr) auto auto;cursor:default;
+  grid-template-areas:"num nom nom nom" "num hora quita listo";
+  --et-cols:4;
+  row-gap:7px;align-items:center;
+  border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et.editando .et-n{grid-area:num;align-self:start;margin-top:2px}
+.et.editando .et-campo-n{grid-area:nom}
+.et.editando .et-campo-t{grid-area:hora;justify-self:start}
+.et.editando .et-quita{grid-area:quita}
+.et.editando .et-ok{grid-area:listo}
+.et-campo{min-width:0;width:100%;min-height:2.5rem;padding:4px 10px;border:1px solid var(--su-linea);border-radius:11px;
+  background:var(--su-papel);font-weight:800;font-size:.97rem;color:var(--ti-fuerte)}
+.et-campo:focus{outline:none;border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et-campo-t{display:inline-flex;align-items:center;gap:3px}
+.et-campo-t .campo-num{width:2.6rem}
+.et-accion{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:11px;padding:0;display:grid;place-items:center}
+.et-accion::before{content:"";position:absolute;inset:-4px}
+.et-accion .ico{width:1.0625rem;height:1.0625rem}
+.et-quita{background:var(--te-velo);color:var(--te-hondo)}
+.et-quita:hover{background:var(--su-calido)}
+.et-ok{background:var(--pe-claro);color:#f7f1e9}
+.et-ok:hover{background:var(--pe-hondo)}
+
+/* añadir una etapa desde la propia lista */
+.et-mas-caja{list-style:none;display:flex}
+/* El sitio donde cabría otra etapa: sin borde y con un «+» que casi no
+   se ve. Está ahí para quien lo busque —todo el mundo sabe qué hace un
+   más— y no compite con las etapas de verdad. Al acercar el dedo o el
+   cursor se enciende y toma la forma de una fila. */
+.et-mas{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:2.875rem;
+  border:1.5px dashed transparent;border-radius:14px;background:transparent;color:var(--ti-tenue);
+  opacity:.28;
+  transition:opacity .18s var(--sal),border-color .18s var(--sal),background-color .18s var(--sal),color .18s var(--sal)}
+.et-mas-caja:hover .et-mas,.et-mas:hover,.et-mas:focus-visible{opacity:1;
+  border-color:var(--su-calido);background:var(--su-realce);color:var(--pe-hondo)}
+.et-mas .ico{width:1.25rem;height:1.25rem}
+
+/* Reiniciar, cuando hay una etapa elegida, es de esa etapa */
+.b-suave.de-etapa{border-color:var(--c);color:var(--c)}
+.b-suave.de-etapa b{font-weight:800}
+
+/* la que corre se ve desde el fondo del aula */
+.et.ahora{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 26%,transparent),0 2px 6px rgba(27,21,18,.07)}
+.et.ahora .et-nombre{color:var(--c)}
+/* la que espera se recoge con color, no con opacidad: bajarle la
+   opacidad al texto le baja también el contraste, y eso no se hace */
+.et.espera{background:var(--su-fondo)}
+.et.espera .et-nombre{color:var(--ti-tenue)}
+.et.espera .et-t{color:var(--ti-tenue)}
+.et.espera .et-n{background:color-mix(in srgb,var(--c) 34%,var(--su-hondo));color:var(--ti-fuerte)}
+.et.hecha .et-n{background:var(--su-hondo);color:var(--ti-tenue);box-shadow:inset 0 0 0 2px var(--c)}
+
+/* ── El editor de etapas, dentro de los ajustes ─────────────────────── */
+/* el panel se ensancha un poco: el nombre de una etapa tiene que caber
+   entero, que es lo que el maestro va a leer en la lista */
+.ajustes{width:min(47rem,calc(100vw - 28px))}
+.aj-etapas{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.et-editor{display:flex;flex-direction:column;gap:7px;max-height:min(22rem,44vh);overflow-y:auto;overscroll-behavior:contain;
+  padding-right:4px;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.et-ed{display:grid;grid-template-columns:1.5rem minmax(6rem,1fr) auto auto auto auto 2.25rem;align-items:center;gap:5px}
+.et-ed-color{width:1.5rem;height:1.5rem;border-radius:.5rem;background:var(--c)}
+.et-ed-nombre{min-width:0;width:100%;min-height:2.5rem;padding:4px 10px;border:1px solid var(--su-linea);border-radius:11px;
+  background:var(--su-papel);font-weight:800;font-size:.97rem;color:var(--ti-fuerte)}
+.et-ed-nombre:focus{outline:none;border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et-ed .campo-num{width:2.9rem}
+.et-ed .aj-unidad{font-weight:700;font-size:.8rem;color:var(--ti-tenue)}
+.et-quitar{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:11px;padding:0;display:grid;place-items:center;
+  background:var(--su-hondo);color:var(--te-hondo)}
+.et-quitar::before{content:"";position:absolute;inset:-4px}
+.et-quitar:hover:not(:disabled){background:var(--te-velo)}
+.et-quitar:disabled{opacity:.35;cursor:default}
+.et-pie{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:11px}
+.b-mas{min-height:2.75rem;padding:0 1.125rem}
+.b-mas:disabled{opacity:.45;cursor:default}
+.et-pie .aj-nota{margin:0;flex:1 1 12rem;min-width:0}
+
+/* ── Las señales de la etapa que se acaba ───────────────────────────── */
+.pieza[data-tramo="aviso"] .cifra{color:var(--te-suave)}
+.pieza[data-tramo="final"] .cifra{color:var(--te-base);animation:palpita 1s var(--resorte) infinite both;animation-delay:var(--fase,0ms)}
+.pieza[data-tramo="pasada"] .cifra{color:var(--te-hondo)}
+@keyframes palpita{0%,100%{transform:scale(1)}44%{transform:scale(1.035)}}
+.pieza[data-e="fin"] .cifra{color:var(--pe-hondo)}
+
+/* ── Cuando la columna del reloj se estrecha ──────────────────────────
+   «Siguiente» y «Reiniciar» son más anchos que los mandos del cronómetro
+   de actividad, así que este pasa a dos filas antes que él. El umbral va
+   en rem para que valga igual en un portátil y en un proyector grande,
+   donde la raíz crece y los botones con ella. */
+@container reloj (max-width: 37rem){
+  .mandos{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem}
+  .b-principal{grid-column:1 / -1;width:100%;min-width:0;padding:0 1rem}
+  .b-marca,.b-suave{width:100%;padding-left:1rem;padding-right:1rem}
+  .reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + var(--m-mandos) + 3.625rem + 3.85rem + .375rem)}
+  .rep-pista{height:.9375rem}
+  .rep-pie{font-size:.94rem}
+}
+@container reloj (max-width: 26rem){
+  .mandos{grid-template-columns:minmax(0,1fr) auto}
+  .b-marca,.b-suave{font-size:.98rem;padding-left:.8rem;padding-right:.8rem}
+}
+
+/* la columna de lo previsto se distingue de lo que pasó de verdad */
+.cmp td.cmp-plan{color:var(--ti-tenue);border-right:1px solid var(--su-linea)}
+.cmp tr.cmp-total th,.cmp tr.cmp-total td{border-top:1px solid var(--su-calido);font-weight:800;color:var(--ti-fuerte)}
+/* cada evento tiene su color: así se sigue una columna sin leer el rótulo */
+.cmp th.cmp-ev,.cmp td.cmp-gana{white-space:nowrap}
+.cmp-punto{display:inline-block;width:9px;height:9px;margin-right:7px;border-radius:50%;background:var(--c);vertical-align:baseline}
+.cmp td.cmp-gana{border-left:1px solid var(--su-linea);font-weight:800;color:var(--c)}
+.cmp td.cmp-gana.cmp-vacia{color:var(--ti-guia)}
+.cmp td.cmp-gana.cmp-empate{font-weight:700;color:var(--ti-tenue)}
+
+/* el color de cada evento en el menú de la cabecera */
+.menu-cab .r-color{flex:0 0 auto;width:.875rem;height:.875rem;border-radius:5px;background:var(--c)}
+.menu-cab .r-activo{flex:0 0 auto;padding:1px 7px;border-radius:999px;background:var(--pe-velo);
+  font-size:.72rem;font-weight:800;color:var(--pe-claro);text-transform:lowercase}
+
+/* ── Modo documento ─────────────────────────────────────────────────── */
+@media (orientation: portrait), (max-height: 480px){
+  .reparto{margin-top:18px}
+  .et-ed{grid-template-columns:1.5rem minmax(0,1fr) auto auto 2.25rem;row-gap:4px}
+  .et-ed .aj-unidad{display:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .rep-tramo,.rep-tramo.corre .rep-lleno{transition:none!important}
+  .pieza[data-tramo="final"] .cifra{animation:none!important}
+}
+
+/* ── Ajustes de oficio: nombre, centro del reloj, ajustes en pantalla completa y manual ── */
+
+/* El nombre de la actividad («Actividad»): 20 % más grande, y su caja mide
+   lo mismo que el ícono —arriba con arriba, abajo con abajo—, con la
+   palabra centrada entre las dos líneas. --ico repite la medida del ícono. */
+.p-cab{--ico:clamp(3.125rem,min(4.2cqi,8.4vh),3.75rem)}
+html.pc .p-cab{--ico:2.875rem}
+.dinamica{--fs:calc(1.2 * var(--f-dinamica,clamp(1.32rem,min(2.4cqi,4.6vh),2.5rem)));
+  font-size:var(--fs);min-height:var(--ico);
+  padding-top:max(1px,calc((var(--ico) - 2px - 1.2 * var(--fs)) / 2))}
+@media (orientation: portrait) and (max-width: 600px){
+  .dinamica{min-height:0;padding-top:1px}
+}
+
+/* El centro del reloj: las letras con aire. Las cifras ganan algo de
+   espacio entre sí y las etiquetas y los botones suben un 20 %. */
+.cifra{letter-spacing:.02em}
+.cifra .sep{margin:0 -.04em}
+.rep-pie{font-size:1.2rem}
+.b-principal{font-size:1.44rem}
+.b-marca,.b-suave{font-size:1.27rem}
+/* la etiqueta de abajo es más alta: la cifra cede ese poco */
+.reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + .3rem + var(--m-mandos) + 3.625rem + .375rem)}
+@container reloj (max-width: 37rem){
+  .rep-pie{font-size:1.13rem}
+}
+/* Los mandos: con sitio, ícono y palabra; cuando el reloj se estrecha,
+   solo el ícono —iniciar/pausar, siguiente, reiniciar y las etapas—, los
+   cuatro en una sola fila centrada que baja con orden si no cabe. El
+   texto no desaparece: queda para el lector de pantalla y como rótulo al
+   pasar el cursor. */
+.pieza .mandos{flex-wrap:wrap;justify-content:center}
+@container reloj (max-width: 40rem){
+  .reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + .3rem + var(--m-mandos) + 3.625rem + .375rem)}
+  .pieza .mandos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:clamp(.5rem,3cqi,.875rem);width:auto}
+  .pieza .mandos>*{flex:0 0 auto;grid-column:auto;justify-self:auto}
+  .pieza .b-principal,.pieza .b-marca,.pieza .b-suave{width:2.875rem;height:2.875rem;min-width:0;padding:0;
+    border-radius:.9375rem;gap:0;grid-column:auto}
+  .pieza .b-principal{width:3.25rem;height:3.25rem;border-radius:1.0625rem}
+  .pieza .b-principal .ico{width:1.5rem;height:1.5rem}
+  .pieza .b-marca .ico,.pieza .b-suave .ico{width:1.375rem;height:1.375rem}
+  .pieza .b-principal .apila,.pieza .b-marca .apila,.pieza .b-suave .apila{
+    position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+}
+/* Cuando el lienzo se achica, las columnas laterales ceden: con la lista y
+   la información abiertas, al reloj le quedaban 126 px y los botones se
+   aplastaban. Así conserva el espacio que necesita. */
+@container pieza (max-width: 62rem){
+  .p-cuerpo.con-lista{--col-lista:clamp(12.5rem,24%,23.75rem)}
+  .p-cuerpo.con-info{--col-info:clamp(12.5rem,22%,24rem)}
+}
+
+/* Pantalla completa: la casa esconde Ajustes, pero aquí es donde se
+   reparte el tiempo. El botón y su panel se quedan; el panel sigue
+   cerrado hasta que se toca. */
+html.pc #btn-ajustes{display:grid!important}
+html.pc .ajustes:not([hidden]){display:block!important}
+/* Reiniciar también se queda en pantalla completa (con su segundo toque,
+   para que nadie borre la tanda de un roce en la pizarra) */
+html.pc #btn-reiniciar{display:inline-flex!important}
+
+/* El enlace al manual: texto subrayado, en terracota claro y discreto, a la
+   derecha de las migas. Sigue visible aunque el teléfono oculte el rastro. */
+.manual{position:relative;margin-left:auto;flex:0 0 auto;padding:4px 2px;border-radius:4px;
+  color:color-mix(in srgb,var(--te-claro) 82%,#f7f1e9);font-weight:700;font-size:13.4px;line-height:1.3;
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,currentColor 55%,transparent);
+  transition:color .2s var(--sal),text-decoration-color .2s var(--sal)}
+.manual::before{content:"";position:absolute;inset:-9px -8px}
+.manual:hover{color:#f4b99d;text-decoration-color:currentColor}
+.manual:focus-visible{outline:2px solid var(--te-claro);outline-offset:3px}
+html.pc .manual{display:none}
+
+/* Las letras no se pintan con la tipografía de reserva: la marca de la barra
+   y el texto de la carga esperan a las fuentes (el guion pone «fuentes-ok»).
+   Si algo fallara, a los 3.6 s se muestran igual. */
+.marca-txt,.carga-marca,.carga-dice{transition:opacity .3s ease}
+html:not(.fuentes-ok) .marca-txt,html:not(.fuentes-ok) .carga-marca,html:not(.fuentes-ok) .carga-dice{
+  opacity:0;animation:texto-ya .01s linear 3.6s forwards}
+@keyframes texto-ya{to{opacity:1}}

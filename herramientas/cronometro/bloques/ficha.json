@@ -1,0 +1,33 @@
+{
+  "id": "bloques",
+  "orden": 4,
+  "nombre": "Minutos en bloques",
+  "antetitulo": "el tiempo que se ve crecer",
+  "lema": "Cada minuto que pasa se convierte en un bloque que se queda ahí.",
+  "para_que": "Primaria y primer ciclo de secundaria, para quien todavía no lee un reloj de un vistazo: recoger el salón, leer en silencio, resolver una tanda de ejercicios, una estación de trabajo. Donde importa que se **vea** el tiempo pasar, no que se mida con precisión.",
+  "como_funciona": "Una rueda de sesenta marcas se llena mientras dura un bloque —un minuto de forma predeterminada, o el tiempo que elijas—; al completarse, cae un bloque entero. Los bloques se acumulan a la vista, agrupados de cinco o de diez, hasta llegar a la meta que pusiste. **No mide con precisión**: mide para que se vea crecer.",
+  "ideas": [
+    "Pon la meta antes de empezar —cinco bloques para leer, diez para ordenar el salón— y la clase **ve cuánto le queda** sin preguntar.",
+    "En modo Estaciones, cada grupo llena su propia bandeja **desde cero** al llegar a la mesa: se compara de un vistazo cuántos bloques llenó cada uno.",
+    "En modo Reto, fija la meta y anímalos a **superar su propio tiempo** la próxima vez que se mida la misma tarea.",
+    "Cuenta hacia atrás desde la meta con preguntas: «si ya van tres bloques, ¿cuántos minutos faltan para cinco?»."
+  ],
+  "aprendizajes": [
+    "Medida del tiempo",
+    "Agrupación y conteo",
+    "Sistema sexagesimal",
+    "Relación entre minutos y segundos"
+  ],
+  "incluye": [
+    "Duración de bloque configurable",
+    "Meta en bloques",
+    "Agrupar de 5 o de 10",
+    "Pantalla completa"
+  ],
+  "instruccion": "Escribe el nombre de la actividad y pon la meta en bloques.",
+  "abrir": "index.html",
+  "icono": "icono.svg",
+  "vista": "vista.webp",
+  "version": "1.0",
+  "fecha": "2026-09-22"
+}

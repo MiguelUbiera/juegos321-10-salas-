@@ -1,0 +1,216 @@
+<!-- ICONOS -->
+
+<!-- La carga de la casa: lo primero que se pinta. El sitio la sacará a una pieza común. -->
+<div class="carga" id="carga" data-s321="carga" role="status" aria-live="polite">
+  <div class="carga-int">
+    <svg class="iso" viewBox="0 0 64 64" aria-hidden="true">
+      <rect class="p1" x="11" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p2" x="34" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p3" x="11" y="34" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="u1" x="34" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u2" x="44.6" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u3" x="34" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u4" x="44.6" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e08a5f"/>
+    </svg>
+    <div class="carga-marca">Secuencia321</div>
+    <p class="carga-dice">Preparando el cronómetro…</p>
+    <div class="carga-raya" aria-hidden="true"><i></i></div>
+  </div>
+</div>
+<script>window.S321_CARGA_T0 = performance.now();</script>
+
+<!-- La barra: fiel a la del sitio. El sitio pondrá aquí su barra común con los menús. -->
+<header class="barra" data-s321="barra">
+  <div class="barra-int">
+    <a class="marca" href="/" aria-label="Secuencia321, ir a la portada">
+      <span class="marca-icono"><img src="favicon.svg" alt="" width="36" height="36"></span>
+      <span class="marca-txt">Secuencia321</span>
+    </a>
+  </div>
+</header>
+
+<div class="escenario">
+  <div class="cifras-fondo" aria-hidden="true">
+    <span style="left:3%;top:8%;font-size:96px;animation-delay:-3s;animation-duration:24s">3</span>
+    <span style="left:90%;top:12%;font-size:64px;animation-delay:-11s;animation-duration:19s">2</span>
+    <span style="left:5%;top:60%;font-size:118px;animation-delay:-7s;animation-duration:27s">1</span>
+    <span style="left:93%;top:56%;font-size:88px;animation-delay:-15s;animation-duration:22s">7</span>
+    <span style="left:1%;top:34%;font-size:52px;animation-delay:-2s;animation-duration:18s">5</span>
+    <span style="left:87%;top:82%;font-size:110px;animation-delay:-9s;animation-duration:28s">9</span>
+    <span style="left:12%;top:85%;font-size:70px;animation-delay:-17s;animation-duration:21s">4</span>
+    <span style="left:97%;top:32%;font-size:46px;animation-delay:-5s;animation-duration:17s">8</span>
+    <span style="left:46%;top:91%;font-size:58px;animation-delay:-13s;animation-duration:25s">6</span>
+    <span style="left:52%;top:1%;font-size:40px;animation-delay:-19s;animation-duration:20s">1</span>
+    <span style="left:77%;top:3%;font-size:76px;animation-delay:-8s;animation-duration:26s">2</span>
+    <span style="left:22%;top:2%;font-size:50px;animation-delay:-21s;animation-duration:23s">3</span>
+  </div>
+
+  <nav class="migas" aria-label="Estás en">
+    <div class="rastro">
+      <ol>
+        <li><a href="/">Inicio</a></li>
+        <li><span class="sin-enlace">Herramientas</span></li>
+        <li><span class="sin-enlace">Cronómetros</span></li>
+        <li><span class="aqui" aria-current="page">Minutos en bloques</span></li>
+      </ol>
+    </div>
+    <a class="manual" href="manual-bloques.pdf" target="_blank" rel="noopener" aria-label="Manual en PDF (se abre en una ventana nueva)" title="Abrir el manual en PDF">manual</a>
+  </nav>
+
+  <main class="mesa">
+    <section class="pieza" id="pieza" data-e="listo" aria-labelledby="pieza-titulo">
+
+      <header class="p-cab">
+        <span class="p-icono" aria-hidden="true"><!-- ICONO --></span>
+        <div class="p-textos">
+          <span class="oculto" id="pieza-titulo">Minutos en bloques</span>
+          <div class="dinamica-campo" id="dinamica-campo">
+            <textarea class="dinamica" id="dinamica" rows="1" maxlength="70" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Actividad" aria-label="Nombre de la actividad"></textarea>
+          </div>
+        </div>
+        <div class="p-botones">
+          <button type="button" class="b-app" id="btn-info" aria-label="Ocultar la información" title="Información" aria-pressed="true" aria-controls="info">
+            <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-ajustes" aria-label="Ajustes" title="Ajustes" aria-expanded="false" aria-controls="ajustes">
+            <svg class="ico" aria-hidden="true"><use href="#i-ajustes"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-pantalla" aria-label="Pantalla completa" title="Pantalla completa">
+            <svg class="ico" aria-hidden="true"><use id="pantalla-ico" href="#i-ampliar"/></svg>
+          </button>
+
+          <div class="ajustes" id="ajustes" role="dialog" aria-labelledby="ajustes-titulo" hidden>
+            <div class="aj-cab">
+              <h2 class="aj-titulo" id="ajustes-titulo">Ajustes</h2>
+              <button type="button" class="aj-cerrar" id="ajustes-cerrar" aria-label="Cerrar los ajustes" title="Cerrar">
+                <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+              </button>
+            </div>
+            <div class="aj-rejilla">
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Duración y meta</p>
+                <div class="aj-fila">
+                  <label>Duración de un bloque</label>
+                  <div class="segmentado" id="seg-duracion" role="group" aria-label="Duración de un bloque">
+                    <button type="button" data-v="1" aria-pressed="true">1 min</button>
+                    <button type="button" data-v="5">5 min</button>
+                    <button type="button" data-v="personalizado">Otra</button>
+                  </div>
+                </div>
+                <div class="aj-fila" id="fila-duracion-personal" hidden>
+                  <label for="dur-personal">Minutos por bloque</label>
+                  <div class="aj-inline"><input type="text" class="campo-num" id="dur-personal" inputmode="numeric" maxlength="2" value="7"><span class="aj-unidad">min</span></div>
+                </div>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <div class="aj-fila">
+                  <label>Bloques objetivo</label>
+                  <div class="segmentado" id="seg-objetivo" role="group" aria-label="Bloques objetivo">
+                    <button type="button" data-v="5" aria-pressed="true">5</button>
+                    <button type="button" data-v="10">10</button>
+                    <button type="button" data-v="personalizado">Otra</button>
+                  </div>
+                </div>
+                <div class="aj-fila" id="fila-personalizado" hidden>
+                  <label for="obj-personal">Cuántos bloques</label>
+                  <div class="aj-inline"><input type="text" class="campo-num" id="obj-personal" inputmode="numeric" maxlength="3" value="12"><span class="aj-unidad">bloques</span></div>
+                </div>
+                <div class="aj-fila">
+                  <label>Agrupar de</label>
+                  <div class="segmentado" id="seg-agrupa" role="group" aria-label="Agrupar los bloques">
+                    <button type="button" data-v="5" aria-pressed="true">5</button>
+                    <button type="button" data-v="10">10</button>
+                    <button type="button" data-v="libre">Libre</button>
+                  </div>
+                </div>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <p class="aj-rotulo">Variantes</p>
+                <div class="aj-fila">
+                  <label>Modo</label>
+                  <div class="segmentado" id="seg-modo" role="group" aria-label="Modo de la actividad">
+                    <button type="button" data-v="libre" aria-pressed="true">Libre</button>
+                    <button type="button" data-v="estaciones">Estaciones</button>
+                    <button type="button" data-v="reto">Reto</button>
+                  </div>
+                </div>
+              </div>
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Cuando se acerca el final del bloque</p>
+                <div class="aj-fila">
+                  <label for="aj-avisar">Avisar antes de que se acabe</label>
+                  <input type="checkbox" class="interruptor" id="aj-avisar" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-senal">Parpadear en el tramo final</label>
+                  <input type="checkbox" class="interruptor" id="aj-senal" role="switch" checked>
+                </div>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <div class="aj-fila">
+                  <label for="aj-decenas">Colorear la rueda de diez en diez</label>
+                  <input type="checkbox" class="interruptor" id="aj-decenas" role="switch" checked>
+                </div>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <p class="aj-rotulo">Sonido</p>
+                <div class="aj-fila">
+                  <label for="aj-sonido-bloque">Al completar un bloque</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido-bloque" role="switch">
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-sonido-meta">Al llegar a la meta</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido-meta" role="switch" checked>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-cuerpo" id="cuerpo">
+        <div class="principal" id="principal">
+          <div class="bl-grid">
+            <div class="reloj-col">
+              <p class="estado" id="estado" aria-live="polite">
+                <span class="punto" aria-hidden="true"></span>
+                <svg class="ico" aria-hidden="true"><use href="#i-listo"/></svg>
+                <span id="estado-txt">Listo</span>
+              </p>
+              <div class="bl-rueda-caja">
+                <svg class="bl-rueda" id="rueda" viewBox="0 0 240 240" role="img" aria-label="Rueda de sesenta marcas"></svg>
+              </div>
+            </div>
+            <div class="bandeja-col">
+              <p class="bl-meta-txt" id="meta-txt"><b id="meta-n">5</b> bloques</p>
+              <div class="bandeja" id="bandeja" aria-live="polite"></div>
+              <div class="tira-estaciones" id="tira-estaciones" hidden></div>
+            </div>
+          </div>
+
+          <div class="mandos">
+            <button type="button" class="b-suave-ico" id="btn-estacion" aria-label="Nueva estación" title="Nueva estación" hidden>
+              <svg class="ico" aria-hidden="true"><use href="#i-mas"/></svg>
+            </button>
+            <button type="button" class="b-principal-ico" id="btn-marcha" aria-label="Empezar" title="Empezar">
+              <svg class="ico" aria-hidden="true"><use id="marcha-ico" href="#i-marcha"/></svg>
+            </button>
+            <button type="button" class="b-suave-ico" id="btn-reiniciar" aria-label="Reiniciar" title="Reiniciar">
+              <svg class="ico" aria-hidden="true"><use href="#i-reinicio"/></svg>
+              <span class="pista-reinicio" aria-hidden="true">Toca otra vez para reiniciar</span>
+            </button>
+          </div>
+        </div>
+
+        <aside class="info" id="info" aria-labelledby="info-titulo">
+          <div class="info-int">
+            <!-- INFO -->
+          </div>
+        </aside>
+      </div>
+
+      <div class="aviso" id="aviso" role="status" hidden>
+        <span class="aviso-txt" id="aviso-txt"></span>
+        <button type="button" id="aviso-deshacer">Deshacer</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="pie">© Secuencia321</p>
+</div>

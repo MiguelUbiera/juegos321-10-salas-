@@ -1,0 +1,252 @@
+<!-- ICONOS -->
+
+<!-- La carga de la casa: lo primero que se pinta. El sitio la sacará a una pieza común. -->
+<div class="carga" id="carga" data-s321="carga" role="status" aria-live="polite">
+  <div class="carga-int">
+    <svg class="iso" viewBox="0 0 64 64" aria-hidden="true">
+      <rect class="p1" x="11" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p2" x="34" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p3" x="11" y="34" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="u1" x="34" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u2" x="44.6" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u3" x="34" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u4" x="44.6" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e08a5f"/>
+    </svg>
+    <div class="carga-marca">Secuencia321</div>
+    <p class="carga-dice">Preparando el cronómetro…</p>
+    <div class="carga-raya" aria-hidden="true"><i></i></div>
+  </div>
+</div>
+<script>window.S321_CARGA_T0 = performance.now();</script>
+
+<!-- La barra: fiel a la del sitio. El sitio pondrá aquí su barra común con los menús. -->
+<header class="barra" data-s321="barra">
+  <div class="barra-int">
+    <a class="marca" href="/" aria-label="Secuencia321, ir a la portada">
+      <span class="marca-icono"><img src="favicon.svg" alt="" width="36" height="36"></span>
+      <span class="marca-txt">Secuencia321</span>
+    </a>
+  </div>
+</header>
+
+<div class="escenario">
+  <div class="cifras-fondo" aria-hidden="true">
+    <span style="left:3%;top:8%;font-size:96px;animation-delay:-3s;animation-duration:24s">3</span>
+    <span style="left:90%;top:12%;font-size:64px;animation-delay:-11s;animation-duration:19s">2</span>
+    <span style="left:5%;top:60%;font-size:118px;animation-delay:-7s;animation-duration:27s">1</span>
+    <span style="left:93%;top:56%;font-size:88px;animation-delay:-15s;animation-duration:22s">7</span>
+    <span style="left:1%;top:34%;font-size:52px;animation-delay:-2s;animation-duration:18s">5</span>
+    <span style="left:87%;top:82%;font-size:110px;animation-delay:-9s;animation-duration:28s">9</span>
+    <span style="left:12%;top:85%;font-size:70px;animation-delay:-17s;animation-duration:21s">4</span>
+    <span style="left:97%;top:32%;font-size:46px;animation-delay:-5s;animation-duration:17s">8</span>
+    <span style="left:46%;top:91%;font-size:58px;animation-delay:-13s;animation-duration:25s">6</span>
+    <span style="left:52%;top:1%;font-size:40px;animation-delay:-19s;animation-duration:20s">1</span>
+    <span style="left:77%;top:3%;font-size:76px;animation-delay:-8s;animation-duration:26s">2</span>
+    <span style="left:22%;top:2%;font-size:50px;animation-delay:-21s;animation-duration:23s">3</span>
+  </div>
+
+  <nav class="migas" aria-label="Estás en">
+    <div class="rastro">
+      <ol>
+        <li><a href="/">Inicio</a></li>
+        <li><span class="sin-enlace">Herramientas</span></li>
+        <li><span class="sin-enlace">Cronómetros</span></li>
+        <li><span class="aqui" aria-current="page">Cronómetro de actividad</span></li>
+      </ol>
+    </div>
+    <a class="manual" href="manual-actividad.pdf" target="_blank" rel="noopener" aria-label="Manual en PDF (se abre en una ventana nueva)" title="Abrir el manual en PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M21 3 11 13"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg>
+      Manual
+    </a>
+  </nav>
+
+  <main class="mesa">
+    <section class="pieza" id="pieza" data-e="listo" data-tramo="nada" aria-labelledby="pieza-titulo">
+
+      <header class="p-cab">
+        <span class="p-icono" aria-hidden="true"><!-- ICONO --></span>
+        <div class="p-textos">
+          <span class="oculto" id="pieza-titulo">Cronómetro de actividad</span>
+          <div class="dinamica-campo" id="dinamica-campo">
+            <textarea class="dinamica" id="dinamica" rows="1" maxlength="70" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Actividad" aria-label="Nombre de la dinámica"></textarea>
+          </div>
+        </div>
+        <div class="p-botones">
+          <button type="button" class="b-app" id="btn-info" aria-label="Ocultar la información" title="Información" aria-pressed="true" aria-controls="info">
+            <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-ajustes" aria-label="Ajustes" title="Ajustes" aria-expanded="false" aria-controls="ajustes">
+            <svg class="ico" aria-hidden="true"><use href="#i-ajustes"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-pantalla" aria-label="Pantalla completa" title="Pantalla completa">
+            <svg class="ico" aria-hidden="true"><use id="pantalla-ico" href="#i-ampliar"/></svg>
+          </button>
+
+          <div class="ajustes" id="ajustes" role="dialog" aria-labelledby="ajustes-titulo" hidden>
+            <div class="aj-cab">
+              <h2 class="aj-titulo" id="ajustes-titulo">Ajustes</h2>
+              <button type="button" class="aj-cerrar" id="ajustes-cerrar" aria-label="Cerrar los ajustes" title="Cerrar">
+                <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+              </button>
+            </div>
+            <div class="aj-rejilla">
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Meta</p>
+                <div class="aj-fila">
+                  <label for="aj-meta">Usar una meta</label>
+                  <input type="checkbox" class="interruptor" id="aj-meta" role="switch" checked>
+                </div>
+                <div class="aj-meta">
+                  <input type="text" class="campo-num" id="aj-min" inputmode="numeric" autocomplete="off" maxlength="3" aria-label="Minutos de la meta" value="5">
+                  <span class="aj-unidad" aria-hidden="true">min</span>
+                  <input type="text" class="campo-num" id="aj-seg" inputmode="numeric" autocomplete="off" maxlength="2" aria-label="Segundos de la meta" value="00">
+                  <span class="aj-unidad" aria-hidden="true">s</span>
+                </div>
+                <p class="aj-nota">Al llegar a la meta, el cronómetro sigue contando y muestra el exceso.</p>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <div class="aj-fila">
+                  <label for="aj-avisar">Avisar al acercarse la meta</label>
+                  <input type="checkbox" class="interruptor" id="aj-avisar" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-sonido">Sonido al llegar a la meta</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido" role="switch">
+                </div>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <div class="aj-fila">
+                  <label for="aj-cupo">Contar marcas por ronda</label>
+                  <input type="checkbox" class="interruptor" id="aj-cupo" role="switch">
+                </div>
+                <div class="aj-meta" id="aj-cupo-caja">
+                  <input type="text" class="campo-num" id="aj-cupo-n" inputmode="numeric" autocomplete="off" maxlength="3" aria-label="Marcas por ronda" value="4" disabled>
+                  <span class="aj-unidad" aria-hidden="true">marcas</span>
+                </div>
+                <p class="aj-nota">Al llegar al cupo, la ronda queda marcada como completa: se puede seguir marcando, o reiniciar para archivarla y pasar a la siguiente.</p>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <div class="aj-teclado" id="aj-teclado">
+                  <p class="aj-rotulo">Con teclado</p>
+                  <ul class="teclas" id="teclas">
+                    <li><kbd>M</kbd><span>marca</span></li>
+                    <li><kbd>R</kbd><span>reiniciar</span></li>
+                    <li><kbd>P</kbd><span>pantalla completa</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-cuerpo" id="cuerpo">
+        <aside class="lista" id="lista" aria-labelledby="lista-titulo-b">
+          <div class="lista-int">
+            <div class="lista-cab">
+              <h2 class="lista-titulo" id="lista-titulo">
+                <button type="button" class="lista-titulo-b" id="lista-titulo-b" title="Cambiar el encabezado">Marcas</button>
+              </h2>
+              <button type="button" class="lista-lapiz" id="lista-lapiz" aria-label="Cambiar el encabezado de la lista" title="Cambiar el encabezado">
+                <svg class="ico" aria-hidden="true"><use href="#i-lapiz"/></svg>
+              </button>
+              <button type="button" class="lista-lapiz lista-volver" id="lista-volver" hidden aria-label="Volver a la ronda de ahora" title="Volver a la de ahora">
+                <svg class="ico" aria-hidden="true"><use href="#i-atras"/></svg>
+              </button>
+              <div class="rondas-caja" id="rondas-caja" hidden>
+                <button type="button" class="lista-menu" id="lista-menu" aria-label="Rondas guardadas" title="Rondas" aria-haspopup="menu" aria-expanded="false" aria-controls="rondas-menu">
+                  <svg class="ico" aria-hidden="true"><use href="#i-lista"/></svg>
+                </button>
+                <ul class="menu rondas-menu" id="rondas-menu" role="menu" aria-label="Rondas guardadas" hidden></ul>
+              </div>
+              <button type="button" class="lista-plegar" id="lista-plegar" aria-expanded="true" aria-controls="lista-marcas" aria-label="Plegar la lista">
+                <svg class="ico" aria-hidden="true"><use href="#i-abajo"/></svg>
+              </button>
+            </div>
+            <ol class="lista-marcas" id="lista-marcas"></ol>
+          </div>
+        </aside>
+
+        <div class="reloj" id="reloj">
+          <div class="reloj-int">
+            <p class="estado oculto" id="estado" aria-live="polite">
+              <span class="punto" aria-hidden="true"></span>
+              <svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg>
+              <span id="estado-txt">Listo</span>
+            </p>
+            <div class="cifra-caja">
+              <p class="cifra" id="cifra" role="timer" aria-live="off" aria-atomic="true">00<span class="sep">:</span>00</p>
+              <div class="sombra" id="sombra" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use id="sombra-ico" href="#i-pausa"/></svg>
+              </div>
+            </div>
+            <div class="meta" id="meta">
+              <div class="meta-pista" aria-hidden="true"><div class="meta-lleno" id="meta-lleno"></div></div>
+              <div class="meta-pie">
+                <span class="meta-izq"><svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg><span id="meta-valor"><span class="oculto">Meta </span><span class="num">5:00</span></span></span>
+                <span class="meta-der" id="meta-der"><span class="num">0</span> %</span>
+              </div>
+            </div>
+            <div class="mandos">
+              <button type="button" class="b-principal" id="btn-marcha" title="Iniciar">
+                <svg class="ico" aria-hidden="true"><use id="marcha-ico" href="#i-marcha"/></svg>
+                <span class="apila oculto" id="marcha-txt"><span class="ve" data-l="iniciar">Iniciar</span><span data-l="pausar">Pausar</span><span data-l="seguir">Seguir</span></span>
+              </button>
+              <button type="button" class="b-marca" id="btn-marca" title="Marca" disabled>
+                <svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg><span class="oculto">Marca</span>
+                <span class="marca-cupo" id="marca-cupo" hidden>0 / 4</span>
+              </button>
+              <button type="button" class="b-suave" id="btn-reiniciar" title="Reiniciar">
+                <svg class="ico" aria-hidden="true"><use href="#i-reinicio"/></svg>
+                <span class="apila oculto" id="reiniciar-txt">
+                  <span class="ve" data-l="reiniciar">Reiniciar</span>
+                  <span data-l="toca">Toca otra vez</span>
+                </span>
+              </button>
+              <div class="clip-caja" id="clip-caja" hidden>
+                <button type="button" class="b-clip" id="btn-clip" aria-label="Opciones de las marcas" title="Marcas" aria-haspopup="menu" aria-expanded="false" aria-controls="clip-menu">
+                  <svg class="ico" aria-hidden="true"><use href="#i-lista"/></svg>
+                  <span class="clip-n num" id="clip-n" hidden>0</span>
+                </button>
+                <ul class="menu clip-menu" id="clip-menu" role="menu" aria-label="Marcas" hidden>
+                  <li role="none" id="menu-guardada-li" hidden><button type="button" role="menuitem" id="menu-guardada"><svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg><span id="menu-guardada-txt">Ver la ronda guardada</span></button></li>
+                  <li role="none" id="menu-ver-li"><button type="button" role="menuitem" id="menu-ver"><svg class="ico" aria-hidden="true"><use id="menu-ver-ico" href="#i-ocultar"/></svg><span id="menu-ver-txt">Ocultar marcas</span></button></li>
+                  <li role="none" id="menu-comparar-li" hidden><button type="button" role="menuitem" id="menu-comparar"><svg class="ico" aria-hidden="true"><use href="#i-ola"/></svg><span id="menu-comparar-txt">Comparar rondas</span></button></li>
+                  <li role="none" id="menu-borrar-li"><button type="button" role="menuitem" class="peligro" id="menu-borrar"><svg class="ico" aria-hidden="true"><use href="#i-basura"/></svg><span id="menu-borrar-txt">Borrar marcas</span></button></li>
+                  <li role="none" id="menu-vaciar-li" hidden><button type="button" role="menuitem" class="peligro" id="menu-vaciar"><svg class="ico" aria-hidden="true"><use href="#i-basura"/></svg><span id="menu-vaciar-txt">Borrar las rondas</span></button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="info" id="info" aria-labelledby="info-titulo">
+          <div class="info-int">
+            <!-- INFO -->
+          </div>
+        </aside>
+      </div>
+
+      <div class="cmp-velo" id="cmp-velo" hidden></div>
+      <div class="comparar" id="comparar" role="dialog" aria-modal="true" aria-labelledby="cmp-titulo" hidden>
+        <div class="cmp-cab">
+          <div>
+            <h2 class="cmp-titulo" id="cmp-titulo">Comparar rondas</h2>
+            <p class="cmp-sub" id="cmp-sub"></p>
+          </div>
+          <button type="button" class="cmp-cerrar" id="cmp-cerrar" aria-label="Cerrar la comparación" title="Cerrar">
+            <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+          </button>
+        </div>
+        <div class="cmp-marco" id="cmp-marco" tabindex="0"></div>
+        <p class="cmp-nota" id="cmp-nota"></p>
+      </div>
+
+
+      <div class="aviso" id="aviso" role="status" hidden>
+        <span class="aviso-txt" id="aviso-txt"></span>
+        <button type="button" id="aviso-deshacer">Deshacer</button>
+      </div>
+    </section>
+  </main>
+
+
+  <p class="pie">© Secuencia321</p>
+</div>

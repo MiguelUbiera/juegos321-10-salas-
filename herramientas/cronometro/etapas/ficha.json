@@ -1,0 +1,27 @@
+{
+  "id": "etapas",
+  "orden": 2,
+  "nombre": "Cronómetro por etapas",
+  "antetitulo": "el reparto del tiempo, a la vista",
+  "lema": "Lo que planeaste y lo que de verdad duró, en la misma barra.",
+  "para_que": "Lo que se hace por partes y conviene repartir antes de empezar: una clase con inicio, desarrollo y cierre, un taller por estaciones, un examen por bloques, una presentación por turnos.",
+  "como_funciona": "Cada etapa lleva su nombre y su tiempo previsto, y entre todas llenan la barra: ahí se ve de un vistazo cuánto pesa cada parte. Nombres y tiempos se cambian desde la lista misma, y se añaden o se quitan etapas a cualquier hora. Un toque cierra la etapa y abre la siguiente. Si una se pasa **no se corta nada**: sigue contando y la lista dice cuánto se fue de más.",
+  "ideas": [
+    "Reparte la clase antes de empezar y déjala puesta en la pizarra: los estudiantes **ven cuánto queda de cada parte** y no hay que anunciarlo.",
+    "Al terminar, «Guardar» archiva la tanda y abre otra igual: corre el mismo recorrido con el siguiente grupo y **compáralos etapa por etapa**.",
+    "Al comparar, la última columna dice **quién tardó menos** en cada etapa, con el color de su grupo: la respuesta, no una tabla de cifras."
+  ],
+  "incluye": [
+    "Etapas con nombre",
+    "Previsto contra real",
+    "Reparto en una barra",
+    "Comparar eventos",
+    "Pantalla completa"
+  ],
+  "instruccion": "Escribe el nombre de la actividad y reparte el tiempo entre las etapas.",
+  "abrir": "index.html",
+  "icono": "icono.svg",
+  "vista": "vista.webp",
+  "version": "1.8",
+  "fecha": "2026-09-12"
+}

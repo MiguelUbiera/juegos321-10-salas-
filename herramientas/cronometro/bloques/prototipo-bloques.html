@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minutos en bloques · prototipo · Secuencia321</title>
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;600;700&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Prototipo · Cronómetro 4 · Minutos en bloques
+   Tokens y componentes tomados de _comun/casa.css, para que se sienta del
+   mismo ecosistema que Actividad y Etapas. No es el molde de producción:
+   es un HTML suelto para ver la mecánica funcionando antes de construirlo
+   de verdad con construir.py.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --su-fondo:#f7f1e9; --su-hondo:#efe6d8; --su-papel:#fffcf7;
+  --su-realce:#f9f3ea; --su-linea:#e2d6c4; --su-calido:#e4c5b5;
+  --ti-fuerte:#1b1512; --ti-media:#2e2622; --ti-tenue:#4a3f38; --ti-guia:#7a6d62; --ti-sep:#8a7c70;
+  --te-hondo:#8f3a1e; --te-base:#b04a2a; --te-vivo:#c85f3c; --te-suave:#b6583b; --te-velo:#f0dccf; --te-claro:#e08a5f;
+  --pe-hondo:#0f2d3a; --pe-base:#173f50; --pe-caja:#2a4e5e; --pe-claro:#2c5c70; --pe-velo:#eaf0f2;
+  --no-cuerpo:#e4c5b5;
+  --fam-titulo:'Lora', Georgia, 'Times New Roman', serif;
+  --fam-cuerpo:'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --fam-num:'Source Code Pro', Consolas, monospace;
+  --sal:cubic-bezier(.22,.8,.25,1);
+  --sombra-menu:0 6px 18px rgba(15,45,58,.16), 0 18px 48px rgba(15,45,58,.14);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;
+  font-family:var(--fam-cuerpo);font-weight:600;color:var(--ti-fuerte);background:var(--pe-hondo);
+  -webkit-font-smoothing:antialiased;line-height:1.45}
+button,input{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--te-claro);outline-offset:2px}
+.ico{width:1.25em;height:1.25em;flex:0 0 auto;display:block}
+.oculto{position:absolute!important;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{font-family:var(--fam-num);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ── barra ─────────────────────────────────────────────────────────── */
+.barra{flex:0 0 auto;background:rgba(23,63,80,.97);border-bottom:1px solid rgba(228,197,181,.16)}
+.barra-int{display:flex;align-items:center;gap:16px;min-height:64px;padding-inline:clamp(18px,2vw,28px)}
+.marca{display:flex;align-items:center;gap:11px;margin-right:auto}
+.marca-icono{width:36px;height:36px;border-radius:12px;background:#173f50;border:1px solid rgba(228,197,181,.28);display:grid;place-items:center}
+.marca-icono svg{width:22px;height:22px}
+.marca-txt{font-family:var(--fam-titulo);font-weight:700;font-size:17px;color:#f7f1e9}
+.rotulo-proto{font-family:var(--fam-num);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--te-claro);
+  background:rgba(228,197,181,.13);border:1px solid rgba(228,197,181,.3);padding:5px 12px;border-radius:999px}
+
+/* ── escenario ─────────────────────────────────────────────────────── */
+.escenario{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;isolation:isolate;
+  background:radial-gradient(1100px 520px at 82% -8%,#24576b 0%,transparent 62%),
+    linear-gradient(168deg,#1b485c 0%,#173f50 46%,#0f2d3a 100%)}
+.cifras-fondo{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.cifras-fondo span{position:absolute;font-family:var(--fam-num);font-weight:700;color:#e4c5b5;opacity:.06;
+  animation:flotar 22s ease-in-out infinite}
+@keyframes flotar{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-26px) rotate(3deg)}}
+.migas{flex:0 0 auto;padding:10px clamp(18px,2vw,28px) 2px;font-size:13px;font-weight:700;color:var(--no-cuerpo)}
+.migas span+span::before{content:"›";margin:0 8px;color:var(--te-claro)}
+.mesa{flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:stretch;
+  padding:clamp(4px,1vh,14px) clamp(12px,3vw,56px) clamp(10px,1.6vh,18px)}
+
+/* ── la pieza ──────────────────────────────────────────────────────── */
+.pieza{position:relative;width:100%;max-width:1200px;min-height:0;max-height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);
+  background:var(--su-papel);border-radius:32px;padding:clamp(12px,2.4vh,26px) clamp(18px,2.2vw,34px) clamp(20px,3vh,32px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(5,20,27,.26),0 26px 64px rgba(5,20,27,.4);
+  container:pieza/inline-size;transition:padding .26s var(--sal),border-radius .26s var(--sal);
+  overflow-y:auto;overflow-x:hidden}
+/* red de seguridad: si algo no cupiera en la altura disponible, la pieza
+   se desplaza por dentro en vez de esconder los mandos fuera de la vista */
+.pieza::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 6px var(--te-velo);opacity:0;transition:opacity .45s ease-out}
+.pieza.halo::after{opacity:1;transition:opacity .15s ease-out}
+
+.p-cab{position:relative;z-index:3;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
+  column-gap:clamp(12px,1.3cqi,18px);padding-bottom:clamp(8px,1.5vh,15px)}
+.p-icono{width:3.5rem;aspect-ratio:1;border-radius:28%;background:linear-gradient(180deg,#30657b 0%,#1d4557 100%);
+  box-shadow:0 4px 12px rgba(15,45,58,.26),0 1px 2px rgba(15,45,58,.22);display:grid;place-items:center}
+.p-icono svg{width:62%;height:62%}
+/* alineado por la base, no por el centro. Sin el guion punteado (se quitó
+   a pedido: ver «Qué cambié»), ya no hace falta reservar espacio debajo
+   del texto para una línea — así que el bloque se anda más pegado a sus
+   propias letras, y anclarlo al fondo de la fila lo deja a la altura del
+   pie del ícono, con un pelín extra para que quede incluso un poco por
+   debajo */
+.p-textos{min-width:0;align-self:end;margin-bottom:-2px}
+.dinamica-campo{max-width:min(100%,42rem)}
+.dinamica{width:100%;display:block;margin:0;padding:0;resize:none;overflow:hidden;border:0;
+  background:transparent;outline:none;
+  font-family:var(--fam-titulo);font-weight:700;line-height:1.28;color:rgba(15,45,58,.74);
+  font-size:clamp(1.55rem,4cqi,2.6rem)}
+.dinamica::placeholder{color:var(--ti-guia);opacity:1}
+
+.p-botones{display:flex;gap:.625rem;position:relative}
+.b-app{position:relative;width:2.875rem;height:2.875rem;border-radius:.9375rem;border:0;padding:0;display:grid;place-items:center;
+  color:#f7f1e9;background:linear-gradient(180deg,#30657b 0%,#1d4557 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 8px rgba(15,45,58,.28),0 1px 2px rgba(15,45,58,.24);
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),filter .3s var(--sal)}
+.b-app:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.b-app:active{transform:translateY(0) scale(.96)}
+.b-app[aria-expanded="true"],.b-app[aria-pressed="true"]{box-shadow:inset 0 0 0 2px rgba(224,138,95,.95),0 3px 8px rgba(15,45,58,.28)}
+
+/* ── ajustes ───────────────────────────────────────────────────────── */
+.ajustes{position:absolute;top:calc(100% + 12px);right:0;z-index:50;width:min(38rem,calc(100vw - 28px));
+  max-height:76vh;overflow:auto;padding:14px 18px 18px;background:var(--su-papel);border:1px solid var(--su-linea);
+  border-radius:22px;box-shadow:var(--sombra-menu);animation:entra-arriba .2s var(--sal) both;transform-origin:top right}
+@keyframes entra-arriba{from{opacity:0;transform:translateY(-7px) scale(.98)}to{opacity:1;transform:none}}
+.aj-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;margin-bottom:12px;border-bottom:1px solid var(--su-linea)}
+.aj-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:1.2rem;color:var(--pe-hondo)}
+.aj-cerrar{width:2.5rem;height:2.5rem;border:0;border-radius:12px;padding:0;display:grid;place-items:center;background:var(--su-hondo);color:var(--ti-media)}
+.aj-cerrar:hover{background:var(--su-calido)}
+.aj-rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 26px}
+.aj-grupo{min-width:0;display:flex;flex-direction:column;gap:10px}
+.aj-grupo+.aj-grupo{border-left:1px solid var(--su-linea);padding-left:24px}
+.aj-rotulo{margin:0;font-family:var(--fam-num);font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ti-tenue)}
+.aj-fila{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:2.6rem}
+.aj-fila label{font-weight:800;font-size:.98rem;color:var(--ti-fuerte)}
+.aj-nota{margin:0;font-size:.84rem;font-weight:700;line-height:1.4;color:var(--ti-tenue)}
+.aj-sep{height:1px;background:var(--su-linea);margin:2px 0}
+/* flex-shrink:0 — sin esto, una etiqueta larga («Colorear la rueda de
+   diez en diez») puede apretar la fila y deformar el interruptor en vez
+   de dejar que el texto haga el ajuste */
+.interruptor{-webkit-appearance:none;appearance:none;position:relative;width:3.1rem;height:1.8rem;margin:0;border-radius:999px;
+  flex-shrink:0;border:2px solid var(--ti-guia);background:var(--su-hondo);cursor:pointer;transition:background-color .2s var(--sal),border-color .2s var(--sal)}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:calc(1.8rem - 10px);height:calc(1.8rem - 10px);border-radius:50%;background:var(--ti-guia);transition:transform .22s var(--sal),background-color .2s var(--sal)}
+.interruptor:checked{background:var(--pe-claro);border-color:var(--pe-claro)}
+.interruptor:checked::after{transform:translateX(1.3rem);background:#fffcf7}
+.seg{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;background:var(--su-hondo);border-radius:11px}
+.seg button{border:0;background:transparent;padding:7px 11px;border-radius:9px;font-weight:700;font-size:.84rem;color:var(--ti-tenue);min-height:34px}
+.seg button[aria-pressed="true"]{background:var(--su-papel);color:var(--pe-hondo);box-shadow:0 1px 3px rgba(15,45,58,.18)}
+.campo-num{width:4rem;height:2.5rem;padding:0 8px;border:2px solid var(--su-linea);border-radius:11px;background:var(--su-fondo);
+  text-align:center;font-family:var(--fam-num);font-weight:600;font-size:1.05rem;color:var(--ti-fuerte);outline:none}
+.campo-num:focus{border-color:var(--te-base);background:var(--su-papel)}
+.aj-inline{display:flex;align-items:center;gap:8px}
+.aj-unidad{font-weight:700;font-size:.82rem;color:var(--ti-tenue)}
+
+/* ── cuerpo: la rueda a la izquierda, la bandeja a la derecha ──────── */
+.p-cuerpo{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--col-info,0px);column-gap:var(--col-gap,0px);
+  padding-top:clamp(16px,2.8vh,30px);border-top:1px solid var(--su-linea);
+  transition:grid-template-columns .35s var(--sal),column-gap .35s var(--sal)}
+.p-cuerpo.con-info{--col-info:clamp(16.5rem,28%,23rem);--col-gap:clamp(16px,2cqi,30px)}
+.principal{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,1.6vh,20px);padding-block:4px}
+.estado-pieza{display:inline-flex;align-items:center;gap:.5rem;height:1.8rem;padding:0 .8rem 0 .65rem;border-radius:999px;
+  background:var(--su-hondo);color:var(--ti-media);font-weight:800;font-size:.86rem;transition:background-color .3s var(--sal)}
+.estado-pieza .punto{width:.5rem;height:.5rem;border-radius:50%;background:var(--ti-tenue)}
+.pieza[data-e="marcha"] .estado-pieza{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="marcha"] .estado-pieza .punto{background:var(--te-base);animation:latido 1.3s ease-in-out infinite}
+.pieza[data-e="final"] .estado-pieza{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="final"] .estado-pieza .punto{background:var(--te-hondo);animation:latido 1s ease-in-out infinite}
+.pieza[data-e="cumplida"] .estado-pieza{background:var(--te-velo);color:var(--te-hondo)}
+@keyframes latido{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.55}}
+
+/* la rueda manda, pero comparte el sitio con la bandeja: por eso no
+   necesita ser enorme — con media columna le sobra protagonismo */
+.bl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:center;
+  gap:clamp(18px,3.2cqi,40px);width:100%}
+@container pieza (max-width:640px){.bl-grid{grid-template-columns:1fr}}
+/* el estado ("Listo"/"En marcha"...) vive aquí, a la izquierda de la
+   rueda, no encima — y el margin-left:auto de la caja empuja la rueda
+   hacia el espacio libre de la derecha, en vez de dejarla centrada */
+.reloj-col{display:flex;align-items:center;gap:clamp(10px,2cqi,22px);min-width:0}
+.reloj-col .estado-pieza{flex-shrink:0}
+/* en vh, no en cqh: la pieza solo declara contención de ancho
+   (inline-size), así que cqh no tenía de dónde leer una altura real y
+   caía en el tamaño de la ventana — de ahí que la rueda se viera más
+   grande de lo que el tope en píxeles debía permitir */
+.bl-rueda-caja{position:relative;width:min(100%,46vh,380px);margin-left:auto}
+/* +10% de radio sobre la vuelta anterior, tal como se pidió */
+.pieza.pc .bl-rueda-caja{width:min(100%,63vh,572px)}
+.bl-rueda{display:block;width:100%;height:auto}
+/* seis grupos de diez: el mismo gesto que ya le gustaba de la maqueta,
+   ahora con los dos tonos de la marca en vez de uno inventado */
+.cuenta{fill:var(--su-hondo);transition:fill .18s var(--sal)}
+.cuenta.llena{fill:var(--te-base)}
+.cuenta.llena.par{fill:var(--pe-claro)}
+.pieza[data-e="final"] .cuenta.llena{fill:var(--te-hondo)}
+.bl-cifra{font-family:var(--fam-num);font-weight:600;fill:var(--ti-fuerte);text-anchor:middle;dominant-baseline:central;font-size:40px}
+.bl-cifra .sep{fill:var(--ti-sep)}
+.pieza[data-e="final"] .bl-cifra{animation:palpita 1s cubic-bezier(.33,0,.3,1) infinite}
+@keyframes palpita{0%,100%{transform:scale(1)}44%{transform:scale(1.05)}}
+
+.bandeja-col{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:center}
+.bl-meta-txt{font-size:.92rem;font-weight:800;color:var(--ti-tenue)}
+.bl-meta-txt b{color:var(--pe-hondo)}
+/* sin borde ni líneas: la caja es solo un fondo suave, y su ancho se
+   calcula por JS (dimensionarBandeja) según cuántos bloques le tocan —
+   nunca se queda con un hueco vacío de sobra */
+.bandeja{display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:8px;
+  padding:10px;border-radius:16px;background:var(--su-fondo);width:auto;max-width:100%;min-height:2.5rem;
+  transition:width .3s var(--sal)}
+/* los bloques llevan el mismo lenguaje de botón 3D que el resto de la
+   casa (degradado + realce superior + sombra), no un color plano */
+.bl-bloque{width:2.3rem;height:2.3rem;flex:0 0 auto;border-radius:9px;
+  background:linear-gradient(180deg,var(--pe-claro) 0%,var(--pe-base) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.16),0 2px 5px rgba(15,45,58,.22);
+  animation:surge .32s var(--sal) both}
+.bl-bloque.impar{background:linear-gradient(180deg,var(--pe-base) 0%,var(--pe-hondo) 100%)}
+.bl-bloque.ultimo{background:linear-gradient(180deg,var(--te-vivo) 0%,var(--te-base) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 7px rgba(143,58,30,.32)}
+/* también más grandes en pantalla completa, a juego con la rueda */
+.pieza.pc .bl-bloque{width:2.8rem;height:2.8rem;border-radius:11px}
+@keyframes surge{from{transform:translateY(6px) scale(.85);opacity:0}to{transform:none;opacity:1}}
+.bl-bloque.cierra-grupo{margin-right:10px}
+
+/* discretos, y ahora en vh (ver nota sobre cqh más arriba): el tope
+   anterior podía inflarse mucho más de lo previsto y empujar los mandos
+   demasiado abajo */
+.mandos{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-top:clamp(14px,2.4vh,26px)}
+.b-principal-ico,.b-suave-ico{position:relative;border:0;border-radius:50%;display:grid;place-items:center;
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),background-color .2s var(--sal)}
+.b-principal-ico{width:3.4rem;height:3.4rem;background:var(--te-base);color:#f7f1e9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 4px 11px rgba(143,58,30,.3),0 2px 4px rgba(143,58,30,.22)}
+.b-principal-ico .ico{width:1.4rem;height:1.4rem}
+.b-principal-ico:hover{background:var(--te-vivo);transform:translateY(-2px)}
+.b-principal-ico:active{transform:scale(.97)}
+.b-suave-ico{width:2.6rem;height:2.6rem;border:2px solid var(--su-linea);background:var(--su-papel);color:var(--ti-media)}
+.b-suave-ico .ico{width:1.05rem;height:1.05rem}
+.b-suave-ico:hover{border-color:var(--su-calido);background:var(--su-realce);transform:translateY(-2px)}
+.b-suave-ico.confirmar{background:#674a60;border-color:#674a60;color:#f7f1e9}
+.b-estacion{border:2px solid var(--pe-claro);background:var(--su-papel);color:var(--pe-claro);border-radius:999px;
+  min-height:2.6rem;padding:0 1.1rem;font-weight:800;font-size:.9rem;display:inline-flex;align-items:center;gap:7px}
+.b-estacion:hover{background:var(--pe-velo)}
+.tira-estaciones{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:32rem}
+.tira-estaciones span{font-size:.78rem;font-weight:800;color:var(--pe-claro);background:var(--pe-velo);
+  padding:3px 10px;border-radius:999px}
+
+/* ── información ───────────────────────────────────────────────────── */
+.info{min-width:0;overflow:hidden;display:flex;opacity:0;visibility:hidden;transform:translateX(22px);
+  transition:opacity .28s var(--sal),transform .35s var(--sal),visibility 0s linear .35s}
+.p-cuerpo.con-info .info{opacity:1;visibility:visible;transform:none;transition:opacity .3s var(--sal) .06s,transform .35s var(--sal),visibility 0s}
+.info-int{flex:1 1 auto;min-width:15rem;overflow-y:auto;display:flex;flex-direction:column;gap:14px;
+  padding:1px 4px 6px 20px;border-left:1px solid var(--su-linea)}
+.info-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:1.2rem;color:var(--pe-hondo)}
+.info-bloque{display:flex;flex-direction:column;gap:3px}
+.info-bloque p,.info-bloque li{margin:0;font-weight:600;line-height:1.5;color:var(--ti-media);font-size:.92rem}
+.info-bloque b{font-weight:800;color:var(--ti-fuerte)}
+.info-rotulo{margin:0;font-family:var(--fam-num);font-weight:600;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ti-tenue)}
+.info-ideas,.info-aprende{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.info-ideas li{position:relative;padding-left:15px}
+.info-ideas li::before{content:"";position:absolute;left:1px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--te-base)}
+.info-aprende{flex-direction:row;flex-wrap:wrap;gap:6px}
+.info-aprende li{font-size:.78rem;font-weight:800;color:var(--pe-claro);background:var(--pe-velo);padding:3px 10px;border-radius:999px}
+
+/* ── pantalla completa ─────────────────────────────────────────────── */
+.pieza.pc{position:fixed;inset:0;z-index:200;max-width:none;border-radius:0;box-shadow:none;
+  padding:clamp(30px,5vh,60px) clamp(20px,2.6vw,48px) clamp(30px,5vh,60px)}
+/* respaldo por si :has() no aplica: el clic en pantalla completa también
+   marca <body>, así que barra y migas se van sin depender de una sola vía */
+body:has(.pieza.pc) .barra,body:has(.pieza.pc) .migas,
+body.pc-activo .barra,body.pc-activo .migas{display:none}
+body:has(.pieza.pc) .escenario,body.pc-activo .escenario{background:var(--su-papel)}
+body:has(.pieza.pc) .mesa,body.pc-activo .mesa{padding:0}
+/* pantalla completa mantiene exactamente la misma composición: info y
+   ajustes siguen activos y hacen lo mismo que fuera de pantalla completa
+   (incluida la columna de información cuando se abre) — lo único que
+   cambia es que la rueda crece, porque ahora hay todo el alto de la
+   pantalla para ella */
+.pieza.pc .p-icono{width:3rem}
+
+.pie-proto{flex:0 0 auto;text-align:center;padding:2px 16px 8px;font-size:12px;font-weight:700;color:var(--no-cuerpo)}
+
+@media (max-width:760px){
+  .aj-rejilla{grid-template-columns:1fr}
+  .aj-grupo+.aj-grupo{border-left:0;padding-left:0;border-top:1px solid var(--su-linea);padding-top:12px}
+  .p-cuerpo.con-info{grid-template-columns:1fr;--col-info:0px}
+  .info{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="barra-int">
+    <span class="marca">
+      <span class="marca-icono" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f7f1e9" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14.5" y="14.5" width="6" height="6" rx="1.2" fill="#e08a5f" stroke="none"/></svg>
+      </span>
+      <span class="marca-txt">Secuencia321</span>
+    </span>
+    <span class="rotulo-proto">Prototipo · no es el cronómetro final</span>
+  </div>
+</header>
+
+<div class="escenario">
+  <div class="cifras-fondo" aria-hidden="true">
+    <span style="left:4%;top:10%;font-size:88px;animation-delay:-3s">6</span>
+    <span style="left:89%;top:14%;font-size:60px;animation-delay:-9s">0</span>
+    <span style="left:6%;top:66%;font-size:104px;animation-delay:-6s">1</span>
+    <span style="left:92%;top:60%;font-size:78px;animation-delay:-14s">4</span>
+  </div>
+  <nav class="migas"><span>Herramientas</span><span>Cronómetros</span><span>Minutos en bloques</span></nav>
+
+  <main class="mesa">
+    <section class="pieza" id="pieza" data-e="listo">
+      <header class="p-cab">
+        <span class="p-icono" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f7f1e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="15" r="6.2"/><path d="M9 15v-3.2M7.6 4.6h2.8M14.6 6.6l1.2-1.2"/><rect x="17" y="17" width="4.4" height="4.4" rx="1" fill="#e08a5f" stroke="none"/></svg>
+        </span>
+        <div class="p-textos">
+          <span class="oculto" id="pieza-titulo">Cronómetro de minutos en bloques</span>
+          <div class="dinamica-campo" id="dinamica-campo">
+            <textarea class="dinamica" id="dinamica" rows="1" maxlength="70" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Actividad" aria-label="Nombre de la actividad"></textarea>
+          </div>
+        </div>
+        <div class="p-botones">
+          <button type="button" class="b-app" id="btn-info" aria-label="Información" title="Información" aria-pressed="true" aria-controls="info">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.2M12 7.6v.2"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-ajustes" aria-label="Ajustes" title="Ajustes" aria-expanded="false" aria-controls="ajustes">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="15" cy="6" r="2.1" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="2.1" fill="currentColor" stroke="none"/><circle cx="16" cy="18" r="2.1" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-pantalla" aria-label="Pantalla completa" title="Pantalla completa">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="ico-pantalla"><path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4"/></svg>
+          </button>
+
+          <div class="ajustes" id="ajustes" role="dialog" aria-labelledby="ajustes-titulo" hidden>
+            <div class="aj-cab">
+              <h2 class="aj-titulo" id="ajustes-titulo">Ajustes</h2>
+              <button type="button" class="aj-cerrar" id="ajustes-cerrar" aria-label="Cerrar los ajustes" title="Cerrar">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+            <div class="aj-rejilla">
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Duración y meta</p>
+                <div class="aj-fila">
+                  <label>Duración de un bloque</label>
+                  <div class="seg" id="seg-duracion" role="group" aria-label="Duración de un bloque">
+                    <button type="button" data-v="1" aria-pressed="true">1 min</button>
+                    <button type="button" data-v="3">3 min</button>
+                    <button type="button" data-v="5">5 min</button>
+                    <button type="button" data-v="personalizado">Otra</button>
+                  </div>
+                </div>
+                <div class="aj-fila" id="fila-duracion-personal" hidden>
+                  <label for="dur-personal">Minutos por bloque</label>
+                  <div class="aj-inline"><input type="text" class="campo-num" id="dur-personal" inputmode="numeric" maxlength="2" value="7"><span class="aj-unidad">min</span></div>
+                </div>
+                <div class="aj-sep"></div>
+                <div class="aj-fila">
+                  <label>Bloques objetivo</label>
+                  <div class="seg" id="seg-objetivo" role="group" aria-label="Bloques objetivo">
+                    <button type="button" data-v="5" aria-pressed="true">5</button>
+                    <button type="button" data-v="10">10</button>
+                    <button type="button" data-v="15">15</button>
+                    <button type="button" data-v="20">20</button>
+                    <button type="button" data-v="personalizado">Otra</button>
+                  </div>
+                </div>
+                <div class="aj-fila" id="fila-personalizado" hidden>
+                  <label for="obj-personal">Cuántos bloques</label>
+                  <div class="aj-inline"><input type="text" class="campo-num" id="obj-personal" inputmode="numeric" maxlength="3" value="12"><span class="aj-unidad">bloques</span></div>
+                </div>
+                <div class="aj-fila">
+                  <label>Agrupar de</label>
+                  <div class="seg" id="seg-agrupa" role="group" aria-label="Agrupar los bloques">
+                    <button type="button" data-v="5" aria-pressed="true">5</button>
+                    <button type="button" data-v="10">10</button>
+                    <button type="button" data-v="libre">Libre</button>
+                  </div>
+                </div>
+                <div class="aj-sep"></div>
+                <p class="aj-rotulo">Variantes</p>
+                <div class="aj-fila">
+                  <label>Modo</label>
+                  <div class="seg" id="seg-modo" role="group" aria-label="Modo de la actividad">
+                    <button type="button" data-v="libre" aria-pressed="true">Libre</button>
+                    <button type="button" data-v="estaciones">Estaciones</button>
+                    <button type="button" data-v="reto">Reto</button>
+                  </div>
+                </div>
+              </div>
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Cuando se acerca el final del bloque</p>
+                <div class="aj-fila">
+                  <label for="aj-avisar">Avisar antes de que se acabe</label>
+                  <input type="checkbox" class="interruptor" id="aj-avisar" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-senal">Parpadear en el tramo final</label>
+                  <input type="checkbox" class="interruptor" id="aj-senal" role="switch" checked>
+                </div>
+                <div class="aj-sep"></div>
+                <div class="aj-fila">
+                  <label for="aj-decenas">Colorear la rueda de diez en diez</label>
+                  <input type="checkbox" class="interruptor" id="aj-decenas" role="switch" checked>
+                </div>
+                <div class="aj-sep"></div>
+                <p class="aj-rotulo">Sonido</p>
+                <div class="aj-fila">
+                  <label for="aj-sonido-bloque">Al completar un bloque</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido-bloque" role="switch">
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-sonido-meta">Al llegar a la meta</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido-meta" role="switch" checked>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-cuerpo" id="cuerpo">
+        <div class="principal" id="principal">
+          <div class="bl-grid">
+            <div class="reloj-col">
+              <p class="estado-pieza" id="estado" aria-live="polite"><span class="punto" aria-hidden="true"></span><span id="estado-txt">Listo</span></p>
+              <div class="bl-rueda-caja">
+                <svg class="bl-rueda" id="rueda" viewBox="0 0 240 240" role="img" aria-label="Rueda de sesenta marcas"></svg>
+              </div>
+            </div>
+            <div class="bandeja-col">
+              <p class="bl-meta-txt" id="meta-txt"><b id="meta-n">5</b> bloques</p>
+              <div class="bandeja" id="bandeja" aria-live="polite"></div>
+              <div class="tira-estaciones" id="tira-estaciones" hidden></div>
+            </div>
+          </div>
+
+          <div class="mandos">
+            <button type="button" class="b-suave-ico" id="btn-estacion" title="Nueva estación" aria-label="Nueva estación" hidden>
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button type="button" class="b-principal-ico" id="btn-marcha" aria-label="Empezar" title="Empezar">
+              <svg class="ico" viewBox="0 0 24 24" fill="currentColor" id="ico-marcha" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>
+            </button>
+            <button type="button" class="b-suave-ico" id="btn-reiniciar" aria-label="Reiniciar" title="Reiniciar">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <aside class="info" id="info" aria-labelledby="info-titulo">
+          <div class="info-int">
+            <h2 class="info-titulo" id="info-titulo">El tiempo que se ve crecer</h2>
+            <div class="info-bloque">
+              <p class="info-rotulo">Para qué</p>
+              <p>Actividades donde lo que importa es que el tiempo <b>se vea pasar</b>, no medirlo con precisión: recoger el salón, leer en silencio una tanda, resolver una lista de ejercicios, una estación de trabajo, un reto contrarreloj. Pensado sobre todo para quien todavía no lee un reloj de un vistazo.</p>
+            </div>
+            <div class="info-bloque">
+              <p class="info-rotulo">Cómo funciona</p>
+              <p>La rueda se llena mientras dura un bloque —un minuto de forma predeterminada, o el tiempo que configures—. Al completarse, cae un bloque entero y se acumula junto a los demás, agrupados de cinco o de diez para que se cuenten de un vistazo. Todo se decide antes de empezar: cuánto dura un bloque, cuántos hacen falta y cómo se agrupan. Al llegar a la meta, la rueda se detiene sola y lo avisa.</p>
+            </div>
+            <div class="info-bloque">
+              <p class="info-rotulo">Ideas para el aula</p>
+              <ul class="info-ideas">
+                <li>Pon la meta antes de empezar —cinco bloques para leer, diez para ordenar el salón— y la clase <b>ve cuánto le queda</b> sin preguntar.</li>
+                <li>En modo Estaciones, cada grupo llena su propia bandeja <b>desde cero</b> al llegar a la mesa: se compara de un vistazo cuántos bloques llenó cada uno.</li>
+                <li>En modo Reto, fija la meta y anímalos a <b>superar su propio tiempo</b> la próxima vez que se mida la misma tarea.</li>
+                <li>Cuenta hacia atrás desde la meta: «si ya van tres bloques, ¿cuántos minutos faltan para cinco?».</li>
+              </ul>
+            </div>
+            <div class="info-bloque">
+              <p class="info-rotulo">Aprendizajes relacionados</p>
+              <ul class="info-aprende">
+                <li>Medida del tiempo</li><li>Agrupación y conteo</li><li>Sistema sexagesimal</li><li>Minutos y segundos</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+<p class="pie-proto">Prototipo a 10× de velocidad, solo para verlo funcionar — en el cronómetro real cada bloque tarda lo que configures (un minuto, de forma predeterminada). © Secuencia321</p>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+/* 10× más rápido que la vida real, solo para poder ver la mecánica sin
+   esperar minutos de verdad. En producción: TICK_MS = 1000/60 según el
+   reloj del sistema, nunca un temporizador contado. */
+const TICK_MS = 100;
+
+const E = {
+  duracion: 1, duracionPersonal: 7,
+  objetivo: 5, personalizado: 12, agrupa: '5', modo: 'libre',
+  avisar: true, senal: true, sonidoBloque: false, sonidoMeta: true, decenas: true,
+  bloques: 0, tick: 0, segTotal: 0, segBloque: 0, corriendo: false, meta: false,
+  estaciones: []
+};
+
+const $pieza = $('#pieza'), $principal = $('#principal'), $rueda = $('#rueda'),
+  $bandeja = $('#bandeja'), $metaN = $('#meta-n'), $estado = $('#estado'), $estadoTxt = $('#estado-txt'),
+  $btnMarcha = $('#btn-marcha'), $icoMarcha = $('#ico-marcha'), $btnReiniciar = $('#btn-reiniciar'),
+  $btnEstacion = $('#btn-estacion'), $tiraEst = $('#tira-estaciones'),
+  $din = $('#dinamica'), $dinCampo = $('#dinamica-campo'),
+  $btnInfo = $('#btn-info'), $info = $('#info'), $cuerpo = $('#cuerpo'),
+  $btnAjustes = $('#btn-ajustes'), $ajustes = $('#ajustes'), $ajCerrar = $('#ajustes-cerrar'),
+  $filaPersonal = $('#fila-personalizado'), $objPersonal = $('#obj-personal'),
+  $filaDuracionPersonal = $('#fila-duracion-personal'), $durPersonal = $('#dur-personal'),
+  $btnPantalla = $('#btn-pantalla'), $icoPantalla = $('#ico-pantalla'),
+  $ajAvisar = $('#aj-avisar'), $ajSenal = $('#aj-senal'), $ajSonidoBloque = $('#aj-sonido-bloque'),
+  $ajSonidoMeta = $('#aj-sonido-meta'), $ajDecenas = $('#aj-decenas');
+
+/* ── la rueda de sesenta marcas ───────────────────────────────────── */
+let marcasHTML = '';
+for (let i = 0; i < 60; i++) marcasHTML += `<rect x="116.5" y="10" width="7" height="22" rx="3.5" class="cuenta" data-i="${i}" transform="rotate(${i * 6} 120 120)"/>`;
+/* el centro dibuja minutos : segundos, como en los demás cronómetros */
+$rueda.innerHTML = `<g>${marcasHTML}</g><text x="120" y="120" class="bl-cifra" id="bl-cifra-central"></text>`;
+const $cuentas = $$('.cuenta', $rueda);
+const svgTxt = $('#bl-cifra-central', $rueda);
+
+function pintarRueda() {
+  $cuentas.forEach((c, i) => {
+    c.classList.toggle('llena', i < E.tick);
+    c.classList.toggle('par', E.decenas && Math.floor(i / 10) % 2 === 1);
+  });
+  /* el centro es siempre el tiempo real transcurrido (minutos : segundos
+     desde que se le dio a «Empezar»), sin importar cuánto dure un bloque:
+     con la duración por defecto de un minuto coincide exactamente con
+     antes (bloques completos : segundos del bloque en curso) */
+  const mm = Math.floor(E.segTotal / 60), ss = E.segTotal % 60;
+  svgTxt.innerHTML = `${mm}<tspan class="sep">:</tspan>${String(ss).padStart(2, '0')}`;
+}
+
+/* ── audio simple, sin recursos externos ─────────────────────────── */
+let audioCtx = null;
+function beep(f, d = .16) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = f; o.type = 'sine';
+    g.gain.setValueAtTime(.14, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + d);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + d);
+  } catch (e) { /* sin audio, la herramienta sigue funcionando */ }
+}
+
+/* ── la bandeja: un bloque por minuto, agrupados de un vistazo ───────
+   El color alterna por grupo (el tamaño que se eligió en «Agrupar de»),
+   con petróleo claro y hondo — el terracota queda solo para el bloque
+   final, así no se confunde con el agrupamiento. */
+function metaActual() { return E.objetivo === 'personalizado' ? (parseInt(E.personalizado, 10) || 1) : E.objetivo; }
+function tamGrupo() { return E.agrupa === 'libre' ? 0 : Number(E.agrupa); }
+/* la caja no tiene un ancho fijo: se calcula según cuántos bloques le
+   tocan, en una forma más ancha que alta (para que asiente bien junto a
+   la rueda), y queda reservada desde el principio — así nunca sobra un
+   hueco vacío ni hace falta explicar con un texto qué va a pasar ahí. */
+function dimensionarBandeja(meta) {
+  const enPantallaCompleta = $pieza.classList.contains('pc');
+  const BLOQUE = enPantallaCompleta ? 44.8 : 36.8, GAP = 8, PAD = 20;
+  /* de a uno por fila hasta cinco, como se pidió — recién ahí empieza a
+     acomodarse en varias filas, nunca en menos de cinco columnas */
+  const cols = Math.max(1, Math.min(meta, Math.max(5, Math.ceil(Math.sqrt(meta * 2.2)))));
+  $bandeja.style.width = Math.round(cols * BLOQUE + (cols - 1) * GAP + PAD) + 'px';
+}
+function pintarBandeja() {
+  const meta = metaActual();
+  $metaN.textContent = String(meta);
+  dimensionarBandeja(meta);
+  const grupo = tamGrupo();
+  let h = '';
+  for (let i = 0; i < E.bloques; i++) {
+    const esUltimo = i === E.bloques - 1 && E.bloques === meta;
+    const impar = grupo > 0 && Math.floor(i / grupo) % 2 === 1;
+    const cierra = grupo > 0 && (i + 1) % grupo === 0 && i !== E.bloques - 1;
+    h += `<div class="bl-bloque${esUltimo ? ' ultimo' : impar ? ' impar' : ''}${cierra ? ' cierra-grupo' : ''}"></div>`;
+  }
+  $bandeja.innerHTML = h;
+}
+
+/* ── estado y señales ─────────────────────────────────────────────── */
+function calcularEstado() {
+  if (E.meta) return 'cumplida';
+  if (E.corriendo && E.senal && E.tick >= 50) return 'final';
+  if (E.corriendo) return 'marcha';
+  if (E.bloques > 0 || E.tick > 0) return 'pausa';
+  return 'listo';
+}
+const TXT_ESTADO = { listo: 'Listo', marcha: 'En marcha', pausa: 'En pausa', final: 'Últimos segundos', cumplida: 'Meta cumplida' };
+function pintarEstado() {
+  const e = calcularEstado();
+  if ($pieza.dataset.e !== e) { $pieza.dataset.e = e; $estadoTxt.textContent = TXT_ESTADO[e]; }
+}
+
+function actualizarBotones() {
+  $icoMarcha.innerHTML = E.corriendo
+    ? '<path d="M8 5h3v14H8zM13 5h3v14h-3z"/>'
+    : '<path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z"/>';
+  $btnMarcha.setAttribute('aria-label', E.corriendo ? 'Pausar' : (E.bloques > 0 || E.tick > 0 ? 'Seguir' : 'Empezar'));
+  $btnMarcha.title = $btnMarcha.getAttribute('aria-label');
+  $btnEstacion.hidden = E.modo !== 'estaciones';
+  $tiraEst.hidden = E.estaciones.length === 0;
+}
+
+/* ── el reloj ─────────────────────────────────────────────────────── */
+/* la duración de un bloque ya no está fija en un minuto: la rueda sigue
+   teniendo sesenta marcas, pero cada una vale «duración / 60» del tiempo
+   real, así que con la duración por defecto (1 min) cada marca sigue
+   siendo, literalmente, un segundo. */
+function duracionMin() { return E.duracion === 'personalizado' ? (parseInt(E.duracionPersonal, 10) || 1) : E.duracion; }
+function duracionSeg() { return duracionMin() * 60; }
+function recalcularTick() {
+  E.tick = Math.min(59, Math.floor(E.segBloque * 60 / duracionSeg()));
+  pintarRueda();
+}
+
+let raf = 0, avisado50 = false;
+function paso() {
+  if (!E.corriendo) return;
+  E.segTotal += 1;
+  E.segBloque += 1;
+  const totalSeg = duracionSeg();
+  E.tick = Math.min(59, Math.floor(E.segBloque * 60 / totalSeg));
+  if (E.segBloque >= totalSeg) {
+    E.segBloque = 0;
+    E.tick = 0;
+    E.bloques += 1;
+    avisado50 = false;
+    if (E.sonidoBloque) beep(660);
+    pintarBandeja(true);
+    const meta = metaActual();
+    if (E.bloques >= meta) {
+      E.bloques = meta;
+      E.meta = true;
+      E.corriendo = false;
+      $pieza.classList.add('halo');
+      if (E.sonidoMeta) { beep(660); setTimeout(() => beep(880), 150); setTimeout(() => beep(1100), 320); }
+    }
+  } else if (E.avisar && E.tick === 50 && !avisado50) {
+    avisado50 = true;
+  }
+  pintarRueda(); pintarEstado(); actualizarBotones();
+  if (E.corriendo) raf = setTimeout(paso, TICK_MS);
+}
+
+function alternar() {
+  if (E.meta) return;
+  E.corriendo = !E.corriendo;
+  clearTimeout(raf);
+  if (E.corriendo) raf = setTimeout(paso, TICK_MS);
+  pintarEstado(); actualizarBotones();
+}
+
+let reinicioT = 0, confirmando = false;
+function pedirReinicio() {
+  if (!confirmando) {
+    confirmando = true;
+    $btnReiniciar.classList.add('confirmar');
+    $btnReiniciar.title = 'Toca otra vez para reiniciar';
+    clearTimeout(reinicioT);
+    reinicioT = setTimeout(() => { confirmando = false; $btnReiniciar.classList.remove('confirmar'); $btnReiniciar.title = 'Reiniciar'; }, 3000);
+    return;
+  }
+  confirmando = false;
+  clearTimeout(reinicioT);
+  $btnReiniciar.classList.remove('confirmar');
+  $btnReiniciar.title = 'Reiniciar';
+  reiniciar();
+}
+function reiniciar() {
+  E.corriendo = false; clearTimeout(raf);
+  E.bloques = 0; E.tick = 0; E.segTotal = 0; E.segBloque = 0; E.meta = false; avisado50 = false;
+  $pieza.classList.remove('halo');
+  pintarRueda(); pintarBandeja(false); pintarEstado(); actualizarBotones();
+}
+function nuevaEstacion() {
+  if (E.bloques > 0 || E.tick > 0) {
+    E.estaciones.push(E.bloques);
+    $tiraEst.innerHTML = E.estaciones.map((n, i) => `<span>Estación ${i + 1} · ${n}</span>`).join('');
+  }
+  E.corriendo = false; clearTimeout(raf);
+  E.bloques = 0; E.tick = 0; E.segTotal = 0; E.segBloque = 0; E.meta = false; avisado50 = false;
+  $pieza.classList.remove('halo');
+  pintarRueda(); pintarBandeja(false); pintarEstado(); actualizarBotones();
+}
+
+/* ── ajustes: segmentados ─────────────────────────────────────────── */
+function segmentado(id, onCambio) {
+  const cont = $(id);
+  $$('button', cont).forEach(b => b.addEventListener('click', () => {
+    $$('button', cont).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    onCambio(b.dataset.v);
+  }));
+}
+segmentado('#seg-duracion', v => {
+  E.duracion = v === 'personalizado' ? 'personalizado' : Number(v);
+  $filaDuracionPersonal.hidden = v !== 'personalizado';
+  recalcularTick();
+});
+$durPersonal.addEventListener('input', () => {
+  $durPersonal.value = $durPersonal.value.replace(/\D/g, '').slice(0, 2);
+  E.duracionPersonal = Math.max(1, parseInt($durPersonal.value, 10) || 1);
+  recalcularTick();
+});
+segmentado('#seg-objetivo', v => {
+  E.objetivo = v === 'personalizado' ? 'personalizado' : Number(v);
+  $filaPersonal.hidden = v !== 'personalizado';
+  if (E.meta && E.bloques < metaActual()) { E.meta = false; $pieza.classList.remove('halo'); }
+  pintarBandeja(false); pintarEstado();
+});
+$objPersonal.addEventListener('input', () => {
+  $objPersonal.value = $objPersonal.value.replace(/\D/g, '').slice(0, 3);
+  E.personalizado = Math.max(1, parseInt($objPersonal.value, 10) || 1);
+  pintarBandeja(false);
+});
+segmentado('#seg-agrupa', v => { E.agrupa = v; pintarBandeja(); });
+segmentado('#seg-modo', v => {
+  E.modo = v;
+  if (v === 'reto') {
+    E.objetivo = 'personalizado'; E.personalizado = 8; $objPersonal.value = '8';
+    $$('#seg-objetivo button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === 'personalizado')));
+    $filaPersonal.hidden = false;
+    pintarBandeja();
+  }
+  actualizarBotones();
+});
+
+$ajAvisar.addEventListener('change', () => { E.avisar = $ajAvisar.checked; });
+$ajSenal.addEventListener('change', () => { E.senal = $ajSenal.checked; });
+$ajSonidoBloque.addEventListener('change', () => { E.sonidoBloque = $ajSonidoBloque.checked; });
+$ajSonidoMeta.addEventListener('change', () => { E.sonidoMeta = $ajSonidoMeta.checked; });
+$ajDecenas.addEventListener('change', () => { E.decenas = $ajDecenas.checked; pintarRueda(); });
+
+/* ── campo de actividad ───────────────────────────────────────────── */
+function ajustarDinamica() {
+  $din.style.height = 'auto'; $din.style.height = $din.scrollHeight + 'px';
+  $dinCampo.classList.toggle('lleno', $din.value.trim() !== '');
+}
+$din.addEventListener('input', ajustarDinamica);
+ajustarDinamica();
+/* la Lora del título llega por red: si se mide la altura antes de que
+   cargue, la raya queda calculada con la tipografía de reserva y termina
+   cruzando el texto en vez de quedar debajo. Se vuelve a medir cuando la
+   fuente está lista, y también si el tamaño de letra cambia (al entrar o
+   salir de pantalla completa, o si la ventana cambia de ancho). */
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarDinamica);
+if (window.ResizeObserver) new ResizeObserver(ajustarDinamica).observe($pieza);
+
+/* ── info / ajustes: abrir y cerrar ───────────────────────────────── */
+function abrirInfo(si) {
+  $cuerpo.classList.toggle('con-info', si);
+  $btnInfo.setAttribute('aria-pressed', String(si));
+  $btnInfo.title = si ? 'Ocultar la información' : 'Información';
+}
+abrirInfo(true);
+$btnInfo.addEventListener('click', () => abrirInfo(!$cuerpo.classList.contains('con-info')));
+
+function abrirAjustes(si) {
+  $ajustes.hidden = !si;
+  $btnAjustes.setAttribute('aria-expanded', String(si));
+}
+$btnAjustes.addEventListener('click', () => abrirAjustes($ajustes.hidden));
+$ajCerrar.addEventListener('click', () => abrirAjustes(false));
+document.addEventListener('click', e => {
+  if (!$ajustes.hidden && !e.target.closest('.ajustes') && !e.target.closest('#btn-ajustes')) abrirAjustes(false);
+});
+
+/* al primer bloque, la información se retira sola, como en Actividad */
+let infoRetirada = false;
+function talVezRetirarInfo() {
+  if (!infoRetirada && E.bloques > 0) { infoRetirada = true; abrirInfo(false); }
+}
+
+/* ── pantalla completa ────────────────────────────────────────────── */
+function alternarPantalla() {
+  const activa = $pieza.classList.contains('pc');
+  if (!activa && document.fullscreenElement === null && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (activa && document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+  $pieza.classList.toggle('pc', !activa);
+  document.body.classList.toggle('pc-activo', !activa);
+  /* los bloques cambian de tamaño en pantalla completa, así que la
+     bandeja tiene que recalcular su ancho con la nueva medida */
+  dimensionarBandeja(metaActual());
+  /* no se toca el estado de info/ajustes al entrar o salir: si estaba
+     abierto, sigue abierto — la pantalla completa cambia el tamaño de la
+     rueda, no la composición */
+  $icoPantalla.innerHTML = !activa
+    ? '<path d="M8 4H5a1 1 0 0 0-1 1v3M14 4h3a1 1 0 0 1 1 1v3M8 20H5a1 1 0 0 1-1-1v-3M14 20h3a1 1 0 0 0 1-1v-3"/>'
+    : '<path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4"/>';
+  $btnPantalla.title = !activa ? 'Salir de pantalla completa' : 'Pantalla completa';
+}
+$btnPantalla.addEventListener('click', alternarPantalla);
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && $pieza.classList.contains('pc')) { $pieza.classList.remove('pc'); document.body.classList.remove('pc-activo'); dimensionarBandeja(metaActual()); $icoPantalla.innerHTML = '<path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4"/>'; }
+});
+
+/* ── mandos ────────────────────────────────────────────────────────── */
+$btnMarcha.addEventListener('click', alternar);
+$btnReiniciar.addEventListener('click', pedirReinicio);
+$btnEstacion.addEventListener('click', nuevaEstacion);
+
+/* ── teclado ───────────────────────────────────────────────────────── */
+const escribiendo = el => el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type !== 'checkbox'));
+document.addEventListener('keydown', e => {
+  if (escribiendo(e.target)) return;
+  if (e.key === ' ') { e.preventDefault(); alternar(); }
+  else if (e.key.toLowerCase() === 'r') pedirReinicio();
+  else if (e.key.toLowerCase() === 'p') alternarPantalla();
+});
+
+/* redibuja lo que hace falta cada vez que cambian los bloques */
+const _pintarBandejaOriginal = pintarBandeja;
+pintarBandeja = function (nuevo) { _pintarBandejaOriginal(nuevo); talVezRetirarInfo(); };
+
+/* ── arranque ─────────────────────────────────────────────────────── */
+pintarRueda();
+pintarBandeja(false);
+pintarEstado();
+actualizarBotones();
+})();
+</script>
+</body>
+</html>
