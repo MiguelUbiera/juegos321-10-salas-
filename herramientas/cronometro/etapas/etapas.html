@@ -1,0 +1,2857 @@
+<!DOCTYPE html>
+<html lang="es">
+<!-- Secuencia321 · Cronómetro por etapas · v1.8
+     Producto: sale de fuente/ con construir.py. No se retoca a mano. -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cronómetro por etapas · Secuencia321</title>
+<meta name="description" content="Cronómetro por etapas de Secuencia321: Lo que planeaste y lo que de verdad duró, en la misma barra. Lo que se hace por partes y conviene repartir antes de empezar: una clase con inicio, desarrollo y cierre, un taller por estaciones, un examen por bloques, una presentación por turnos.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#173f50">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="fuentes" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&amp;family=Nunito:wght@400;600;700;800&amp;family=Source+Code+Pro:wght@400;600;700&amp;display=swap" media="print" onload="this.media='all';this.dataset.lista='1'" onerror="this.dataset.lista='1'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&amp;family=Nunito:wght@400;600;700;800&amp;family=Source+Code+Pro:wght@400;600;700&amp;display=swap"><style>.carga{display:none!important}html:not(.fuentes-ok) .marca-txt{opacity:1!important;animation:none!important}</style></noscript>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Secuencia321 · La casa de los cronómetros · estilo común
+   Lo que comparten todos: los tokens de la marca, la barra, la carga, el
+   escenario, la pieza, el panel de información, el reloj, los mandos, los
+   menús, los ajustes, pantalla completa, el modo documento y el
+   movimiento reducido.
+   NO SE RETOCA PARA UN CRONÓMETRO. Lo que solo usa uno va en su propio.css.
+   Se corrige aquí y se vuelven a construir todos.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1 · Tokens de la marca ─────────────────────────────────────────────
+   Cada tono tiene un oficio: tinta que se lee, terracota que se toca,
+   petróleo que ordena. Donde el sitio difiere, manda la marca. */
+:root{
+  /* superficies */
+  --su-fondo:#f7f1e9; --su-hondo:#efe6d8; --su-papel:#fffcf7;
+  --su-realce:#f9f3ea; --su-linea:#e2d6c4; --su-calido:#e4c5b5;
+  /* tinta: negro cálido, nunca gris */
+  --ti-fuerte:#1b1512; --ti-media:#2e2622; --ti-tenue:#4a3f38;
+  --ti-guia:#7a6d62;            /* solo marcadores de posición */
+  --ti-sep:#8a7c70;             /* los dos puntos de la cifra */
+  /* terracota: la acción */
+  --te-hondo:#8f3a1e; --te-base:#b04a2a; --te-vivo:#c85f3c;
+  --te-suave:#b6583b; --te-velo:#f0dccf; --te-claro:#e08a5f;
+  /* petróleo: la estructura */
+  --pe-hondo:#0f2d3a; --pe-base:#173f50; --pe-caja:#2a4e5e;
+  --pe-claro:#2c5c70; --pe-velo:#eaf0f2;
+  /* ciruela: la ocasión especial (confirmar el reinicio) */
+  --ci-caja:#674a60;
+  /* sobre el suelo petróleo */
+  --no-titular:#f7f1e9; --no-cuerpo:#e4c5b5;
+
+  --fam-titulo:'Lora', Georgia, 'Times New Roman', serif;
+  --fam-cuerpo:'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --fam-num:'Source Code Pro', Consolas, monospace;
+
+  --barra-h:65px;               /* 64 de barra + 1 de línea, como en el sitio */
+  --sal:cubic-bezier(.22,.8,.25,1);
+  --resorte:cubic-bezier(.25,.46,.45,.94);
+  --sombra-menu:0 6px 18px rgba(15,45,58,.16), 0 18px 48px rgba(15,45,58,.14);
+  color-scheme:light;
+}
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce){
+  @view-transition { navigation: none; }
+}
+/* Entrar y salir de pantalla completa cambia media pieza de sitio. En vez de
+   un salto, la pieza y la cifra se mueven de un estado al otro: el navegador
+   las reconoce por su nombre y anima la caja; el resto se cruza. */
+::view-transition-group(root),::view-transition-group(s321-barra),
+::view-transition-group(s321-pieza),::view-transition-group(s321-cifra){
+  animation-duration:.34s;animation-timing-function:cubic-bezier(.22,.8,.25,1)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-size:16px}
+/* en un proyector grande, la pieza entera crece con la cifra: todo proporcionado.
+   La barra, las migas y el pie van en px y no cambian, como en el sitio. */
+@media (min-width:1500px) and (min-height:820px){
+  html{font-size:17.5px}
+}
+@media (min-width:1800px) and (min-height:940px){
+  html{font-size:19px}
+}
+@media (min-width:2400px) and (min-height:1300px){
+  html{font-size:23px}
+}
+body{margin:0;font-family:var(--fam-cuerpo);font-weight:600;color:var(--ti-fuerte);
+  background:var(--pe-hondo);-webkit-font-smoothing:antialiased;line-height:1.45}
+button,input,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--te-claro);outline-offset:2px}
+.num{font-family:var(--fam-num);font-weight:600;font-variant-numeric:tabular-nums}
+.oculto{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;border:0;
+  overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.ico{width:1.25em;height:1.25em;flex:0 0 auto;display:block}
+/* ── 2 · La carga de la casa ───────────────────────────────────────────
+   Copiada del documento de carga de las secuencias (segmentedDocument):
+   el suelo con su halo, el isotipo que se compone, el nombre, la frase y
+   la raya que recorre. Queda bajo la barra, que no se mueve. */
+.carga{position:fixed;left:0;right:0;bottom:0;top:var(--barra-h);z-index:60;
+  display:grid;place-items:center;padding:24px;text-align:center;
+  background:radial-gradient(900px 480px at 50% -10%,#24576b 0%,transparent 62%),
+    linear-gradient(168deg,#1b485c 0%,#173f50 46%,#0f2d3a 100%);
+  color:#e4c5b5;font:600 15px/1.5 var(--fam-cuerpo);
+  opacity:1;transition:opacity .25s ease}
+.carga.fuera{opacity:0;pointer-events:none}
+/* red de seguridad: si el guion no llegara a retirarla, la carga se va sola a los 6 s */
+.carga{animation:carga-segura .3s ease 6s forwards}
+@keyframes carga-segura{to{opacity:0;visibility:hidden;pointer-events:none}}
+.carga-int{display:flex;flex-direction:column;align-items:center;gap:22px}
+.carga .iso{width:88px;height:88px}
+.carga .iso rect{transform-origin:50% 50%;animation:pieza 2.1s cubic-bezier(.22,.8,.25,1) infinite both}
+.carga .iso .p1{animation-delay:0s}
+.carga .iso .p2{animation-delay:.12s}
+.carga .iso .p3{animation-delay:.24s}
+.carga .iso .u1{animation-delay:.40s}
+.carga .iso .u2{animation-delay:.50s}
+.carga .iso .u3{animation-delay:.60s}
+.carga .iso .u4{animation-delay:.70s}
+@keyframes pieza{
+  0%{opacity:0;transform:scale(.55)}
+  22%{opacity:1;transform:scale(1)}
+  72%{opacity:1;transform:scale(1)}
+  100%{opacity:.18;transform:scale(.92)}
+}
+.carga-marca{font-family:var(--fam-titulo);font-weight:700;font-size:19.5px;color:#f7f1e9;letter-spacing:.01em}
+.carga-marca sup{font-size:.55em}
+.carga-dice{margin:0;font-size:14.4px;opacity:.85}
+.carga-raya{width:180px;height:3px;border-radius:3px;background:rgba(228,197,181,.2);overflow:hidden}
+.carga-raya i{display:block;height:100%;width:40%;border-radius:3px;background:#e08a5f;
+  animation:recorre 1.5s cubic-bezier(.22,.8,.25,1) infinite}
+@keyframes recorre{from{transform:translateX(-110%)}to{transform:translateX(360%)}}
+/* ── 3 · La barra: fiel a la del sitio ─────────────────────────────────
+   El sitio pondrá aquí su barra común con los menús. */
+.barra{position:sticky;top:0;z-index:70;flex:0 0 auto;
+  background:rgba(23,63,80,.97);-webkit-backdrop-filter:saturate(140%) blur(8px);backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid rgba(228,197,181,.16);view-transition-name:s321-barra}
+.barra-int{display:flex;align-items:center;gap:16px;min-height:64px;
+  padding-left:clamp(18px,2vw,28px);padding-right:clamp(18px,2vw,28px)}
+.marca{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:auto;min-width:0}
+.marca-icono{width:36px;height:36px;border-radius:12px;flex:0 0 auto;border:1px solid rgba(228,197,181,.28)}
+.marca-icono img{display:block;width:100%;height:100%;border-radius:inherit}
+.marca-txt{font-family:var(--fam-titulo);font-weight:700;font-size:17px;color:#f7f1e9;
+  min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.marca-txt sup{font-size:.55em}
+@media(max-width:860px){
+  .marca-txt{font-size:15.2px}
+}
+@media(max-width:400px){
+  .marca-txt{font-size:13.8px}
+  .marca-icono{width:32px;height:32px}
+}
+/* ── 4 · El escenario ───────────────────────────────────────────────────
+   Suelo petróleo con halo y cifras de la marca al 6 %, como la portada. */
+html,body{height:100%}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.escenario{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;isolation:isolate;
+  background:radial-gradient(1100px 520px at 82% -8%,#24576b 0%,transparent 62%),
+    linear-gradient(168deg,#1b485c 0%,#173f50 46%,#0f2d3a 100%)}
+.cifras-fondo{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.cifras-fondo span{position:absolute;font-family:var(--fam-num);font-weight:700;line-height:1;color:#e4c5b5;
+  opacity:.06;user-select:none;animation:flotar 22s ease-in-out infinite}
+@keyframes flotar{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-26px) rotate(3deg)}}
+/* migas: una fila fina bajo la barra */
+.migas{flex:0 0 auto;display:flex;align-items:center;gap:14px;min-height:44px;
+  padding:4px clamp(18px,2vw,28px);font-size:13.4px;font-weight:700;color:var(--no-cuerpo)}
+.volver{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:5px 15px 5px 9px;
+  border-radius:999px;text-decoration:none;color:#f7f1e9;font-weight:800;white-space:nowrap;
+  background:rgba(228,197,181,.10);border:1px solid rgba(228,197,181,.32);
+  transition:background .18s var(--sal),border-color .18s var(--sal),transform .3s var(--sal)}
+.volver::before{content:"";position:absolute;inset:-5px -2px}
+.volver .ico{width:17px;height:17px;color:var(--te-claro)}
+.volver:hover{background:rgba(228,197,181,.18);border-color:#e4c5b5}
+.rastro{min-width:0;display:flex;align-items:center;gap:14px}
+/* la rayita solo separaba de «Cronómetros»: sin ese botón, no hace falta */
+.volver + .rastro::before{content:"";width:1px;height:18px;background:rgba(228,197,181,.28);flex:0 0 auto}
+.rastro ol{list-style:none;display:flex;align-items:center;flex-wrap:nowrap;gap:0;margin:0;padding:0;min-width:0;overflow:hidden}
+.rastro li{display:flex;align-items:center;white-space:nowrap;min-width:0}
+.rastro li+li::before{content:"›";margin:0 9px;color:var(--te-claro);font-weight:800}
+.rastro a{position:relative;color:#f7f1e9;text-decoration:none;border-radius:6px;padding:4px 2px}
+.rastro a::before{content:"";position:absolute;inset:-9px -4px}
+/* 44 px de superficie */
+.rastro a:hover{text-decoration:underline;text-underline-offset:3px}
+.rastro .aqui{color:#f7f1e9;font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.rastro .sin-enlace{color:var(--no-cuerpo)}
+/* la mesa sostiene la pieza */
+.mesa{flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:stretch;
+  padding:clamp(2px,.8vh,10px) clamp(12px,3vw,56px) clamp(6px,1.2vh,14px)}
+.pie{flex:0 0 auto;margin:0;text-align:center;padding:0 16px clamp(6px,1vh,10px);
+  font-size:12.2px;font-weight:700;letter-spacing:.02em;color:var(--no-cuerpo)}
+/* ── 5 · La pieza ──────────────────────────────────────────────────────── */
+.pieza{position:relative;width:100%;max-width:1480px;min-height:0;view-transition-name:s321-pieza;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  background:var(--su-papel);border-radius:32px;
+  padding:clamp(12px,2.4vh,26px) clamp(18px,2.2vw,34px) clamp(8px,1.5vh,16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 6px rgba(5,20,27,.26),0 26px 64px rgba(5,20,27,.40);
+  container:pieza/inline-size}
+/* Entrar y salir de pantalla completa cambia el recorte de la pieza. Sin
+   transición de vista de por medio, lo suaviza el CSS: solo la forma, que
+   es lo único que se puede interpolar. */
+.pieza{transition:padding .26s var(--sal),border-radius .26s var(--sal)}
+/* el halo de la meta cumplida */
+.pieza::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 6px var(--te-velo);opacity:0;transition:opacity .45s ease-out}
+.pieza.halo::after{opacity:1;transition:opacity .15s ease-out}
+/* cabecera: ícono, nombre e instrucción; a la derecha, los dos botones */
+.p-cab{position:relative;z-index:3;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"icono textos botones";align-items:center;column-gap:clamp(12px,1.3cqi,18px);
+  padding-bottom:clamp(8px,1.5vh,15px)}
+.p-icono{grid-area:icono;display:block;width:clamp(3.125rem,min(4.2cqi,8.4vh),3.75rem);aspect-ratio:1;border-radius:28%;
+  box-shadow:0 4px 12px rgba(15,45,58,.26),0 1px 2px rgba(15,45,58,.22)}
+.p-icono svg{display:block;width:100%;height:100%}
+.p-textos{grid-area:textos;min-width:0}
+/* el nombre de la herramienta hace de antetítulo; debajo, el de la dinámica */
+.p-tool{margin:0 0 1px;font-family:var(--fam-num);font-weight:600;line-height:1.2;color:var(--pe-base);
+  font-size:clamp(.72rem,min(.84cqi,1.7vh),.84rem);letter-spacing:.15em;text-transform:uppercase}
+.p-botones{grid-area:botones;position:relative;display:flex;gap:.625rem}
+/* botones con forma y color de ícono de aplicación */
+.b-app{position:relative;width:2.875rem;height:2.875rem;border-radius:.9375rem;border:0;padding:0;display:grid;place-items:center;
+  color:#f7f1e9;background:linear-gradient(180deg,#30657b 0%,#1d4557 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 8px rgba(15,45,58,.28),0 1px 2px rgba(15,45,58,.24);
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),filter .3s var(--sal)}
+.b-app::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 52%)}
+.b-app .ico{width:1.375rem;height:1.375rem;position:relative}
+.b-app:hover{transform:translateY(-2px);filter:brightness(1.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -1px 0 rgba(0,0,0,.2),0 8px 18px rgba(15,45,58,.30),0 2px 4px rgba(15,45,58,.24)}
+.b-app:active{transform:translateY(0) scale(.96);transition-duration:.1s}
+.b-app[aria-expanded="true"],.b-app[aria-pressed="true"]{box-shadow:inset 0 0 0 2px rgba(224,138,95,.95),0 3px 8px rgba(15,45,58,.28)}
+/* nombre de la dinámica */
+.rotulo{display:block;margin:0 0 1px;font-family:var(--fam-num);font-weight:600;font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ti-tenue)}
+.dinamica-campo{display:flex;align-items:flex-end;gap:8px;max-width:min(100%,46rem)}
+.dinamica{flex:1 1 auto;min-width:0;display:block;margin:0;padding:1px 0 4px;resize:none;overflow:hidden;
+  border:0;border-bottom:2px dashed var(--su-calido);border-radius:0;background:transparent;outline:none;
+  font-family:var(--fam-titulo);font-weight:700;line-height:1.2;color:var(--pe-hondo);
+  font-size:var(--f-dinamica,clamp(1.32rem,min(2.4cqi,4.6vh),2.5rem));
+  transition:border-color .2s var(--sal)}
+/* «Actividad» de guía: solo para saber dónde se escribe. Se queda con
+   el mismo gris apagado de todo marcador de la casa —«--ti-guia»,
+   pensado justo para esto—; bajarle más la opacidad lo hunde por debajo
+   de lo que se puede leer (lo mide la prueba de contraste), así que la
+   transparencia que pedía Miguel es la que ya trae ese gris frente al
+   texto oscuro de cuando se escribe, no una capa extra. Desaparece del
+   todo en cuanto hay una letra o el campo tiene el foco. */
+.dinamica::placeholder{color:var(--ti-guia);opacity:1}
+.dinamica:hover{border-bottom-color:var(--te-suave)}
+.dinamica:focus{border-bottom-style:solid;border-bottom-color:var(--te-base)}
+.dinamica-campo.lleno .dinamica:not(:focus):not(:hover){border-bottom-color:transparent}
+/* ── 6 · El cuerpo: la lista a la izquierda y el reloj ───────────────────
+   Sin marcas, la columna de la lista mide cero y el reloj va al centro.
+   Con la primera marca, la columna crece y el reloj se corre. */
+.p-cuerpo{min-height:0;display:grid;grid-template-columns:var(--col-lista,0px) minmax(0,1fr) var(--col-info,0px);
+  column-gap:var(--col-gap,0px);padding-top:clamp(6px,1.2vh,12px);
+  transition:grid-template-columns .35s var(--sal),column-gap .35s var(--sal)}
+.p-cuerpo.con-lista{--col-lista:clamp(16.25rem,28%,23.75rem);--col-gap:clamp(16px,2cqi,30px)}
+.p-cuerpo.con-info{--col-info:clamp(16.5rem,28%,24rem);--col-gap:clamp(16px,2cqi,30px)}
+/* la información sale sobre el mismo lienzo, sin recuadro aparte */
+.info{min-width:0;min-height:0;overflow:hidden;display:flex;
+  opacity:0;visibility:hidden;transform:translateX(22px);
+  transition:opacity .28s var(--sal),transform .35s var(--sal),visibility 0s linear .35s}
+.p-cuerpo.con-info .info{opacity:1;visibility:visible;transform:none;
+  transition:opacity .3s var(--sal) .06s,transform .35s var(--sal),visibility 0s}
+.info-int{flex:1 1 auto;min-width:15rem;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:clamp(8px,1.3vh,14px);
+  padding:1px 4px 6px clamp(16px,1.8cqi,26px);border-left:1px solid var(--su-linea);
+  scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.info-int.hay-abajo{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+.info-int.hay-arriba{-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px)}
+.info-int.hay-arriba.hay-abajo{-webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent)}
+.info-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;line-height:1.25;color:var(--pe-hondo);
+  font-size:clamp(1.06rem,min(1.5cqi,2.8vh),1.34rem);text-wrap:balance}
+.info-bloque{display:flex;flex-direction:column;gap:3px}
+.info-bloque p{margin:0;font-weight:600;line-height:1.5;color:var(--ti-media);
+  font-size:clamp(.86rem,min(.98cqi,1.8vh),.97rem)}
+.info-bloque b{font-weight:800;color:var(--ti-fuerte)}
+.info-ideas{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.info-ideas li{position:relative;padding-left:17px;font-weight:600;line-height:1.5;color:var(--ti-media);
+  font-size:clamp(.84rem,min(.95cqi,1.75vh),.95rem)}
+.info-ideas li::before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--te-base)}
+.info-ideas b{font-weight:800;color:var(--ti-fuerte)}
+/* la lista de marcas */
+.lista{min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;
+  background:var(--su-hondo);border-radius:22px;
+  opacity:0;visibility:hidden;transform:translateX(-22px);
+  transition:opacity .28s var(--sal),transform .35s var(--sal),visibility 0s linear .35s}
+.p-cuerpo.con-lista .lista{opacity:1;visibility:visible;transform:none;
+  transition:opacity .3s var(--sal) .06s,transform .35s var(--sal),visibility 0s}
+.lista-int{display:flex;flex-direction:column;min-width:14.75rem;min-height:0;height:100%;padding:10px 8px 10px 12px}
+.lista-cab{display:flex;align-items:center;gap:2px;padding:0 4px 6px 2px;min-width:0}
+.lista-titulo{margin:0;min-width:0;display:flex;align-items:center}
+.lista-titulo-b{min-width:0;max-width:100%;min-height:2.5rem;padding:4px 6px;border:0;border-radius:10px;background:transparent;
+  font-family:var(--fam-titulo);font-weight:700;font-size:1.12rem;line-height:1.2;color:var(--pe-hondo);text-align:left;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lista-titulo-b:hover{background:rgba(255,252,247,.7)}
+.lista-titulo-campo{width:100%;min-width:0;min-height:2.5rem;padding:4px 10px;border:2px solid var(--te-base);border-radius:12px;
+  background:var(--su-papel);font-family:var(--fam-titulo);font-weight:700;font-size:1.08rem;color:var(--pe-hondo);outline:none}
+.lista-titulo-campo::placeholder{color:var(--ti-guia);opacity:1}
+.lista-lapiz{position:relative;flex:0 0 auto;width:2.125rem;height:2.125rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--ti-tenue)}
+.lista-lapiz::before{content:"";position:absolute;inset:-5px}
+.lista-lapiz .ico{width:1.125rem;height:1.125rem}
+.lista-lapiz:hover{background:rgba(255,252,247,.7);color:var(--pe-hondo)}
+/* el menú de las rondas guardadas, donde antes iba la cuenta de marcas */
+.lista-menu{position:relative;width:2.125rem;height:2.125rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:var(--pe-velo);color:var(--pe-hondo)}
+.lista-menu::before{content:"";position:absolute;inset:-5px}
+.lista-menu .ico{width:1.125rem;height:1.125rem}
+.lista-menu:hover,.lista-menu[aria-expanded="true"]{background:var(--pe-claro);color:#fbf6ef}
+/* una ronda guardada se mira, no se toca */
+.lista-plegar{display:none}
+/* si hay más marcas de las que caben, el borde se desvanece: se lee que la lista sigue */
+/* una marca en edición */
+/* ── 7 · El reloj ───────────────────────────────────────────────────────
+   La cifra toma el tamaño del sitio que le toca: el menor entre el ancho
+   de su columna y el alto que dejan la píldora, la meta y los mandos. */
+.reloj{min-width:0;min-height:0;display:flex;container:reloj/size;
+  --em:3.43;            /* ancho de la cifra en em, lo pone el guion */
+  --k:.72;              /* parte del ancho que puede ocupar la cifra */
+  --lh:.92;             /* alto de la caja de la cifra, en em */
+  --m-meta:clamp(24px,6cqh,42px);     /* de la cifra a la barra de la meta */
+  --m-mandos:clamp(12px,3.2cqh,26px); /* de la meta a los mandos */
+  /* lo que ocupan la píldora, la meta y los mandos: el resto es de la cifra */
+  --fijo:calc(var(--m-meta) + 2.375rem + var(--m-mandos) + 3.625rem + .375rem)}
+.p-cuerpo.con-lista .reloj{--k:.84}
+.reloj-int{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.estado{display:inline-flex;align-items:center;gap:.5rem;height:1.875rem;margin:0 0 .375rem;padding:0 .875rem 0 .6875rem;border-radius:999px;
+  background:var(--su-hondo);color:var(--ti-media);font-weight:800;font-size:.9rem;white-space:nowrap;
+  transition:background-color .3s var(--sal)}
+/* La nota de «listo / en marcha» ya no se ve: queda solo para quien usa
+   lector de pantalla, con la técnica de .oculto. Su propio alto, relleno
+   y separación pesarían igual que los de .oculto y —por ir después en la
+   hoja— ganarían ellos; con las dos clases juntas la especificidad es
+   mayor y sí se queda en 1px. */
+.estado.oculto{height:1px;margin:-1px;padding:0;gap:0}
+.estado .punto{width:.5625rem;height:.5625rem;border-radius:50%;background:var(--ti-tenue);flex:0 0 auto}
+.estado .ico{width:.9375rem;height:.9375rem;display:none;color:var(--te-hondo)}
+.pieza[data-e="marcha"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="marcha"] .estado .punto{background:var(--te-base);animation:latido 1.3s ease-in-out infinite}
+.pieza[data-e="final"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="final"] .estado .punto{background:var(--te-hondo);animation:latido 1s ease-in-out infinite}
+.pieza[data-e="cumplida"] .estado{background:var(--te-velo);color:var(--ti-fuerte)}
+.pieza[data-e="cumplida"] .estado .punto{display:none}
+.pieza[data-e="cumplida"] .estado .ico{display:block}
+@keyframes latido{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.55}}
+.cifra-caja{position:relative;display:flex;justify-content:center;max-width:100%;view-transition-name:s321-cifra;
+  font-size:min(calc(var(--k) * 100cqi / var(--em)),calc((100cqh - var(--fijo)) / var(--lh)))}
+.cifra{margin:0;font-family:var(--fam-num);font-weight:600;line-height:var(--lh);white-space:nowrap;
+  color:var(--ti-fuerte);font-variant-numeric:tabular-nums;transform-origin:50% 55%;
+  transition:color .35s var(--sal)}
+.cifra .sep{color:var(--ti-sep);margin:0 -.07em}
+.cifra .frac{font-size:.46em;color:var(--ti-tenue);margin-left:.02em}
+.sombra{position:absolute;left:50%;top:50%;height:.6em;width:.6em;margin:-.3em 0 0 -.3em;opacity:0;pointer-events:none;
+  color:var(--ti-fuerte)}
+.sombra svg{display:block;width:100%;height:100%}
+/* la meta: una barra fina, lejos de la cifra */
+/* los mandos */
+.mandos{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:var(--m-mandos)}
+.b-principal,.b-marca,.b-suave{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  border-radius:999px;font-weight:800;white-space:nowrap;
+  transition:transform .3s var(--sal),box-shadow .3s var(--sal),background-color .2s var(--sal),border-color .2s var(--sal),color .2s var(--sal)}
+.b-principal{height:3.625rem;min-width:11.5rem;padding:0 1.875rem 0 1.625rem;border:0;background:var(--te-base);color:#f7f1e9;
+  font-size:1.2rem;letter-spacing:.01em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 6px 16px rgba(143,58,30,.34),0 2px 4px rgba(143,58,30,.26)}
+.b-principal .ico{width:1.375rem;height:1.375rem}
+.b-principal:hover{background:var(--te-vivo);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 22px rgba(143,58,30,.40),0 2px 4px rgba(143,58,30,.26)}
+.b-marca{height:3.25rem;padding:0 1.375rem 0 1.125rem;border:2px solid var(--te-suave);background:var(--su-papel);color:var(--te-hondo);font-size:1.06rem}
+.b-marca .ico{width:1.25rem;height:1.25rem}
+.b-marca:hover:not(:disabled){background:var(--te-velo);transform:translateY(-2px);box-shadow:0 6px 14px rgba(143,58,30,.16)}
+.b-marca:disabled{border-color:var(--su-calido);color:var(--ti-guia);cursor:default}
+.b-suave{height:3.25rem;padding:0 1.25rem 0 1rem;border:2px solid var(--su-linea);background:var(--su-papel);color:var(--ti-media);font-size:1.06rem}
+.b-suave .ico{width:1.25rem;height:1.25rem}
+.b-suave:hover{border-color:var(--su-calido);background:var(--su-realce);transform:translateY(-2px);box-shadow:0 6px 14px rgba(27,21,18,.08)}
+.b-suave.confirmar{background:var(--ci-caja);border-color:var(--ci-caja);color:#f7f1e9}
+.b-principal:active,.b-marca:active:not(:disabled),.b-suave:active{transform:scale(.98);transition-duration:.1s}
+/* una etiqueta que cambia no mueve los botones vecinos */
+.apila{display:grid}
+.apila>span{grid-area:1/1;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-align:center}
+.apila>span:not(.ve){visibility:hidden}
+/* columna angosta —la lista y la información abiertas a la vez—: los mandos
+   se reparten en dos filas, como en el teléfono, y la cifra cuenta con ello */
+@container reloj (max-width: 560px){
+  .mandos{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem}
+  .b-principal{grid-column:1 / -1;width:100%;min-width:0;padding:0 1rem}
+  .b-marca,.b-suave{width:100%;padding-left:1rem;padding-right:1rem}
+  .reloj-int{--fijo:calc(var(--m-meta) + 2.375rem + var(--m-mandos) + 3.625rem + 3.85rem + .375rem)}
+}
+@container reloj (max-width: 420px){
+  .mandos{grid-template-columns:minmax(0,1fr) auto}
+  .b-marca,.b-suave{font-size:.98rem;padding-left:.8rem;padding-right:.8rem}
+}
+/* el clip de las marcas, junto a Reiniciar */
+.clip-caja{position:relative;display:flex}
+.b-clip{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:.6875rem;padding:0;display:grid;place-items:center;
+  background:var(--su-hondo);color:var(--ti-media);transition:background-color .18s var(--sal),transform .3s var(--sal)}
+.b-clip::before{content:"";position:absolute;inset:-4px}
+/* 44 px de superficie */
+.b-clip .ico{width:1.1875rem;height:1.1875rem}
+.b-clip:hover{background:var(--su-calido)}
+.b-clip[aria-expanded="true"]{background:var(--su-calido)}
+.b-clip .clip-n{position:absolute;top:-7px;right:-9px;min-width:21px;height:21px;padding:0 5px;border-radius:999px;display:grid;place-items:center;
+  background:var(--pe-claro);color:#f7f1e9;font-family:var(--fam-num);font-weight:600;font-size:.72rem;box-shadow:0 0 0 2px var(--su-papel)}
+/* con las marcas guardadas, el botón se tiñe: hay algo ahí dentro */
+.b-clip.oculta{background:var(--te-velo);color:var(--te-hondo)}
+.b-clip.oculta:hover{background:var(--su-calido)}
+.b-clip.late{animation:clip-late .45s var(--sal)}
+@keyframes clip-late{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+.menu{position:absolute;z-index:40;min-width:236px;padding:6px;margin:0;list-style:none;
+  background:var(--su-papel);border:1px solid var(--su-linea);border-radius:18px;box-shadow:var(--sombra-menu);
+  animation:menu-entra .2s var(--sal) both}
+.clip-menu{right:-6px;bottom:calc(100% + 10px);transform-origin:bottom right}
+.menu button{display:flex;align-items:center;gap:11px;width:100%;min-height:44px;padding:9px 14px 9px 12px;border:0;border-radius:12px;
+  background:none;text-align:left;font-weight:800;font-size:.97rem;color:var(--ti-fuerte);white-space:nowrap}
+.menu button .ico{width:19px;height:19px;color:var(--pe-claro)}
+.menu button.peligro .ico{color:var(--te-hondo)}
+.menu button:hover,.menu button:focus-visible{background:var(--su-realce)}
+@keyframes menu-entra{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+/* lo que entra suave también sale suave: nada desaparece de un tirón */
+.saliendo{pointer-events:none}
+.clip-menu.saliendo{animation:menu-sale .17s var(--sal) both}
+.menu-cab.saliendo,.ajustes.saliendo{animation:menu-sale-arriba .17s var(--sal) both}
+@keyframes menu-sale{from{opacity:1;transform:none}to{opacity:0;transform:translateY(6px) scale(.98)}}
+/* un menú colgado de la cabecera de la lista: la casa lo coloca, cada
+   cronómetro le pone dentro lo suyo */
+.cab-caja{position:relative;margin-left:auto;flex:0 0 auto}
+.menu-cab{right:-6px;top:calc(100% + 9px);transform-origin:top right;max-height:min(20rem,52vh);overflow-y:auto;overscroll-behavior:contain;
+  animation:menu-entra-arriba .2s var(--sal) both;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+@keyframes menu-sale-arriba{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-7px) scale(.98)}}
+/* Los atajos viven en el panel de ajustes, no al pie de la pieza: en la
+   pizarra esa tira de frases era ruido —ahí se toca, no se teclea— y
+   quien tiene teclado los busca donde se busca todo lo demás. Van en el
+   hueco que deja la columna más corta, así que no cuestan altura, y solo
+   los que no se adivinan: el espacio para iniciar y pausar lo sabe todo
+   el mundo y se llevaba un renglón. */
+.aj-teclado{margin-top:auto;padding-top:10px}
+/* En los visores más bajos del parque —638 px de alto— el panel se recoge:
+   menos aire entre filas y entre grupos. Con eso entra entero y no hace
+   falta desplazarlo, que era lo que lo hacía parecer enorme. */
+@media (max-height: 700px){
+  .ajustes{padding:12px 18px 14px}
+  .aj-cab{padding-bottom:8px;margin-bottom:9px}
+  .aj-rejilla{gap:10px 26px}
+  .aj-grupo{gap:7px}
+  .aj-fila{min-height:2.375rem}
+  .aj-teclado{padding-top:7px}
+  .aj-teclado .aj-rotulo{margin-bottom:4px}
+  .teclas{gap:4px 14px}
+}
+.aj-teclado .aj-rotulo{margin-bottom:6px}
+/* en dos columnas, no en una tira que se parte donde cabe: así las
+   teclas quedan alineadas y se leen de un vistazo */
+.teclas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,auto));
+  justify-content:start;gap:5px 16px;
+  font-size:.82rem;font-weight:700;line-height:1.35;color:var(--ti-tenue)}
+.teclas li{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.teclas kbd{flex:0 0 auto;min-width:2.25rem;padding:1px 7px;border-radius:7px;text-align:center;
+  border:1px solid var(--su-linea);border-bottom-width:2px;
+  background:var(--su-fondo);font-family:var(--fam-num);font-weight:600;font-size:.74rem;line-height:1.5;color:var(--ti-media)}
+/* en una pantalla de dedo no hay teclado que explicar: se va el grupo
+   entero, rótulo incluido, no solo la lista */
+@media (hover:none) and (pointer:coarse){
+  .aj-teclado{display:none}
+}
+/* el aviso que ofrece deshacer */
+.aviso{position:absolute;left:50%;bottom:clamp(6px,1.2vh,12px);z-index:35;display:flex;align-items:center;gap:12px;
+  max-width:calc(100% - 32px);padding:6px 6px 6px 18px;border-radius:999px;background:var(--pe-caja);color:#f7f1e9;
+  font-weight:800;font-size:.93rem;white-space:nowrap;box-shadow:0 10px 26px rgba(15,45,58,.30);
+  transform:translateX(-50%);animation:aviso-entra .25s var(--sal) both}
+.aviso-txt{overflow:hidden;text-overflow:ellipsis}
+.aviso button{position:relative;flex:0 0 auto;min-height:36px;padding:4px 14px;border:0;border-radius:999px;background:rgba(247,241,233,.14);
+  color:#f7f1e9;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.aviso button:hover{background:rgba(247,241,233,.24)}
+.aviso button::before{content:"";position:absolute;inset:-4px -2px}
+@keyframes aviso-entra{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+/* ── 7-bis · Comparar rondas ───────────────────────────────────────────── */
+/* la hoja se ajusta a lo que lleva dentro y solo crece hasta donde cabe */
+/* ── 7-bis · Comparar: la hoja que cruza lo guardado ───────────────────────────────────────────── */
+.cmp-velo{position:absolute;inset:0;z-index:58;border-radius:inherit;background:rgba(15,45,58,.34);
+  animation:velo-entra .2s var(--sal) both}
+@keyframes velo-entra{from{opacity:0}to{opacity:1}}
+/* la hoja se ajusta a lo que lleva dentro y solo crece hasta donde cabe */
+.comparar{position:absolute;z-index:59;left:50%;top:50%;
+  width:min(58rem,calc(100% - clamp(18px,4.4vw,56px)));
+  max-height:calc(100% - clamp(14px,4vh,40px));
+  display:flex;flex-direction:column;min-height:0;
+  padding:clamp(12px,1.8vh,20px) clamp(14px,1.8vw,24px) clamp(10px,1.4vh,16px);
+  background:var(--su-papel);border:1px solid var(--su-linea);border-radius:22px;box-shadow:var(--sombra-menu);
+  transform:translate(-50%,-50%);animation:cmp-entra .22s var(--sal) both}
+@keyframes cmp-entra{from{opacity:0;transform:translate(-50%,-50%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.cmp-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding-bottom:10px;margin-bottom:2px;border-bottom:1px solid var(--su-linea)}
+.cmp-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:clamp(1.1rem,1.5cqi,1.35rem);color:var(--pe-hondo)}
+.cmp-sub{margin:2px 0 0;font-weight:600;font-size:.88rem;color:var(--ti-tenue)}
+.cmp-cerrar{position:relative;flex:0 0 auto;width:2.5rem;height:2.5rem;border:0;border-radius:12px;padding:0;
+  display:grid;place-items:center;background:var(--su-hondo);color:var(--ti-media)}
+.cmp-cerrar::before{content:"";position:absolute;inset:-3px}
+.cmp-cerrar:hover{background:var(--su-calido);color:var(--pe-hondo)}
+.cmp-marco{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;margin:0 -4px;padding:0 4px;
+  scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.cmp-marco:focus-visible{outline:3px solid var(--te-claro);outline-offset:-3px;border-radius:12px}
+.cmp{width:100%;border-collapse:separate;border-spacing:0;font-size:clamp(.84rem,.95cqi,.95rem)}
+.cmp th,.cmp td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--su-linea)}
+.cmp thead th{position:sticky;top:0;z-index:2;background:var(--su-papel);
+  font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ti-tenue);
+  border-bottom:1px solid var(--su-calido)}
+.cmp th.cmp-quien,.cmp td.cmp-quien{position:sticky;left:0;z-index:1;background:var(--su-papel);
+  text-align:left;font-weight:800;color:var(--ti-fuerte);max-width:11rem;overflow:hidden;text-overflow:ellipsis}
+.cmp thead th.cmp-quien{z-index:3}
+.cmp tbody tr:hover td{background:var(--su-realce)}
+.cmp tbody tr:hover td.cmp-quien{background:var(--su-realce)}
+.cmp td.cmp-t{font-family:var(--fam-num);font-weight:600;font-variant-numeric:tabular-nums;color:var(--ti-media)}
+.cmp td.cmp-vacia{color:var(--ti-guia)}
+.cmp td.cmp-mejor{color:var(--pe-hondo);font-weight:700}
+.cmp td.cmp-cambio{font-family:var(--fam-num);font-weight:700;font-variant-numeric:tabular-nums;
+  border-left:1px solid var(--su-linea);color:var(--ti-tenue)}
+.cmp td.cmp-cambio.baja{color:var(--pe-claro)}
+.cmp td.cmp-cambio.sube{color:var(--te-hondo)}
+.cmp tbody tr:last-child th,.cmp tbody tr:last-child td{border-bottom:0}
+.cmp-nota{margin:9px 0 0;font-weight:600;font-size:.83rem;line-height:1.45;color:var(--ti-tenue)}
+.cmp-nada{margin:22px 0;text-align:center;font-weight:700;color:var(--ti-tenue)}
+.comparar.saliendo{animation:cmp-sale .19s var(--sal) both}
+@keyframes cmp-sale{from{opacity:1;transform:translate(-50%,-50%) scale(1)}to{opacity:0;transform:translate(-50%,-50%) scale(.97)}}
+.cmp-velo.saliendo{animation:velo-sale .19s var(--sal) both}
+@keyframes velo-sale{from{opacity:1}to{opacity:0}}
+
+/* ── 8 · Ajustes: menú desplegable ─────────────────────────────────────── */
+.ajustes{position:absolute;top:calc(100% + 12px);right:0;z-index:50;width:min(40rem,calc(100vw - 28px));
+  max-height:var(--aj-alto,76vh);overflow:auto;overscroll-behavior:contain;
+  padding:14px 18px 18px;background:var(--su-papel);border:1px solid var(--su-linea);border-radius:22px;
+  box-shadow:var(--sombra-menu);animation:menu-entra-arriba .2s var(--sal) both;transform-origin:top right}
+@keyframes menu-entra-arriba{from{opacity:0;transform:translateY(-7px) scale(.98)}to{opacity:1;transform:none}}
+.aj-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;margin-bottom:12px;border-bottom:1px solid var(--su-linea)}
+.aj-titulo{margin:0;font-family:var(--fam-titulo);font-weight:700;font-size:1.2rem;color:var(--pe-hondo)}
+.aj-cerrar{position:relative;width:2.5rem;height:2.5rem;border:0;border-radius:12px;padding:0;display:grid;place-items:center;background:var(--su-hondo);color:var(--ti-media)}
+.aj-cerrar::before{content:"";position:absolute;inset:-3px}
+.aj-cerrar .ico{width:20px;height:20px}
+.aj-cerrar:hover{background:var(--su-calido)}
+.aj-rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 26px}
+.aj-grupo{min-width:0;display:flex;flex-direction:column;gap:10px}
+.aj-grupo+.aj-grupo{border-left:1px solid var(--su-linea);padding-left:24px}
+.aj-rotulo{margin:0;font-family:var(--fam-num);font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ti-tenue)}
+.aj-fila{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:2.75rem}
+.aj-fila label{font-weight:800;font-size:1rem;color:var(--ti-fuerte);cursor:pointer}
+.aj-nota{margin:0;font-size:.86rem;font-weight:700;line-height:1.4;color:var(--ti-tenue)}
+.aj-sep{height:1px;background:var(--su-linea);margin:2px 0}
+/* interruptor: una casilla con forma de interruptor */
+.interruptor{-webkit-appearance:none;appearance:none;position:relative;flex:0 0 auto;width:3.25rem;height:1.875rem;margin:0;border-radius:999px;
+  border:2px solid var(--ti-guia);background:var(--su-hondo);cursor:pointer;transition:background-color .2s var(--sal),border-color .2s var(--sal)}
+.interruptor::after{content:"";position:absolute;top:3px;left:3px;width:calc(1.875rem - 10px);height:calc(1.875rem - 10px);border-radius:50%;background:var(--ti-guia);
+  transition:transform .22s var(--sal),background-color .2s var(--sal)}
+.interruptor:checked{background:var(--pe-claro);border-color:var(--pe-claro)}
+.interruptor:checked::after{transform:translateX(1.375rem);background:#fffcf7}
+/* la meta: minutos y segundos */
+.campo-num{width:4.5rem;height:2.875rem;padding:0 8px;border:2px solid var(--su-linea);border-radius:12px;background:var(--su-fondo);
+  text-align:center;font-family:var(--fam-num);font-weight:600;font-size:1.25rem;color:var(--ti-fuerte);outline:none}
+.campo-num:focus{border-color:var(--te-base);background:var(--su-papel)}
+.campo-num:disabled{color:var(--ti-guia);background:var(--su-realce);border-style:dashed}
+.aj-unidad{font-weight:800;font-size:.98rem;color:var(--ti-media);margin-right:8px}
+/* la precisión: cuatro opciones con su muestra */
+/* ── 9 · Las señales de la meta ─────────────────────────────────────────
+   Aviso: la cifra respira. Final: se pone terracota honda y palpita una
+   vez por segundo. Meta cumplida: se queda quieta en terracota honda.
+   En pausa, nada se mueve. */
+.pieza.corre[data-tramo="aviso"] .cifra{animation:respira 2.4s ease-in-out infinite}
+.pieza.corre[data-tramo="final"] .cifra{animation:palpita 1s cubic-bezier(.33,0,.3,1) infinite;animation-delay:var(--fase,0ms)}
+/* ── 10 · Pantalla completa ─────────────────────────────────────────────
+   Solo la herramienta: sin barra, sin migas, sin pie y sin la línea de
+   teclas. La pieza crema a todo lo ancho, que en un aula con luz se lee
+   mejor. Del panel de la cabecera y de los mandos solo queda lo esencial:
+   pausar/reanudar, siguiente/terminar y, cuando hace falta, las etapas;
+   Información y Ajustes se cierran solos si estaban abiertos. */
+html.pc,html.pc body{background:var(--su-papel)}
+html.pc .barra,html.pc .migas,html.pc .pie,html.pc .cifras-fondo{display:none!important}
+html.pc #btn-info,html.pc #btn-ajustes,html.pc #btn-reiniciar,html.pc .ajustes{display:none!important}
+html.pc .info{display:none!important}
+html.pc .p-cuerpo.con-info{--col-info:0px}
+html.pc .escenario{background:var(--su-papel)}
+html.pc .mesa{padding:0}
+html.pc .pieza{max-width:none;border-radius:0;box-shadow:none;
+  padding:clamp(14px,2.6vh,30px) clamp(20px,2.6vw,48px) clamp(8px,1.5vh,16px)}
+html.pc .pieza::after{box-shadow:inset 0 0 0 6px var(--te-velo)}
+html.pc .p-icono{width:2.875rem}
+html.pc .reloj{--k:.78}
+html.pc .p-cuerpo.con-lista .reloj{--k:.86}
+html.pc .meta{--meta-ancho:47.5rem}
+html.pc .carga{top:0}
+/* Pasado un rato sin tocar nada, con el reloj corriendo, los mandos que
+   quedan (pausar/reanudar, siguiente y el de las etapas) se atenúan un
+   60%: no compiten con la clase mientras se mira el reloj, pero siguen
+   enteros —tocar uno de ellos o cualquier punto de la pantalla los
+   despierta de golpe—. Nada de esto ocurre fuera de pantalla completa
+   ni con el reloj en pausa. */
+html.pc .mandos{transition:opacity .7s ease}
+html.pc.latente .mandos{opacity:.4}
+/* ── 11 · Modo documento ────────────────────────────────────────────────
+   Solo en vertical y en el teléfono girado: la orientación decide, no el
+   ancho. Una pizarra 4:3 de 1024 px sigue siendo un aula. */
+@media (orientation: portrait), (max-height: 480px){
+  html,body{height:auto}
+  body{height:auto;min-height:100vh;min-height:100dvh;overflow-x:hidden;overflow-y:auto}
+  .escenario{flex:1 0 auto}
+  .mesa{padding:6px 10px 12px;align-items:flex-start}
+  .pieza{display:block;border-radius:26px;padding:16px 16px 12px}
+  .p-cuerpo{display:flex;flex-direction:column;gap:14px;padding-top:12px}
+  .reloj{container:reloj/inline-size;display:block}
+  .reloj-int{padding:6px 0 4px}
+  .cifra-caja{font-size:min(calc(var(--k) * 100cqi / var(--em)),22vh,12rem)}
+  .reloj{--k:.9}
+  .p-cuerpo.con-lista .reloj{--k:.9}
+  .mandos{flex-wrap:wrap;margin-top:18px}
+  .lista{order:2;transform:none;max-height:none;border-radius:20px}
+  .info{order:3;transform:none;overflow:visible}
+  .p-cuerpo:not(.con-info) .info{display:none}
+  .info-int{min-width:0;overflow:visible;border-left:0;border-top:1px solid var(--su-linea);padding:14px 2px 8px;-webkit-mask-image:none;mask-image:none}
+  .p-cuerpo:not(.con-lista) .lista{display:none}
+  .lista-int{min-width:0;height:auto}
+  .lista-plegar{display:grid;position:relative;flex:0 0 auto;width:40px;height:40px;margin-left:4px;border:0;border-radius:12px;padding:0;place-items:center;
+    background:rgba(255,252,247,.7);color:var(--ti-media)}
+  .lista-plegar .ico{width:20px;height:20px;transition:transform .25s var(--sal)}
+  .lista.plegada .lista-plegar .ico{transform:rotate(-90deg)}
+  .aviso{position:fixed;bottom:16px}
+  .lista.plegada .lista-marcas{display:none}
+  .lista.plegada .lista-cab{padding-bottom:0}
+  html.pc .pieza{border-radius:0}
+}
+@media (orientation: portrait) and (max-width: 600px){
+  .migas .rastro{display:none}
+  .p-cab{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"icono . botones" "textos textos textos";row-gap:12px}
+  .p-icono{width:54px}
+  .mandos{display:grid;grid-template-columns:1fr auto auto;width:100%;gap:10px}
+  .b-principal{grid-column:1 / -1;width:100%}
+  .b-marca,.b-suave{width:100%}
+  .mandos .clip-caja{justify-self:end}
+  .ajustes{position:fixed;left:10px;right:10px;top:auto;width:auto}
+    .aj-rejilla{grid-template-columns:1fr}
+  .aj-grupo+.aj-grupo{border-left:0;padding-left:0;border-top:1px solid var(--su-linea);padding-top:12px}
+}
+@media (max-width: 720px){
+  .aj-rejilla{grid-template-columns:1fr}
+  .aj-grupo+.aj-grupo{border-left:0;padding-left:0;border-top:1px solid var(--su-linea);padding-top:12px}
+  .ajustes{width:min(420px,calc(100vw - 20px))}
+}
+@media (max-width: 380px){
+  .mandos{grid-template-columns:1fr 1fr}
+  .mandos .clip-caja{grid-column:1 / -1;justify-self:center}
+}
+/* ── 12 · Movimiento reducido ───────────────────────────────────────────
+   Ni latido, ni respiración, ni pulso, ni sombra, ni deslizamientos: solo
+   cambia el color. El isotipo de la carga aparece quieto y sin raya. */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+  .carga .iso rect{animation:none!important;opacity:1}
+  .carga-raya{display:none}
+  .cifras-fondo span{animation:none!important}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Cronómetro por etapas · lo suyo
+   Va después de casa.css: el reparto (la barra de las etapas), la lista
+   de etapas y el editor de los ajustes. Todo lo demás lo pone la casa.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Los colores de las etapas salen de la paleta, en el orden de las
+   misiones: terracota, verde, petróleo, ciruela, y dos hondos si alguien
+   llega a seis. Ninguno inventado. */
+:root{
+  --e1:#b04a2a; --e2:#327a52; --e3:#2c5c70;
+  --e4:#5a3a52; --e5:#8f3a1e; --e6:#0f2d3a;
+}
+
+/* ── El reparto: una sola barra, a todo el ancho ─────────────────────────
+   El punteado encierra lo previsto; el relleno dice lo que va corrido. Una
+   etapa que se pasa llena su tramo y se tiñe: no crece, porque el reparto
+   es el mapa de lo planeado y ese mapa no se mueve. */
+/* el reparto es lo que este cronómetro tiene que decir de lejos, así que
+   la barra pesa más que la de la meta y se le reserva su sitio */
+.reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + var(--m-mandos) + 3.625rem + .375rem)}
+.reparto{width:100%;margin-top:var(--m-meta)}
+.rep-pista{display:flex;width:100%;height:1.125rem;gap:3px}
+.rep-tramo{position:relative;min-width:4px;border-radius:6px;overflow:hidden;
+  border:1.5px dashed color-mix(in srgb,var(--c) 74%,transparent);
+  background:color-mix(in srgb,var(--c) 15%,var(--su-fondo));
+  transition:flex-grow .4s var(--sal)}
+.rep-lleno{position:absolute;left:-1.5px;top:-1.5px;bottom:-1.5px;width:0;border-radius:inherit;background:var(--c)}
+.rep-tramo.corre .rep-lleno{transition:width .22s linear}
+/* una etapa que se pasó llena su tramo y se raya: el mapa no se estira */
+.rep-tramo.pasada{border-style:solid;border-color:var(--te-hondo)}
+.rep-tramo.pasada .rep-lleno{background:repeating-linear-gradient(115deg,var(--c) 0 13px,color-mix(in srgb,#fffcf7 34%,var(--c)) 13px 19px)}
+.rep-tramo.hecha{border-style:solid}
+
+.rep-pie{display:flex;justify-content:space-between;align-items:center;gap:.875rem;margin-top:.5625rem;
+  font-weight:800;font-size:1rem;line-height:1.3;color:var(--ti-media);white-space:nowrap}
+.rep-izq{display:inline-flex;align-items:center;gap:7px}
+.rep-izq .ico{width:1.125rem;height:1.125rem;color:var(--pe-claro)}
+.rep-der{display:inline-flex;align-items:center;gap:8px;color:var(--ti-tenue)}
+.rep-der .num{font-size:1.1em;color:var(--ti-fuerte)}
+.rep-der.pasada .num{color:var(--te-hondo)}
+
+/* ── La lista de etapas ─────────────────────────────────────────────── */
+.et-lista.hay-abajo{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+.et-lista.hay-arriba{-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px)}
+.et-lista.hay-arriba.hay-abajo{-webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent)}
+.et-lista{list-style:none;margin:0;padding:2px 4px 4px 0;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+
+.et{position:relative;display:grid;grid-template-columns:1.75rem minmax(0,1fr) auto;align-items:center;column-gap:9px;
+  padding:7px 12px 7px 9px;border-radius:14px;background:var(--su-papel);border:1px solid var(--su-linea);
+  box-shadow:0 1px 2px rgba(27,21,18,.04)}
+.et-n{width:1.75rem;height:1.75rem;border-radius:.5625rem;display:grid;place-items:center;background:var(--c);color:#fffaf4;
+  font-family:var(--fam-num);font-weight:600;font-size:.9rem}
+.et-textos{min-width:0;display:flex;flex-direction:column;gap:1px}
+.et-nombre{min-width:0;font-weight:800;font-size:1rem;line-height:1.25;color:var(--pe-hondo);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.et-donde{font-family:var(--fam-num);font-weight:600;font-size:.76rem;line-height:1.2;color:var(--ti-tenue)}
+.et-cifras{display:flex;flex-direction:column;align-items:flex-end;gap:1px;text-align:right}
+.et-t{font-family:var(--fam-num);font-weight:600;font-size:1rem;line-height:1.25;color:var(--ti-fuerte)}
+.et-dif{font-family:var(--fam-num);font-weight:600;font-size:.78rem;line-height:1.2;color:var(--ti-tenue)}
+.et-dif.sube{color:var(--te-hondo)}
+.et-dif.baja{color:var(--pe-claro)}
+
+/* tocar una etapa la elige; lo que la reinicia es el botón de siempre */
+.et{-webkit-user-select:none;user-select:none}
+.et.tocable{cursor:pointer}
+.et.tocable:hover{background:var(--su-realce);border-color:var(--su-calido)}
+.et:focus-visible{outline:3px solid var(--te-claro);outline-offset:2px}
+.et.elegida{border-color:var(--c);background:var(--su-realce);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.et.quieta{cursor:default;-webkit-user-select:auto;user-select:auto}
+.et.quieta:hover{background:var(--su-papel);border-color:var(--su-linea)}
+.lista.mirando .lista-titulo-b{color:var(--te-hondo)}
+/* Los dos íconos del encabezado van discretos, del color de la tinta y
+   sin caja: son ayudas, no mandos. Al sombrearlos se ve que responden.
+   La lista despliega los eventos guardados y la comparación; el menos
+   **quita el panel de en medio** —lo mismo que «Ocultar» de abajo— y le
+   devuelve el sitio al reloj. */
+.lista-menu{background:transparent;color:var(--ti-tenue)}
+.lista-menu:hover,.lista-menu[aria-expanded="true"]{background:rgba(255,252,247,.75);color:var(--pe-hondo)}
+.lista-plegar{display:grid;position:relative;flex:0 0 auto;width:2.125rem;height:2.125rem;margin-left:2px;
+  border:0;border-radius:10px;padding:0;place-items:center;background:transparent;color:var(--ti-tenue)}
+.lista-plegar::before{content:"";position:absolute;inset:-5px}
+.lista-plegar .ico{width:1.125rem;height:1.125rem;transition:none}
+.lista-plegar:hover{background:rgba(255,252,247,.75);color:var(--pe-hondo)}
+
+/* la X de cada evento guardado, al final de su renglón */
+.menu-cab .r-fila{display:flex;align-items:center;gap:2px}
+.menu-cab .r-fila>button[data-evento]{flex:1 1 auto;min-width:0;width:auto}
+/* `.menu button{width:100%}` vive en la casa y ganaba por especificidad:
+   la X salía del ancho entero y se montaba encima del nombre */
+.menu-cab .r-fila .r-quitar{position:relative;flex:0 0 auto;width:1.875rem;height:1.875rem;border:0;border-radius:9px;padding:0;
+  display:grid;place-items:center;background:transparent;color:var(--ti-tenue);
+  transition:background-color .16s var(--sal),color .16s var(--sal)}
+.r-quitar::before{content:"";position:absolute;inset:-6px -4px}
+.r-quitar .ico{width:.875rem;height:.875rem}
+.r-quitar:hover,.r-quitar:focus-visible{background:var(--te-velo);color:var(--te-hondo)}
+
+/* la X: solo cuando se está mirando un evento guardado, que es lo único
+   que hay que poder eliminar desde aquí */
+.lista-quitar{color:var(--te-hondo)}
+.lista-quitar:hover{background:var(--te-velo);color:var(--te-hondo)}
+.lista-quitar .ico{width:1rem;height:1rem}
+
+/* el lápiz de cada fila: cambiar el nombre o el tiempo sin salir de aquí */
+.et{grid-template-columns:1.75rem minmax(0,1fr) auto auto auto}
+/* Las flechas solo salen en la etapa elegida: elegir una es tomarla, y
+   una vez tomada se puede llevar a otro sitio de la columna. En las
+   demás no estorban. */
+.et-mover{display:none;flex-direction:column;gap:1px}
+.et.elegida .et-mover{display:flex}
+.et-flecha{position:relative;width:1.5rem;height:1.25rem;border:0;border-radius:7px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--c)}
+.et-flecha::before{content:"";position:absolute;inset:-4px -6px}
+.et-flecha .ico{width:1rem;height:1rem}
+.et-flecha:hover:not(:disabled){background:color-mix(in srgb,var(--c) 16%,transparent)}
+.et-flecha:disabled{color:var(--ti-guia);cursor:default}
+.et.editando .et-mover{display:none}
+.et-lapiz{position:relative;width:2rem;height:2rem;border:0;border-radius:10px;padding:0;display:grid;place-items:center;
+  background:transparent;color:var(--ti-tenue)}
+.et-lapiz::before{content:"";position:absolute;inset:-5px}
+.et-lapiz .ico{width:1.0625rem;height:1.0625rem}
+.et-lapiz:hover{background:var(--su-hondo);color:var(--pe-hondo)}
+.et.quieta .et-lapiz{display:none}
+
+/* El nombre se lleva su propia línea. Compartiéndola con los minutos y
+   los dos botones se quedaba en veintidós píxeles en el visor estrecho:
+   un campo donde no cabe lo que se escribe no es un campo. */
+.et.editando{grid-template-columns:1.75rem minmax(0,1fr) auto auto;cursor:default;
+  grid-template-areas:"num nom nom nom" "num hora quita listo";
+  --et-cols:4;
+  row-gap:7px;align-items:center;
+  border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et.editando .et-n{grid-area:num;align-self:start;margin-top:2px}
+.et.editando .et-campo-n{grid-area:nom}
+.et.editando .et-campo-t{grid-area:hora;justify-self:start}
+.et.editando .et-quita{grid-area:quita}
+.et.editando .et-ok{grid-area:listo}
+.et-campo{min-width:0;width:100%;min-height:2.5rem;padding:4px 10px;border:1px solid var(--su-linea);border-radius:11px;
+  background:var(--su-papel);font-weight:800;font-size:.97rem;color:var(--ti-fuerte)}
+.et-campo:focus{outline:none;border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et-campo-t{display:inline-flex;align-items:center;gap:3px}
+.et-campo-t .campo-num{width:2.6rem}
+.et-accion{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:11px;padding:0;display:grid;place-items:center}
+.et-accion::before{content:"";position:absolute;inset:-4px}
+.et-accion .ico{width:1.0625rem;height:1.0625rem}
+.et-quita{background:var(--te-velo);color:var(--te-hondo)}
+.et-quita:hover{background:var(--su-calido)}
+.et-ok{background:var(--pe-claro);color:#f7f1e9}
+.et-ok:hover{background:var(--pe-hondo)}
+
+/* añadir una etapa desde la propia lista */
+.et-mas-caja{list-style:none;display:flex}
+/* El sitio donde cabría otra etapa: sin borde y con un «+» que casi no
+   se ve. Está ahí para quien lo busque —todo el mundo sabe qué hace un
+   más— y no compite con las etapas de verdad. Al acercar el dedo o el
+   cursor se enciende y toma la forma de una fila. */
+.et-mas{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:2.875rem;
+  border:1.5px dashed transparent;border-radius:14px;background:transparent;color:var(--ti-tenue);
+  opacity:.28;
+  transition:opacity .18s var(--sal),border-color .18s var(--sal),background-color .18s var(--sal),color .18s var(--sal)}
+.et-mas-caja:hover .et-mas,.et-mas:hover,.et-mas:focus-visible{opacity:1;
+  border-color:var(--su-calido);background:var(--su-realce);color:var(--pe-hondo)}
+.et-mas .ico{width:1.25rem;height:1.25rem}
+
+/* Reiniciar, cuando hay una etapa elegida, es de esa etapa */
+.b-suave.de-etapa{border-color:var(--c);color:var(--c)}
+.b-suave.de-etapa b{font-weight:800}
+
+/* la que corre se ve desde el fondo del aula */
+.et.ahora{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 26%,transparent),0 2px 6px rgba(27,21,18,.07)}
+.et.ahora .et-nombre{color:var(--c)}
+/* la que espera se recoge con color, no con opacidad: bajarle la
+   opacidad al texto le baja también el contraste, y eso no se hace */
+.et.espera{background:var(--su-fondo)}
+.et.espera .et-nombre{color:var(--ti-tenue)}
+.et.espera .et-t{color:var(--ti-tenue)}
+.et.espera .et-n{background:color-mix(in srgb,var(--c) 34%,var(--su-hondo));color:var(--ti-fuerte)}
+.et.hecha .et-n{background:var(--su-hondo);color:var(--ti-tenue);box-shadow:inset 0 0 0 2px var(--c)}
+
+/* ── El editor de etapas, dentro de los ajustes ─────────────────────── */
+/* el panel se ensancha un poco: el nombre de una etapa tiene que caber
+   entero, que es lo que el maestro va a leer en la lista */
+.ajustes{width:min(47rem,calc(100vw - 28px))}
+.aj-etapas{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.et-editor{display:flex;flex-direction:column;gap:7px;max-height:min(22rem,44vh);overflow-y:auto;overscroll-behavior:contain;
+  padding-right:4px;scrollbar-width:thin;scrollbar-color:#cdbba9 transparent}
+.et-ed{display:grid;grid-template-columns:1.5rem minmax(6rem,1fr) auto auto auto auto 2.25rem;align-items:center;gap:5px}
+.et-ed-color{width:1.5rem;height:1.5rem;border-radius:.5rem;background:var(--c)}
+.et-ed-nombre{min-width:0;width:100%;min-height:2.5rem;padding:4px 10px;border:1px solid var(--su-linea);border-radius:11px;
+  background:var(--su-papel);font-weight:800;font-size:.97rem;color:var(--ti-fuerte)}
+.et-ed-nombre:focus{outline:none;border-color:var(--te-base);box-shadow:0 0 0 3px var(--te-velo)}
+.et-ed .campo-num{width:2.9rem}
+.et-ed .aj-unidad{font-weight:700;font-size:.8rem;color:var(--ti-tenue)}
+.et-quitar{position:relative;width:2.25rem;height:2.25rem;border:0;border-radius:11px;padding:0;display:grid;place-items:center;
+  background:var(--su-hondo);color:var(--te-hondo)}
+.et-quitar::before{content:"";position:absolute;inset:-4px}
+.et-quitar:hover:not(:disabled){background:var(--te-velo)}
+.et-quitar:disabled{opacity:.35;cursor:default}
+.et-pie{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:11px}
+.b-mas{min-height:2.75rem;padding:0 1.125rem}
+.b-mas:disabled{opacity:.45;cursor:default}
+.et-pie .aj-nota{margin:0;flex:1 1 12rem;min-width:0}
+
+/* ── Las señales de la etapa que se acaba ───────────────────────────── */
+.pieza[data-tramo="aviso"] .cifra{color:var(--te-suave)}
+.pieza[data-tramo="final"] .cifra{color:var(--te-base);animation:palpita 1s var(--resorte) infinite both;animation-delay:var(--fase,0ms)}
+.pieza[data-tramo="pasada"] .cifra{color:var(--te-hondo)}
+@keyframes palpita{0%,100%{transform:scale(1)}44%{transform:scale(1.035)}}
+.pieza[data-e="fin"] .cifra{color:var(--pe-hondo)}
+
+/* ── Cuando la columna del reloj se estrecha ──────────────────────────
+   «Siguiente» y «Reiniciar» son más anchos que los mandos del cronómetro
+   de actividad, así que este pasa a dos filas antes que él. El umbral va
+   en rem para que valga igual en un portátil y en un proyector grande,
+   donde la raíz crece y los botones con ella. */
+@container reloj (max-width: 37rem){
+  .mandos{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem}
+  .b-principal{grid-column:1 / -1;width:100%;min-width:0;padding:0 1rem}
+  .b-marca,.b-suave{width:100%;padding-left:1rem;padding-right:1rem}
+  .reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + var(--m-mandos) + 3.625rem + 3.85rem + .375rem)}
+  .rep-pista{height:.9375rem}
+  .rep-pie{font-size:.94rem}
+}
+@container reloj (max-width: 26rem){
+  .mandos{grid-template-columns:minmax(0,1fr) auto}
+  .b-marca,.b-suave{font-size:.98rem;padding-left:.8rem;padding-right:.8rem}
+}
+
+/* la columna de lo previsto se distingue de lo que pasó de verdad */
+.cmp td.cmp-plan{color:var(--ti-tenue);border-right:1px solid var(--su-linea)}
+.cmp tr.cmp-total th,.cmp tr.cmp-total td{border-top:1px solid var(--su-calido);font-weight:800;color:var(--ti-fuerte)}
+/* cada evento tiene su color: así se sigue una columna sin leer el rótulo */
+.cmp th.cmp-ev,.cmp td.cmp-gana{white-space:nowrap}
+.cmp-punto{display:inline-block;width:9px;height:9px;margin-right:7px;border-radius:50%;background:var(--c);vertical-align:baseline}
+.cmp td.cmp-gana{border-left:1px solid var(--su-linea);font-weight:800;color:var(--c)}
+.cmp td.cmp-gana.cmp-vacia{color:var(--ti-guia)}
+.cmp td.cmp-gana.cmp-empate{font-weight:700;color:var(--ti-tenue)}
+
+/* el color de cada evento en el menú de la cabecera */
+.menu-cab .r-color{flex:0 0 auto;width:.875rem;height:.875rem;border-radius:5px;background:var(--c)}
+.menu-cab .r-activo{flex:0 0 auto;padding:1px 7px;border-radius:999px;background:var(--pe-velo);
+  font-size:.72rem;font-weight:800;color:var(--pe-claro);text-transform:lowercase}
+
+/* ── Modo documento ─────────────────────────────────────────────────── */
+@media (orientation: portrait), (max-height: 480px){
+  .reparto{margin-top:18px}
+  .et-ed{grid-template-columns:1.5rem minmax(0,1fr) auto auto 2.25rem;row-gap:4px}
+  .et-ed .aj-unidad{display:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .rep-tramo,.rep-tramo.corre .rep-lleno{transition:none!important}
+  .pieza[data-tramo="final"] .cifra{animation:none!important}
+}
+
+/* ── Ajustes de oficio: nombre, centro del reloj, ajustes en pantalla completa y manual ── */
+
+/* El nombre de la actividad («Actividad»): 20 % más grande, y su caja mide
+   lo mismo que el ícono —arriba con arriba, abajo con abajo—, con la
+   palabra centrada entre las dos líneas. --ico repite la medida del ícono. */
+.p-cab{--ico:clamp(3.125rem,min(4.2cqi,8.4vh),3.75rem)}
+html.pc .p-cab{--ico:2.875rem}
+.dinamica{--fs:calc(1.2 * var(--f-dinamica,clamp(1.32rem,min(2.4cqi,4.6vh),2.5rem)));
+  font-size:var(--fs);min-height:var(--ico);
+  padding-top:max(1px,calc((var(--ico) - 2px - 1.2 * var(--fs)) / 2))}
+@media (orientation: portrait) and (max-width: 600px){
+  .dinamica{min-height:0;padding-top:1px}
+}
+
+/* El centro del reloj: las letras con aire. Las cifras ganan algo de
+   espacio entre sí y las etiquetas y los botones suben un 20 %. */
+.cifra{letter-spacing:.02em}
+.cifra .sep{margin:0 -.04em}
+.rep-pie{font-size:1.2rem}
+.b-principal{font-size:1.44rem}
+.b-marca,.b-suave{font-size:1.27rem}
+/* la etiqueta de abajo es más alta: la cifra cede ese poco */
+.reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + .3rem + var(--m-mandos) + 3.625rem + .375rem)}
+@container reloj (max-width: 37rem){
+  .rep-pie{font-size:1.13rem}
+}
+/* Los mandos: con sitio, ícono y palabra; cuando el reloj se estrecha,
+   solo el ícono —iniciar/pausar, siguiente, reiniciar y las etapas—, los
+   cuatro en una sola fila centrada que baja con orden si no cabe. El
+   texto no desaparece: queda para el lector de pantalla y como rótulo al
+   pasar el cursor. */
+.pieza .mandos{flex-wrap:wrap;justify-content:center}
+@container reloj (max-width: 40rem){
+  .reloj-int{--fijo:calc(2.25rem + var(--m-meta) + 3rem + .3rem + var(--m-mandos) + 3.625rem + .375rem)}
+  .pieza .mandos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:clamp(.5rem,3cqi,.875rem);width:auto}
+  .pieza .mandos>*{flex:0 0 auto;grid-column:auto;justify-self:auto}
+  .pieza .b-principal,.pieza .b-marca,.pieza .b-suave{width:2.875rem;height:2.875rem;min-width:0;padding:0;
+    border-radius:.9375rem;gap:0;grid-column:auto}
+  .pieza .b-principal{width:3.25rem;height:3.25rem;border-radius:1.0625rem}
+  .pieza .b-principal .ico{width:1.5rem;height:1.5rem}
+  .pieza .b-marca .ico,.pieza .b-suave .ico{width:1.375rem;height:1.375rem}
+  .pieza .b-principal .apila,.pieza .b-marca .apila,.pieza .b-suave .apila{
+    position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+}
+/* Cuando el lienzo se achica, las columnas laterales ceden: con la lista y
+   la información abiertas, al reloj le quedaban 126 px y los botones se
+   aplastaban. Así conserva el espacio que necesita. */
+@container pieza (max-width: 62rem){
+  .p-cuerpo.con-lista{--col-lista:clamp(12.5rem,24%,23.75rem)}
+  .p-cuerpo.con-info{--col-info:clamp(12.5rem,22%,24rem)}
+}
+
+/* Pantalla completa: la casa esconde Ajustes, pero aquí es donde se
+   reparte el tiempo. El botón y su panel se quedan; el panel sigue
+   cerrado hasta que se toca. */
+html.pc #btn-ajustes{display:grid!important}
+html.pc .ajustes:not([hidden]){display:block!important}
+/* Reiniciar también se queda en pantalla completa (con su segundo toque,
+   para que nadie borre la tanda de un roce en la pizarra) */
+html.pc #btn-reiniciar{display:inline-flex!important}
+
+/* El enlace al manual: texto subrayado, en terracota claro y discreto, a la
+   derecha de las migas. Sigue visible aunque el teléfono oculte el rastro. */
+.manual{position:relative;margin-left:auto;flex:0 0 auto;padding:4px 2px;border-radius:4px;
+  color:color-mix(in srgb,var(--te-claro) 82%,#f7f1e9);font-weight:700;font-size:13.4px;line-height:1.3;
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb,currentColor 55%,transparent);
+  transition:color .2s var(--sal),text-decoration-color .2s var(--sal)}
+.manual::before{content:"";position:absolute;inset:-9px -8px}
+.manual:hover{color:#f4b99d;text-decoration-color:currentColor}
+.manual:focus-visible{outline:2px solid var(--te-claro);outline-offset:3px}
+html.pc .manual{display:none}
+
+/* Las letras no se pintan con la tipografía de reserva: la marca de la barra
+   y el texto de la carga esperan a las fuentes (el guion pone «fuentes-ok»).
+   Si algo fallara, a los 3.6 s se muestran igual. */
+.marca-txt,.carga-marca,.carga-dice{transition:opacity .3s ease}
+html:not(.fuentes-ok) .marca-txt,html:not(.fuentes-ok) .carga-marca,html:not(.fuentes-ok) .carga-dice{
+  opacity:0;animation:texto-ya .01s linear 3.6s forwards}
+@keyframes texto-ya{to{opacity:1}}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="i-marcha" viewBox="0 0 24 24"><path d="M8 5.3v13.4a1.2 1.2 0 0 0 1.8 1l10.4-6.7a1.2 1.2 0 0 0 0-2L9.8 4.3A1.2 1.2 0 0 0 8 5.3z" fill="currentColor"/></symbol><symbol id="i-pausa" viewBox="0 0 24 24"><rect x="6.2" y="4.6" width="4.4" height="14.8" rx="1.6" fill="currentColor"/><rect x="13.4" y="4.6" width="4.4" height="14.8" rx="1.6" fill="currentColor"/></symbol><symbol id="i-bandera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 21V4"/><path d="M5.5 4.6h11.6l-2.4 4.1 2.4 4.1H5.5"/></g></symbol><symbol id="i-reinicio" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 12.2a7.6 7.6 0 1 0 2.3-5.5"/><path d="M4.4 4.4v4.7h4.7"/></g></symbol><symbol id="i-lista" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 6.5h10M9.5 12h10M9.5 17.5h10"/></g><circle cx="5" cy="6.5" r="1.45" fill="currentColor"/><circle cx="5" cy="12" r="1.45" fill="currentColor"/><circle cx="5" cy="17.5" r="1.45" fill="currentColor"/></symbol><symbol id="i-ajustes" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7.5h8.2M17.8 7.5H20M4 16.5h2.2M11.8 16.5H20"/><circle cx="15" cy="7.5" r="2.6"/><circle cx="9" cy="16.5" r="2.6"/></g></symbol><symbol id="i-ampliar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9V4.5H9M15 4.5h4.5V9M19.5 15v4.5H15M9 19.5H4.5V15"/></g></symbol><symbol id="i-reducir" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.5V9H4.5M19.5 9H15V4.5M15 19.5V15h4.5M4.5 15H9v4.5"/></g></symbol><symbol id="i-lapiz" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5h4l10.2-10.2a2.2 2.2 0 0 0 0-3.1l-.9-.9a2.2 2.2 0 0 0-3.1 0L4.5 15.5z"/><path d="m13.2 6.8 4 4"/></g></symbol><symbol id="i-listo" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-basura" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.8 7l.9 12.2h8.6L17.2 7M10.3 10.8v5M13.7 10.8v5"/></g></symbol><symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></symbol><symbol id="i-atras" viewBox="0 0 24 24"><path d="M14.8 5.5 8.3 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-arriba" viewBox="0 0 24 24"><path d="m6 14.8 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-abajo" viewBox="0 0 24 24"><path d="m6 9.2 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-ocultar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12s3.1-6 8.5-6c1.6 0 3 .5 4.2 1.2M20.5 12s-1 2-3 3.7M9.9 17.7c.7.2 1.4.3 2.1.3 5.4 0 8.5-6 8.5-6"/><path d="M4.5 19.5 19.5 4.5"/><path d="M9.8 13.9a3 3 0 0 1 4.1-4.1"/></g></symbol><symbol id="i-mostrar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12s3.1-6 8.5-6 8.5 6 8.5 6-3.1 6-8.5 6-8.5-6-8.5-6z"/><circle cx="12" cy="12" r="2.8"/></g></symbol><symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="12" r="9.1"/><path d="M12 11.2v5.4"/></g><circle cx="12" cy="7.5" r="1.45" fill="currentColor"/></symbol><symbol id="i-campana" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 16.5V11a5.8 5.8 0 0 1 11.6 0v5.5l1.6 1.7H4.6z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></g></symbol><symbol id="i-ola" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M3.5 12h2.6l2.2-5 3.4 10 2.6-7 1.6 2h4.6"/></g></symbol><symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol><symbol id="i-menos" viewBox="0 0 24 24"><path d="M5.5 12h13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol><symbol id="i-siguiente" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6.5 12.5 12 6 17.5"/><path d="M16.5 5.5v13"/></g></symbol></svg>
+
+<!-- La carga de la casa: lo primero que se pinta. El sitio la sacará a una pieza común. -->
+<div class="carga" id="carga" data-s321="carga" role="status" aria-live="polite">
+  <div class="carga-int">
+    <svg class="iso" viewBox="0 0 64 64" aria-hidden="true">
+      <rect class="p1" x="11" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p2" x="34" y="11" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="p3" x="11" y="34" width="19" height="19" rx="4.5" fill="#f7f1e9"/>
+      <rect class="u1" x="34" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u2" x="44.6" y="34" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u3" x="34" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e4c5b5"/>
+      <rect class="u4" x="44.6" y="44.6" width="8.4" height="8.4" rx="2.4" fill="#e08a5f"/>
+    </svg>
+    <div class="carga-marca">Secuencia321</div>
+    <p class="carga-dice">Preparando el cronómetro…</p>
+    <div class="carga-raya" aria-hidden="true"><i></i></div>
+  </div>
+</div>
+<script>window.S321_CARGA_T0 = performance.now();</script>
+
+<!-- La barra: fiel a la del sitio. El sitio pondrá aquí su barra común con los menús. -->
+<header class="barra" data-s321="barra">
+  <div class="barra-int">
+    <a class="marca" href="/" aria-label="Secuencia321, ir a la portada">
+      <span class="marca-icono"><img src="favicon.svg" alt="" width="36" height="36"></span>
+      <span class="marca-txt">Secuencia321</span>
+    </a>
+  </div>
+</header>
+
+<div class="escenario">
+  <div class="cifras-fondo" aria-hidden="true">
+    <span style="left:3%;top:8%;font-size:96px;animation-delay:-3s;animation-duration:24s">3</span>
+    <span style="left:90%;top:12%;font-size:64px;animation-delay:-11s;animation-duration:19s">2</span>
+    <span style="left:5%;top:60%;font-size:118px;animation-delay:-7s;animation-duration:27s">1</span>
+    <span style="left:93%;top:56%;font-size:88px;animation-delay:-15s;animation-duration:22s">7</span>
+    <span style="left:1%;top:34%;font-size:52px;animation-delay:-2s;animation-duration:18s">5</span>
+    <span style="left:87%;top:82%;font-size:110px;animation-delay:-9s;animation-duration:28s">9</span>
+    <span style="left:12%;top:85%;font-size:70px;animation-delay:-17s;animation-duration:21s">4</span>
+    <span style="left:97%;top:32%;font-size:46px;animation-delay:-5s;animation-duration:17s">8</span>
+    <span style="left:46%;top:91%;font-size:58px;animation-delay:-13s;animation-duration:25s">6</span>
+    <span style="left:52%;top:1%;font-size:40px;animation-delay:-19s;animation-duration:20s">1</span>
+    <span style="left:77%;top:3%;font-size:76px;animation-delay:-8s;animation-duration:26s">2</span>
+    <span style="left:22%;top:2%;font-size:50px;animation-delay:-21s;animation-duration:23s">3</span>
+  </div>
+
+  <nav class="migas" aria-label="Estás en">
+    <div class="rastro">
+      <ol>
+        <li><a href="/">Inicio</a></li>
+        <li><span class="sin-enlace">Herramientas</span></li>
+        <li><span class="sin-enlace">Cronómetros</span></li>
+        <li><span class="aqui" aria-current="page">Cronómetro por etapas</span></li>
+      </ol>
+    </div>
+    <a class="manual" href="manual-etapas.pdf" target="_blank" rel="noopener" aria-label="Manual en PDF (se abre en una ventana nueva)" title="Abrir el manual en PDF">manual</a>
+  </nav>
+
+  <main class="mesa">
+    <section class="pieza" id="pieza" data-e="listo" data-tramo="nada" aria-labelledby="pieza-titulo">
+
+      <header class="p-cab">
+        <span class="p-icono" aria-hidden="true"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="ce-fondo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d677e"/><stop offset="1" stop-color="#143847"/></linearGradient><linearGradient id="ce-brillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".2"/><stop offset=".52" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#ce-fondo)"/><rect width="64" height="64" rx="18" fill="url(#ce-brillo)"/><rect x="10" y="23.4" width="12.6" height="11.2" rx="3.4" fill="#b04a2a"/><rect x="24.6" y="23.4" width="20.2" height="11.2" rx="3.4" fill="#327a52"/><rect x="46.8" y="23.4" width="7.2" height="11.2" rx="3.4" fill="#f7f1e9" opacity=".34"/><rect x="46.8" y="23.4" width="7.2" height="11.2" rx="3.4" fill="none" stroke="#f7f1e9" stroke-width="1.6" stroke-dasharray="2.6 2.4"/><path d="M38.4 18.8v18.6" stroke="#f7f1e9" stroke-width="2.6" stroke-linecap="round"/><circle cx="38.4" cy="17.4" r="3.1" fill="#e08a5f"/><path d="M10 43.4h44" stroke="#e4c5b5" stroke-width="2" stroke-linecap="round" opacity=".5"/><path d="M16.3 46.6v3.6M34.7 46.6v3.6M50.4 46.6v3.6" stroke="#e4c5b5" stroke-width="2.2" stroke-linecap="round" opacity=".72"/></svg></span>
+        <div class="p-textos">
+          <span class="oculto" id="pieza-titulo">Cronómetro por etapas</span>
+          <div class="dinamica-campo" id="dinamica-campo">
+            <textarea class="dinamica" id="dinamica" rows="1" maxlength="70" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Actividad" aria-label="Nombre de la actividad"></textarea>
+          </div>
+        </div>
+        <div class="p-botones">
+          <button type="button" class="b-app" id="btn-info" aria-label="Ocultar la información" title="Información" aria-pressed="true" aria-controls="info">
+            <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-ajustes" aria-label="Ajustes" title="Ajustes" aria-expanded="false" aria-controls="ajustes">
+            <svg class="ico" aria-hidden="true"><use href="#i-ajustes"/></svg>
+          </button>
+          <button type="button" class="b-app" id="btn-pantalla" aria-label="Pantalla completa" title="Pantalla completa">
+            <svg class="ico" aria-hidden="true"><use id="pantalla-ico" href="#i-ampliar"/></svg>
+          </button>
+
+          <div class="ajustes" id="ajustes" role="dialog" aria-labelledby="ajustes-titulo" hidden>
+            <div class="aj-cab">
+              <h2 class="aj-titulo" id="ajustes-titulo">Ajustes</h2>
+              <button type="button" class="aj-cerrar" id="ajustes-cerrar" aria-label="Cerrar los ajustes" title="Cerrar">
+                <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+              </button>
+            </div>
+            <div class="aj-rejilla">
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Cuando se acaba el tiempo</p>
+                <div class="aj-fila">
+                  <label for="aj-avisar">Avisar antes de que se acabe</label>
+                  <input type="checkbox" class="interruptor" id="aj-avisar" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-senal">Parpadear en los últimos segundos</label>
+                  <input type="checkbox" class="interruptor" id="aj-senal" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-sonido">Sonido al agotarse</label>
+                  <input type="checkbox" class="interruptor" id="aj-sonido" role="switch">
+                </div>
+                <div class="aj-teclado" id="aj-teclado">
+                  <p class="aj-rotulo">Con teclado</p>
+                  <ul class="teclas" id="teclas">
+                  <li><kbd>V</kbd><span>siguiente etapa</span></li>
+                  <li><kbd>B</kbd><span>volver a la anterior</span></li>
+                  <li><kbd>R</kbd><span>reiniciar</span></li>
+                  <li><kbd>P</kbd><span>pantalla completa</span></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="aj-grupo">
+                <p class="aj-rotulo">Al terminarse una etapa</p>
+                <div class="aj-fila">
+                  <label for="aj-seguir">Pasar sola a la siguiente</label>
+                  <input type="checkbox" class="interruptor" id="aj-seguir" role="switch">
+                </div>
+                <p class="aj-nota">Si no pasa sola, al agotarse una etapa el reloj sigue contando y dice cuánto se pasó: tú decides cuándo cerrarla.</p>
+                <div class="aj-sep" aria-hidden="true"></div>
+                <p class="aj-rotulo">En el taller</p>
+                <div class="aj-fila">
+                  <label for="aj-despierta">Mantener la pantalla despierta</label>
+                  <input type="checkbox" class="interruptor" id="aj-despierta" role="switch" checked>
+                </div>
+                <div class="aj-fila">
+                  <label for="aj-final">Campana al terminar todo</label>
+                  <input type="checkbox" class="interruptor" id="aj-final" role="switch">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-cuerpo" id="cuerpo">
+        <aside class="lista" id="lista" aria-labelledby="lista-titulo-b">
+          <div class="lista-int">
+            <div class="lista-cab">
+              <h2 class="lista-titulo" id="lista-titulo">
+                <button type="button" class="lista-titulo-b" id="lista-titulo-b" title="Cambiar el encabezado">Etapas</button>
+              </h2>
+              <button type="button" class="lista-lapiz" id="lista-lapiz" aria-label="Cambiar el encabezado de la lista" title="Cambiar el encabezado">
+                <svg class="ico" aria-hidden="true"><use href="#i-lapiz"/></svg>
+              </button>
+              <button type="button" class="lista-lapiz lista-volver" id="lista-volver" hidden aria-label="Volver al evento de ahora" title="Volver al de ahora">
+                <svg class="ico" aria-hidden="true"><use href="#i-atras"/></svg>
+              </button>
+              <button type="button" class="lista-lapiz lista-quitar" id="lista-quitar" hidden aria-label="Eliminar este evento" title="Eliminar">
+                <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+              </button>
+              <div class="cab-caja">
+                <button type="button" class="lista-menu" id="lista-menu" aria-label="Eventos guardados" title="Eventos" aria-haspopup="menu" aria-expanded="false" aria-controls="eventos-menu">
+                  <svg class="ico" aria-hidden="true"><use href="#i-lista"/></svg>
+                </button>
+                <ul class="menu menu-cab" id="eventos-menu" role="menu" aria-label="Eventos" hidden></ul>
+              </div>
+              <button type="button" class="lista-plegar" id="lista-plegar" aria-expanded="true" aria-controls="et-lista" aria-label="Recoger las etapas" title="Recoger">
+                <svg class="ico" aria-hidden="true"><use id="plegar-ico" href="#i-menos"/></svg>
+              </button>
+            </div>
+            <ol class="et-lista" id="et-lista"></ol>
+          </div>
+        </aside>
+
+        <div class="reloj" id="reloj">
+          <div class="reloj-int">
+            <p class="estado oculto" id="estado" aria-live="polite">
+              <span class="punto" aria-hidden="true"></span>
+              <svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg>
+              <span id="estado-txt">Listo</span>
+            </p>
+            <div class="cifra-caja">
+              <p class="cifra" id="cifra" role="timer" aria-live="off" aria-atomic="true">00<span class="sep">:</span>00</p>
+              <div class="sombra" id="sombra" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use id="sombra-ico" href="#i-pausa"/></svg>
+              </div>
+            </div>
+            <div class="reparto" id="reparto">
+              <div class="rep-pista" id="rep-pista" aria-hidden="true"></div>
+              <div class="rep-pie">
+                <span class="rep-izq"><svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg><span id="rep-previsto"><span class="oculto">Previsto en total </span><span class="num">45:00</span></span></span>
+                <span class="rep-der" id="rep-der"><span class="num" id="rep-total">00:00</span></span>
+              </div>
+            </div>
+            <div class="mandos">
+              <button type="button" class="b-principal" id="btn-marcha" title="Iniciar">
+                <svg class="ico" aria-hidden="true"><use id="marcha-ico" href="#i-marcha"/></svg>
+                <span class="apila" id="marcha-txt"><span class="ve" data-l="iniciar">Iniciar</span><span data-l="pausar">Pausar</span><span data-l="seguir">Seguir</span></span>
+              </button>
+              <button type="button" class="b-marca" id="btn-siguiente" title="Siguiente" disabled>
+                <svg class="ico" aria-hidden="true"><use id="siguiente-ico" href="#i-siguiente"/></svg>
+                <span class="apila" id="siguiente-txt"><span class="ve" data-l="siguiente">Siguiente</span><span data-l="terminar">Terminar</span><span data-l="nuevo">Guardar</span></span>
+              </button>
+              <button type="button" class="b-suave" id="btn-reiniciar" title="Reiniciar">
+                <svg class="ico" aria-hidden="true"><use href="#i-reinicio"/></svg>
+                <span class="apila" id="reiniciar-txt">
+                  <span class="ve" data-l="reiniciar">Reiniciar</span>
+                  <span data-l="etapa">Reiniciar <b id="reiniciar-etapa-n"></b></span>
+                  <span data-l="toca">Toca otra vez</span>
+                </span>
+              </button>
+              <div class="clip-caja" id="clip-caja">
+                <button type="button" class="b-clip" id="btn-clip" aria-label="Opciones de las etapas" title="Etapas" aria-haspopup="menu" aria-expanded="false" aria-controls="clip-menu">
+                  <svg class="ico" aria-hidden="true"><use href="#i-lista"/></svg>
+                  <span class="clip-n num" id="clip-n" hidden>0</span>
+                </button>
+                <ul class="menu clip-menu" id="clip-menu" role="menu" aria-label="Etapas" hidden>
+                  <li role="none"><button type="button" role="menuitem" id="menu-ver"><svg class="ico" aria-hidden="true"><use id="menu-ver-ico" href="#i-ocultar"/></svg><span id="menu-ver-txt">Ocultar las etapas</span></button></li>
+                  <li role="none" id="menu-guardar-li"><button type="button" role="menuitem" id="menu-guardar"><svg class="ico" aria-hidden="true"><use href="#i-bandera"/></svg><span id="menu-guardar-txt">Guardar el evento</span></button></li>
+                  <li role="none" id="menu-vaciar-li" hidden><button type="button" role="menuitem" class="peligro" id="menu-vaciar"><svg class="ico" aria-hidden="true"><use href="#i-basura"/></svg><span id="menu-vaciar-txt">Borrar los eventos guardados</span></button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="info" id="info" aria-labelledby="info-titulo">
+          <div class="info-int">
+            <h2 class="info-titulo" id="info-titulo">El reparto del tiempo, a la vista</h2>
+            <div class="info-bloque"><p class="rotulo">Para qué</p><p>Lo que se hace por partes y conviene repartir antes de empezar: una clase con inicio, desarrollo y cierre, un taller por estaciones, un examen por bloques, una presentación por turnos.</p></div>
+            <div class="info-bloque"><p class="rotulo">Cómo funciona</p><p>Cada etapa lleva su nombre y su tiempo previsto, y entre todas llenan la barra: ahí se ve de un vistazo cuánto pesa cada parte. Nombres y tiempos se cambian desde la lista misma, y se añaden o se quitan etapas a cualquier hora. Un toque cierra la etapa y abre la siguiente. Si una se pasa <b>no se corta nada</b>: sigue contando y la lista dice cuánto se fue de más.</p></div>
+            <div class="info-bloque"><p class="rotulo">Ideas para la clase</p><ul class="info-ideas"><li>Reparte la clase antes de empezar y déjala puesta en la pizarra: los estudiantes <b>ven cuánto queda de cada parte</b> y no hay que anunciarlo.</li><li>Al terminar, «Guardar» archiva la tanda y abre otra igual: corre el mismo recorrido con el siguiente grupo y <b>compáralos etapa por etapa</b>.</li><li>Al comparar, la última columna dice <b>quién tardó menos</b> en cada etapa, con el color de su grupo: la respuesta, no una tabla de cifras.</li></ul></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="cmp-velo" id="cmp-velo" hidden></div>
+      <div class="comparar" id="comparar" role="dialog" aria-modal="true" aria-labelledby="cmp-titulo" hidden>
+        <div class="cmp-cab">
+          <div>
+            <h2 class="cmp-titulo" id="cmp-titulo">Comparar eventos</h2>
+            <p class="cmp-sub" id="cmp-sub"></p>
+          </div>
+          <button type="button" class="cmp-cerrar" id="cmp-cerrar" aria-label="Cerrar la comparación" title="Cerrar">
+            <svg class="ico" aria-hidden="true"><use href="#i-cerrar"/></svg>
+          </button>
+        </div>
+        <div class="cmp-marco" id="cmp-marco" tabindex="0"></div>
+        <p class="cmp-nota" id="cmp-nota"></p>
+      </div>
+
+
+      <div class="aviso" id="aviso" role="status" hidden>
+        <span class="aviso-txt" id="aviso-txt"></span>
+        <button type="button" id="aviso-deshacer">Deshacer</button>
+      </div>
+    </section>
+  </main>
+
+
+  <p class="pie">© Secuencia321</p>
+</div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   Secuencia321 · Cronómetro por etapas · guion
+   Fuente de index.html: se corrige aquí y se vuelve a construir.
+   Lo que comparte con los demás cronómetros está copiado de la casa; lo
+   propio es el reparto de etapas y su editor.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+(() => {
+'use strict';
+
+/* ── Utilidades ─────────────────────────────────────────────────────── */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const TITULO = 'Cronómetro por etapas';
+const TITULO_PAGINA = 'Cronómetro por etapas · Secuencia321';
+const CLAVE = 's321-cronometro-etapas';
+const VERSION = 2;   /* subirla descarta lo guardado con el esquema viejo */
+const MENOS = '−';                 // el menos tipográfico
+/* un campo de escritura se queda con sus teclas: ni el espacio ni las
+   letras son atajos mientras se escribe */
+const escribiendo = el => !!el && (el.tagName === 'TEXTAREA' || el.isContentEditable ||
+  (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button'].includes(el.type)));
+const NOMBRE_MAX = 32;   /* cabe «Trabajo en parejas por mesas» */
+const MIN_ETAPAS = 2;
+const MAX_ETAPAS = 8;
+const MAX_EVENTOS = 20;                // los más viejos se van dejando caer
+const ETAPA_MAX = 180 * 60000;         // tres horas por etapa
+const reducido = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ico = (n, extra = '') => `<svg class="ico"${extra} aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
+
+/* ── Notación: punto decimal, como se escribe en la República Dominicana ─ */
+const dos = n => String(n).padStart(2, '0');
+const PASO = [1000, 100, 10, 1];        // milisegundos por unidad según la precisión
+const cortar = (ms, p) => Math.floor(Math.max(0, ms) / PASO[p]) * PASO[p];
+function partes(ms, p) {
+  ms = cortar(ms, p);
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+  return {
+    principal: h > 0 ? `${h}:${dos(m)}:${dos(ss)}` : `${dos(m)}:${dos(ss)}`,
+    frac: p > 0 ? '.' + String(Math.floor((ms % 1000) / PASO[p])).padStart(p, '0') : ''
+  };
+}
+/* 03:42.6 · 1:05:57.3 */
+const enReloj = (ms, p) => { const x = partes(ms, p); return x.principal + x.frac; };
+/* duraciones: «45.8 s» bajo el minuto y «1:45.6» por encima; con signo, «+1:45.6» */
+function duracion(ms, p, conSigno) {
+  const a = cortar(Math.abs(ms), p);
+  let t;
+  if (a < 60000) t = (a / 1000).toFixed(p) + ' s';
+  else { const x = partes(a, p); t = x.principal.replace(/^0(?=\d:)/, '') + x.frac; }
+  return (ms < 0 && a > 0 ? MENOS : conSigno ? '+' : '') + t;
+}
+/* la meta: «5:00», «45 s», «1:00:00» */
+function metaPartes(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return { n: String(s), u: ' s' };
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+  return { n: h > 0 ? `${h}:${dos(m)}:${dos(ss)}` : `${m}:${dos(ss)}`, u: '' };
+}
+/* el exceso sobre la meta: «+0:32», «+1:02:05» */
+function exceso(ms) {
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+  return '+' + (h > 0 ? `${h}:${dos(m)}:${dos(ss)}` : `${m}:${dos(ss)}`);
+}
+/* ancho de la cifra en em: en Source Code Pro cada signo mide 0.6 em;
+   los dos puntos se estrechan 0.14 y la fracción va a 0.46 */
+function emDe(x) {
+  const seps = (x.principal.match(/:/g) || []).length;
+  const digitos = x.principal.length - seps;
+  return digitos * 0.6 + seps * 0.46 + (x.frac ? x.frac.length * 0.6 * 0.46 + 0.02 : 0);
+}
+
+
+/* ── Estado ─────────────────────────────────────────────────────────── */
+/* Una etapa tiene nombre y un tiempo previsto. `cortes` guarda el momento
+   —contado desde el arranque— en que se cerró cada una: de ahí sale lo que
+   duró de verdad, sin guardar duraciones que luego no cuadren. */
+const E = {
+  nombre: '', encabezado: '',
+  etapas: [], cortes: [], actual: 0, fin: false,
+  eventos: [], viendo: null, sel: null,
+  avisar: true, sonido: false, seguir: false, senal: true, despierta: true, final: false,
+  ocultas: false, plegada: false, info: true,
+  acum: 0, t0: null
+};
+let sigId = 1, sigEvento = 1;
+let agotadaAvisada = false;
+const corre = () => E.t0 !== null;
+/* El tiempo sale del reloj del sistema, nunca de contar saltos de un
+   temporizador: así no se atrasa aunque se cambie de pestaña. */
+const tiempo = (ahora = performance.now()) => E.acum + (corre() ? ahora - E.t0 : 0);
+
+const nuevaEtapa = (n, plan) => ({ id: sigId++, n, plan });
+/* El estándar de la casa: tres etapas con los nombres de siempre y
+   10 · 20 · 10 minutos. Es de donde arranca todo evento nuevo cuando no
+   hay un reparto anterior que heredar. */
+function etapasDeFabrica() {
+  return [nuevaEtapa('Inicio', 600000), nuevaEtapa('Desarrollo', 1200000), nuevaEtapa('Cierre', 600000)];
+}
+const planTotal = () => E.etapas.reduce((a, e) => a + e.plan, 0);
+const arranqueDe = i => (i > 0 ? E.cortes[i - 1] || 0 : 0);
+/* lo que duró la etapa i: cerrada, entre sus dos cortes; la que corre, lo
+   que lleva; las que no han empezado, nada */
+function realDe(i, t) {
+  if (i < E.cortes.length) return E.cortes[i] - arranqueDe(i);
+  if (i === E.actual && !E.fin) return Math.max(0, t - arranqueDe(i));
+  if (i === E.actual && E.fin) return Math.max(0, t - arranqueDe(i));
+  return null;
+}
+const enEtapa = t => Math.max(0, t - arranqueDe(E.actual));
+const etapaActual = () => E.etapas[Math.min(E.actual, E.etapas.length - 1)];
+const aCero = () => tiempo() === 0 && !corre() && E.cortes.length === 0;
+
+/* ── Memoria: si la página se recarga, sigue donde iba ─────────────── */
+function guardar() {
+  try {
+    localStorage.setItem(CLAVE, JSON.stringify({
+      v: VERSION, nombre: E.nombre, encabezado: E.encabezado,
+      etapas: E.etapas.map(e => ({ n: e.n, plan: e.plan })),
+      cortes: E.cortes.slice(), actual: E.actual, fin: E.fin,
+      eventos: E.eventos.map(v => ({ base: v.base, n: v.n, total: v.total, fecha: v.fecha,
+        etapas: v.etapas.map(e => ({ n: e.n, plan: e.plan })), cortes: v.cortes.slice() })),
+      avisar: E.avisar, sonido: E.sonido, seguir: E.seguir, senal: E.senal,
+      despierta: E.despierta, final: E.final,
+      ocultas: E.ocultas, plegada: E.plegada, info: E.info,
+      acum: tiempo(), corriendo: corre(), reloj: Date.now()
+    }));
+  } catch (e) { /* sin memoria en este navegador: la herramienta sigue funcionando */ }
+}
+let guardarT = 0;
+const guardarLuego = () => { clearTimeout(guardarT); guardarT = setTimeout(guardar, 350); };
+function cargar() {
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem(CLAVE) || 'null'); } catch (e) { o = null; }
+  if (!o || o.v !== VERSION) { E.etapas = etapasDeFabrica(); return; }
+  const txt = (v, max) => typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '';
+  E.nombre = typeof o.nombre === 'string' ? o.nombre.replace(/[\r\n]+/g, ' ').slice(0, 70) : '';
+  E.encabezado = txt(o.encabezado, 28);
+  E.etapas = (Array.isArray(o.etapas) ? o.etapas : [])
+    .filter(e => e && Number.isFinite(e.plan) && e.plan >= 1000).slice(0, MAX_ETAPAS)
+    .map((e, i) => nuevaEtapa(txt(e.n, NOMBRE_MAX) || `Etapa ${i + 1}`, Math.min(ETAPA_MAX, Math.round(e.plan / 1000) * 1000)));
+  if (E.etapas.length < MIN_ETAPAS) E.etapas = etapasDeFabrica();
+  E.avisar = o.avisar !== false;
+  E.sonido = o.sonido === true;
+  E.seguir = o.seguir === true;
+  E.senal = o.senal !== false;
+  E.despierta = o.despierta !== false;
+  E.final = o.final === true;
+  E.ocultas = o.ocultas === true;
+  E.plegada = o.plegada === true;
+  E.info = o.info !== false;
+  E.cortes = (Array.isArray(o.cortes) ? o.cortes : []).filter(Number.isFinite)
+    .map(x => Math.max(0, Math.floor(x))).slice(0, E.etapas.length);
+  E.actual = Number.isFinite(o.actual) ? Math.min(Math.max(0, Math.floor(o.actual)), E.etapas.length - 1) : 0;
+  if (E.cortes.length < E.actual) E.actual = E.cortes.length;
+  E.fin = o.fin === true && E.cortes.length >= E.etapas.length;
+  E.eventos = (Array.isArray(o.eventos) ? o.eventos : []).slice(-MAX_EVENTOS)
+    .map(v => v && Array.isArray(v.etapas) && Array.isArray(v.cortes) ? {
+      id: sigEvento++, base: txt(v.base, 28) || 'Etapas',
+      n: Number.isFinite(v.n) && v.n > 0 ? Math.floor(v.n) : 1,
+      total: Number.isFinite(v.total) ? Math.max(0, Math.floor(v.total)) : 0,
+      fecha: Number.isFinite(v.fecha) ? v.fecha : 0,
+      etapas: v.etapas.filter(e => e && Number.isFinite(e.plan)).slice(0, MAX_ETAPAS)
+        .map((e, i) => ({ n: txt(e.n, NOMBRE_MAX) || `Etapa ${i + 1}`, plan: Math.min(ETAPA_MAX, Math.max(1000, Math.round(e.plan / 1000) * 1000)) })),
+      cortes: v.cortes.filter(Number.isFinite).map(x => Math.max(0, Math.floor(x)))
+    } : null)
+    .filter(v => v && v.etapas.length && v.cortes.length);
+  let acum = Number.isFinite(o.acum) ? Math.max(0, o.acum) : 0;
+  if (o.corriendo === true && !E.fin && Number.isFinite(o.reloj)) {
+    acum += Math.max(0, Date.now() - o.reloj);
+    E.acum = acum; E.t0 = performance.now();
+  } else E.acum = acum;
+  agotadaAvisada = enEtapa(tiempo()) >= etapaActual().plan;
+}
+
+/* ── Referencias ────────────────────────────────────────────────────── */
+const $pieza = $('#pieza'), $cuerpo = $('#cuerpo'), $reloj = $('#reloj'), $cifra = $('#cifra'),
+  $estadoTxt = $('#estado-txt'), $sombra = $('#sombra'), $sombraIco = $('#sombra-ico'),
+  $repPista = $('#rep-pista'), $repPrevisto = $('#rep-previsto'), $repDer = $('#rep-der'), $repTotal = $('#rep-total'),
+  $btnMarcha = $('#btn-marcha'), $marchaIco = $('#marcha-ico'), $marchaTxt = $('#marcha-txt'),
+  $btnSiguiente = $('#btn-siguiente'), $siguienteIco = $('#siguiente-ico'), $siguienteTxt = $('#siguiente-txt'),
+  $btnReiniciar = $('#btn-reiniciar'), $reiniciarTxt = $('#reiniciar-txt'),
+  $clipCaja = $('#clip-caja'), $btnClip = $('#btn-clip'), $clipN = $('#clip-n'), $clipMenu = $('#clip-menu'),
+  $menuVer = $('#menu-ver'), $menuVerTxt = $('#menu-ver-txt'), $menuVerIco = $('#menu-ver-ico'),
+  $menuGuardarLi = $('#menu-guardar-li'), $menuGuardar = $('#menu-guardar'), $menuGuardarTxt = $('#menu-guardar-txt'),
+  $menuVaciarLi = $('#menu-vaciar-li'), $menuVaciar = $('#menu-vaciar'), $menuVaciarTxt = $('#menu-vaciar-txt'),
+  $lista = $('#lista'), $listaTitulo = $('#lista-titulo'), $etLista = $('#et-lista'),
+  $listaLapiz = $('#lista-lapiz'), $listaQuitar = $('#lista-quitar'), $listaPlegar = $('#lista-plegar'), $plegarIco = $('#plegar-ico'), $listaMenu = $('#lista-menu'),
+  $listaVolver = $('#lista-volver'), $eventosMenu = $('#eventos-menu'),
+  $cmpVelo = $('#cmp-velo'), $comparar = $('#comparar'), $cmpSub = $('#cmp-sub'), $cmpMarco = $('#cmp-marco'),
+  $cmpNota = $('#cmp-nota'), $cmpCerrar = $('#cmp-cerrar'),
+  $din = $('#dinamica'), $dinCampo = $('#dinamica-campo'),
+  $btnAjustes = $('#btn-ajustes'), $ajustes = $('#ajustes'), $ajCerrar = $('#ajustes-cerrar'),
+  $ajAvisar = $('#aj-avisar'), $ajSonido = $('#aj-sonido'), $ajSeguir = $('#aj-seguir'), $ajSenal = $('#aj-senal'),
+  $ajDespierta = $('#aj-despierta'), $ajFinal = $('#aj-final'),
+  $btnPantalla = $('#btn-pantalla'), $pantallaIco = $('#pantalla-ico'),
+  $btnInfo = $('#btn-info'), $info = $('#info'), $infoInt = $('.info-int'),
+  $aviso = $('#aviso'), $avisoTxt = $('#aviso-txt'), $avisoDeshacer = $('#aviso-deshacer');
+
+/* ── Dibujar ────────────────────────────────────────────────────────── */
+let cifraHecha = '', emHecho = 0, derHecha = '', previstoHecho = -1, tituloHecho = '', tramoActual = 'nada', raf = 0;
+const P = 0;                        /* una clase se cuenta en segundos */
+
+function pintarCifra(t) {
+  const x = partes(t, P);
+  const html = x.principal.replace(/:/g, '<span class="sep">:</span>');
+  if (html !== cifraHecha) { $cifra.innerHTML = html; cifraHecha = html; }
+  const em = Math.round(emDe(x) * 1000) / 1000;
+  if (em !== emHecho) { emHecho = em; $reloj.style.setProperty('--em', String(em)); }
+}
+
+/* La barra es el mapa de lo previsto y no se mueve: cada tramo ocupa su
+   parte del total planeado. Lo que cambia es el relleno. */
+function armarPista() {
+  $repPista.innerHTML = E.etapas.map((e, i) =>
+    `<div class="rep-tramo" data-i="${i}" style="--c:var(--e${(i % 6) + 1});flex-grow:${e.plan}"><div class="rep-lleno"></div></div>`).join('');
+}
+function pintarPista(t) {
+  const total = planTotal();
+  if (total !== previstoHecho) {
+    previstoHecho = total;
+    $repPrevisto.innerHTML = `<span class="oculto">Previsto en total </span><span class="num">${enReloj(total, 0)}</span>`;
+    $$('.rep-tramo', $repPista).forEach((d, i) => { if (E.etapas[i]) d.style.flexGrow = String(E.etapas[i].plan); });
+  }
+  $$('.rep-tramo', $repPista).forEach((d, i) => {
+    const e = E.etapas[i];
+    if (!e) return;
+    const real = realDe(i, t);
+    const f = real === null ? 0 : Math.min(1, real / e.plan);
+    d.firstElementChild.style.width = (Math.round(f * 1000) / 10) + '%';
+    d.classList.toggle('corre', i === E.actual && corre() && !E.fin);
+    d.classList.toggle('hecha', i < E.cortes.length);
+    d.classList.toggle('pasada', real !== null && real > e.plan);
+  });
+  const der = `<span class="num">${enReloj(t, 0)}</span>`;
+  if (der !== derHecha) { $repDer.innerHTML = der; derHecha = der; }
+  $repDer.classList.toggle('pasada', t > total);
+}
+
+/* los tramos de la etapa que se acaba */
+/* Dos señales distintas, cada una con su interruptor: el **aviso** es la
+   respiración del último minuto —«queda poco»— y la **señal** es el
+   parpadeo de los últimos segundos —«se acaba ahora»—. Quien da clase
+   con proyector a veces quiere la primera y no la segunda. */
+function tramoDe(tE) {
+  const plan = etapaActual().plan;
+  if (E.fin) return 'nada';
+  if (tE >= plan) return 'pasada';
+  const falta = plan - tE;
+  if (E.senal && falta <= Math.min(10000, 0.2 * plan)) return 'final';
+  if (E.avisar && falta <= Math.min(60000, 0.25 * plan)) return 'aviso';
+  return 'nada';
+}
+/* el pulso del tramo final va al compás del segundo */
+const fijarFase = t => $pieza.style.setProperty('--fase', `${-Math.round(t % 1000)}ms`);
+
+function aplicarTramo(tr, tE) {
+  if (tr !== 'pasada' && tE < etapaActual().plan) agotadaAvisada = false;
+  if (tr === tramoActual) return;
+  tramoActual = tr;
+  $pieza.dataset.tramo = tr;
+  if (tr === 'final') fijarFase(tE);
+  if (tr === 'pasada' && corre() && !agotadaAvisada) {
+    agotadaAvisada = true;
+    halo();
+    if (E.sonido) campana();
+    if (E.seguir) siguiente(true);
+  }
+}
+
+function pintarEstado(t) {
+  const c = corre();
+  let e = 'listo', txt = 'Listo';
+  if (E.fin) { e = 'fin'; txt = 'Terminada'; }
+  else if (c && tramoActual === 'pasada') { e = 'cumplida'; txt = ''; }
+  else if (c && tramoActual === 'final') { e = 'final'; txt = 'Últimos segundos'; }
+  else if (c) { e = 'marcha'; txt = 'En marcha'; }
+  else if (t > 0) { e = 'pausa'; txt = 'En pausa'; }
+  if ($pieza.dataset.e !== e) { $pieza.dataset.e = e; $estadoTxt.textContent = txt; }
+}
+
+function pintarTitulo(t) {
+  const s = E.fin ? `${enReloj(t, 0)} · ${TITULO}` : `${enReloj(enEtapa(t), 0)} · ${etapaActual().n}`;
+  if (s !== tituloHecho) { tituloHecho = s; document.title = corre() || t > 0 ? s : TITULO_PAGINA; }
+}
+
+function pintar(ahora = performance.now()) {
+  const t = tiempo(ahora);
+  const tE = enEtapa(t);
+  aplicarTramo(tramoDe(tE), tE);
+  pintarCifra(E.fin ? t : tE);
+  pintarPista(t);
+  pintarEstado(t);
+  pintarTitulo(t);
+  pintarFilas(t);
+}
+function bucle(ahora) { raf = 0; pintar(ahora); if (corre()) raf = requestAnimationFrame(bucle); }
+function pedir() { if (!raf && corre()) raf = requestAnimationFrame(bucle); }
+
+/* La etiqueta que se ve es también el rótulo del botón al pasar el cursor:
+   cuando el botón queda solo con su ícono, el texto sigue ahí. */
+function etiqueta(apila, clave) {
+  $$('[data-l]', apila).forEach(s => s.classList.toggle('ve', s.dataset.l === clave));
+  const v = $('.ve', apila);
+  if (v && apila.parentElement) apila.parentElement.title = v.textContent.replace(/\s+/g, ' ').trim();
+}
+
+function actualizar() {
+  const c = corre(), t = tiempo();
+  $marchaIco.setAttribute('href', c ? '#i-pausa' : '#i-marcha');
+  etiqueta($marchaTxt, c ? 'pausar' : (t > 0 ? 'seguir' : 'iniciar'));
+  $btnMarcha.disabled = E.fin;
+  /* terminada la tanda, el botón que seguía adelante ofrece la siguiente:
+     empezar otro evento no tiene por qué pasar por «Reiniciar» */
+  const ultima = E.actual >= E.etapas.length - 1;
+  $btnSiguiente.disabled = eventoVisto() ? true : (E.fin ? false : (!c && t === 0));
+  $siguienteIco.setAttribute('href', E.fin ? '#i-bandera' : ultima ? '#i-listo' : '#i-siguiente');
+  etiqueta($siguienteTxt, E.fin ? 'nuevo' : ultima ? 'terminar' : 'siguiente');
+  if (!$btnReiniciar.classList.contains('confirmar')) {
+    const deEtapa = reiniciable(E.sel);
+    etiqueta($reiniciarTxt, deEtapa ? 'etapa' : 'reiniciar');
+    const n = deEtapa ? E.etapas[E.sel].n : '';
+    const t = $('#reiniciar-etapa-n');
+    if (t && t.textContent !== n) t.textContent = n;
+    $btnReiniciar.title = deEtapa ? `Reiniciar ${n}` : 'Reiniciar';
+    $btnReiniciar.classList.toggle('de-etapa', deEtapa);
+    if (deEtapa) $btnReiniciar.style.setProperty('--c', `var(--e${(E.sel % 6) + 1})`);
+    else $btnReiniciar.style.removeProperty('--c');
+  }
+  aplicarLista();
+  pintar();
+  pedir();
+  despertar(c && E.despierta);
+  avivarMandos();
+}
+
+/* ── Acciones ───────────────────────────────────────────────────────── */
+function alternar() {
+  if (E.fin) return;
+  E.sel = null;
+  const ahora = performance.now();
+  if (corre()) { E.acum += ahora - E.t0; E.t0 = null; sombra('pausa'); }
+  else { E.t0 = ahora; sombra('marcha'); }
+  if (tramoActual === 'final') fijarFase(enEtapa(tiempo(ahora)));
+  guardar();
+  actualizar();
+  programarEtapa();
+}
+
+/* Cerrar la etapa y abrir la siguiente. La última termina la actividad. */
+function siguiente(sola) {
+  if (E.fin) return;
+  E.sel = null;
+  const t = Math.floor(tiempo());
+  if (!corre() && t === 0) return;
+  E.cortes[E.actual] = t;
+  E.cortes.length = E.actual + 1;
+  if (E.actual >= E.etapas.length - 1) {
+    E.fin = true;
+    if (corre()) { E.acum = t; E.t0 = null; }
+    /* una campana sola al cerrar el evento entero: en un taller es la
+       señal de «hasta aquí», distinta del aviso de cada etapa */
+    if (E.final) campana();
+    sombra('pausa');
+  } else {
+    E.actual += 1;
+    if (E.info) { E.info = false; aplicarInfo(); }
+    if (!sola) sombra('siguiente');
+  }
+  agotadaAvisada = false;
+  tramoActual = '';
+  guardar();
+  actualizar();
+  programarEtapa();
+  desplazarAlActual();
+}
+
+/* Volver a la etapa anterior: se deshace el corte, no el tiempo. */
+function atras() {
+  if (E.actual === 0 && !E.fin) return;
+  if (E.fin) E.fin = false;
+  else E.actual -= 1;
+  E.cortes.length = E.actual;
+  agotadaAvisada = false;
+  tramoActual = '';
+  guardar();
+  actualizar();
+  programarEtapa();
+  desplazarAlActual();
+}
+
+/* Reiniciar no borra: guarda el evento y empieza otro con el mismo
+   reparto, igual que en el cronómetro de actividad. Borrar es aparte. */
+function reiniciar() {
+  cerrarEncabezado(true);
+  cerrarComparar(false);
+  cerrarEventos(false);
+  E.viendo = null;
+  const guardado = guardarEvento(true);
+  if (!guardado) {
+    E.acum = 0; E.t0 = null; E.cortes = []; E.actual = 0; E.fin = false;
+    agotadaAvisada = false;
+    tramoActual = '';
+    ocultarAviso();
+  }
+  E.ocultas = false;
+  cerrarClip(false);
+  rehacerFilas();
+  actualizar();
+  guardar();
+}
+
+/* Reiniciar pide un segundo toque antes de 3 s: nadie borra una
+   actividad por un roce en la pizarra. */
+let reinicioT = 0;
+function volverReinicio() {
+  clearTimeout(reinicioT);
+  $btnReiniciar.classList.remove('confirmar');
+  etiqueta($reiniciarTxt, E.sel === null ? 'reiniciar' : 'etapa');
+}
+function pedirReinicio() {
+  /* con una etapa seleccionada, Reiniciar es de ella: un solo botón,
+     dos alcances, y el rótulo dice cuál */
+  if (reiniciable(E.sel)) { const i = E.sel; volverReinicio(); reiniciarEtapa(i); return; }
+  if ($btnReiniciar.classList.contains('confirmar')) { volverReinicio(); reiniciar(); return; }
+  $btnReiniciar.classList.add('confirmar');
+  etiqueta($reiniciarTxt, 'toca');
+  clearTimeout(reinicioT);
+  reinicioT = setTimeout(volverReinicio, 3000);
+}
+
+/* con la pestaña detrás, el aviso de la etapa llega igual */
+let etapaT = 0;
+function programarEtapa() {
+  clearTimeout(etapaT);
+  if (!corre() || E.fin) return;
+  const falta = etapaActual().plan - enEtapa(tiempo());
+  if (falta <= 0 || falta > 6 * 3600000) return;
+  etapaT = setTimeout(() => { pintar(); }, falta + 20);
+}
+
+/* ── La lista de etapas ─────────────────────────────────────────────── */
+const encabezado = () => E.encabezado || 'Etapas';
+
+function aplicarLista() {
+  const mirando = eventoVisto();
+  const n = etapasVistas().length;
+  const nE = E.eventos.length;
+  const ver = !E.ocultas;
+  const nombre = tituloVisto();
+  $cuerpo.classList.toggle('con-lista', ver);
+  $lista.setAttribute('aria-hidden', ver ? 'false' : 'true');
+  $lista.inert = !ver;
+  $lista.classList.toggle('mirando', !!mirando);
+  $clipN.hidden = nE === 0;
+  $clipN.textContent = String(nE);
+  $btnClip.classList.toggle('oculta', E.ocultas);
+  /* el menú dice el nombre del evento, no «etapas»: lo que se oculta es
+     «Grupo 1», que es como el maestro lo llamó */
+  $menuVerTxt.textContent = E.ocultas ? `Ver «${nombre}»` : `Ocultar «${nombre}»`;
+  $menuVerIco.setAttribute('href', E.ocultas ? '#i-mostrar' : '#i-ocultar');
+  $btnClip.setAttribute('aria-label', nE === 0 ? 'Opciones del evento'
+    : nE === 1 ? 'Opciones del evento: 1 guardado' : `Opciones del evento: ${nE} guardados`);
+  /* guardar en mitad de la tanda la cortaba por la mitad: se ofrece
+     cuando el evento ya terminó, que es cuando hay algo cerrado que
+     guardar */
+  $menuGuardarLi.hidden = !E.fin || !!mirando;
+  $menuGuardarTxt.textContent = `Guardar «${eventoActivo()}»`;
+  /* la X de la cabecera: quita el evento que se está mirando */
+  $listaQuitar.hidden = !mirando;
+  if (mirando) $listaQuitar.setAttribute('aria-label', `Eliminar «${nombre}»`);
+  /* «Borrar todo» barre la herramienta entera, así que se ofrece siempre
+     que haya algo que barrer: un evento guardado, tiempo corrido, un
+     nombre puesto o un reparto distinto del estándar */
+  $menuVaciarLi.hidden = !(nE || hayCorrido() || E.nombre || E.encabezado || !repartoEstandar());
+  $menuVaciarTxt.textContent = 'Borrar todo';
+  $listaLapiz.hidden = !!mirando || !!$('.lista-titulo-campo', $listaTitulo);
+  $listaVolver.hidden = !mirando;
+  /* El menos recoge el panel entero y devuelve el sitio al reloj: es lo
+     mismo que «Ocultar» del menú de abajo, no una tercera cosa. Tener
+     un «minimizar» que escondía las etapas y dejaba el encabezado se
+     peleaba con el menú de eventos, que se abría sobre nada. */
+  $listaPlegar.setAttribute('aria-label', `Ocultar «${nombre}»`);
+  $listaPlegar.title = 'Ocultar';
+  const b = $('#lista-titulo-b');
+  if (b) {
+    b.textContent = nombre;
+    b.title = mirando ? `${nombre} · evento guardado` : 'Cambiar el nombre del evento';
+    b.disabled = !!mirando;
+  }
+  if (nE === 0 && abierto($eventosMenu)) cerrarEventos(false);
+}
+
+function armarFilas() {
+  const mirando = eventoVisto();
+  const filas = etapasVistas().map((e, i) =>
+    `<li class="et" data-i="${i}" style="--c:var(--e${(i % 6) + 1})">` +
+      `<span class="et-n" aria-hidden="true">${i + 1}</span>` +
+      `<span class="et-textos"><span class="et-nombre"></span><span class="et-donde"></span></span>` +
+      `<span class="et-cifras"><span class="et-t"></span><span class="et-dif"></span></span>` +
+      (mirando ? '' :
+        `<span class="et-mover" aria-hidden="false">` +
+          `<button type="button" class="et-flecha" data-subir="${i}"${i === 0 ? ' disabled' : ''} aria-label="Subir la etapa ${i + 1}" title="Subir">${ico('arriba')}</button>` +
+          `<button type="button" class="et-flecha" data-bajar="${i}"${i === etapasVistas().length - 1 ? ' disabled' : ''} aria-label="Bajar la etapa ${i + 1}" title="Bajar">${ico('abajo')}</button>` +
+        `</span>` +
+        `<button type="button" class="et-lapiz" data-editar="${i}" aria-label="Cambiar el nombre y el tiempo de la etapa ${i + 1}" title="Cambiar">${ico('lapiz')}</button>`) +
+    `</li>`).join('');
+  const mas = mirando || E.etapas.length >= MAX_ETAPAS ? '' :
+    `<li class="et-mas-caja"><button type="button" class="et-mas" id="et-mas-lista" aria-label="Añadir una etapa" title="Añadir etapa">${ico('mas')}</button></li>`;
+  $etLista.innerHTML = filas + mas;
+}
+
+function pintarFilas(t) {
+  const mirando = eventoVisto();
+  etapasVistas().forEach((e, i) => {
+    const li = $(`li[data-i="${i}"]`, $etLista);
+    if (!li || i === editandoEtapa) return;
+    const hecha = mirando ? i < mirando.cortes.length : i < E.cortes.length;
+    const ahora = !mirando && i === E.actual && !hecha;
+    /* elegir una etapa es elegirla para rehacerla, y no se rehace lo que
+       aún no ocurrió: la que espera se deja cambiar —su lápiz sigue
+       ahí— pero no se elige */
+    const tocable = !mirando;
+    li.className = 'et' + (mirando ? ' quieta' : '') + (ahora ? ' ahora' : hecha ? ' hecha' : ' espera') +
+      (tocable ? ' tocable' : '') + (!mirando && E.sel === i ? ' elegida' : '');
+    if (tocable) { li.setAttribute('role', 'button'); li.setAttribute('tabindex', '0'); }
+    else { li.removeAttribute('role'); li.removeAttribute('tabindex'); }
+    const nom = $('.et-nombre', li);
+    if (nom.textContent !== e.n) { nom.textContent = e.n; nom.title = e.n; }
+    const real = mirando ? realEnEvento(mirando, i) : realDe(i, t);
+    const donde = ahora ? `etapa ${i + 1} de ${E.etapas.length}` : (hecha ? `previsto ${enReloj(e.plan, 0)}` : '');
+    const $d = $('.et-donde', li);
+    if ($d.textContent !== donde) $d.textContent = donde;
+    const $t = $('.et-t', li), $dif = $('.et-dif', li);
+    const cifra = real === null ? enReloj(e.plan, 0) : enReloj(real, 0);
+    if ($t.textContent !== cifra) $t.textContent = cifra;
+    let dif = '', clase = 'et-dif';
+    if (real !== null && (hecha || real > e.plan)) {
+      const d = real - e.plan;
+      dif = Math.abs(d) < 1000 ? 'en su tiempo' : duracion(d, 0, true);
+      clase += d >= 1000 ? ' sube' : d <= -1000 ? ' baja' : '';
+    } else if (real !== null) {
+      dif = `de ${enReloj(e.plan, 0)}`;
+    }
+    if ($dif.textContent !== dif) $dif.textContent = dif;
+    if ($dif.className !== clase) $dif.className = clase;
+    const etq = tocable ? `${e.n}. ${E.sel === i ? 'Elegida' : 'Elegir esta etapa'}` : e.n;
+    if (li.getAttribute('aria-label') !== etq) li.setAttribute('aria-label', etq);
+    if (tocable) li.setAttribute('aria-pressed', E.sel === i ? 'true' : 'false');
+    else li.removeAttribute('aria-pressed');
+  });
+  requestAnimationFrame(bordesLista);
+}
+
+function desplazarAlActual() {
+  const li = $(`li[data-i="${E.actual}"]`, $etLista);
+  if (li) li.scrollIntoView({ block: 'nearest', behavior: reducido() ? 'auto' : 'smooth' });
+}
+
+function bordesLista() {
+  const ol = $etLista;
+  ol.classList.toggle('hay-arriba', ol.scrollTop > 2);
+  ol.classList.toggle('hay-abajo', ol.scrollHeight - ol.clientHeight - ol.scrollTop > 2);
+}
+$etLista.addEventListener('scroll', bordesLista, { passive: true });
+if (window.ResizeObserver) new ResizeObserver(bordesLista).observe($etLista);
+
+function latirClip() {
+  if (reducido()) return;
+  $btnClip.classList.remove('late');
+  void $btnClip.offsetWidth;
+  $btnClip.classList.add('late');
+}
+
+function ocultarEtapas(si) {
+  E.ocultas = si;
+  aplicarLista();
+  guardar();
+}
+
+/* el encabezado de la lista se puede renombrar */
+let cerrarEncabezado = () => {};
+function editarEncabezado() {
+  const h = $listaTitulo;
+  if ($('.lista-titulo-campo', h)) return;
+  const antes = E.encabezado;
+  h.innerHTML = `<input type="text" class="lista-titulo-campo" id="lista-encabezado" maxlength="28" autocomplete="off" spellcheck="false" enterkeyhint="done" placeholder="Etapas" aria-label="Encabezado de la lista">`;
+  const c = $('.lista-titulo-campo', h);
+  c.value = E.encabezado;
+  c.focus(); c.select();
+  $listaLapiz.hidden = true;
+  let hecho = false;
+  cerrarEncabezado = guardarlo => {
+    if (hecho) return; hecho = true;
+    E.encabezado = guardarlo ? c.value.replace(/\s+/g, ' ').trim().slice(0, 28) : antes;
+    h.innerHTML = `<button type="button" class="lista-titulo-b" id="lista-titulo-b"></button>`;
+    $listaLapiz.hidden = false;
+    cerrarEncabezado = () => {};
+    aplicarLista();
+    guardar();
+  };
+  c.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); cerrarEncabezado(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cerrarEncabezado(false); }
+  });
+  c.addEventListener('blur', () => cerrarEncabezado(true));
+}
+$listaTitulo.addEventListener('click', e => { if (e.target.closest('.lista-titulo-b')) editarEncabezado(); });
+$listaLapiz.addEventListener('click', editarEncabezado);
+$listaPlegar.addEventListener('click', () => { cerrarEventos(false); ocultarEtapas(true); });
+
+/* ── Los eventos: una tanda de etapas que se guarda ──────────────────
+   Un grupo hace sus etapas, se guarda, y el siguiente grupo repite el
+   mismo reparto. Después se comparan: qué grupo se pasó y en qué parte.
+   Es lo mismo que las rondas del cronómetro de actividad, con etapas en
+   vez de marcas. */
+const eventoActivo = () => E.encabezado || 'Etapas';
+const nombreEvento = v => `${v.base} ${v.n}`;
+/* cada evento lleva un color, que es lo que lo distingue de un vistazo en
+   el menú y en la comparación. Sale del mismo anillo de la paleta. */
+const colorEvento = i => `var(--e${(i % 6) + 1})`;
+const colorActivo = () => colorEvento(E.eventos.length);
+const hayCorrido = () => E.cortes.length > 0 || tiempo() > 0;
+/* ¿el reparto sigue siendo el de fábrica? */
+const repartoEstandar = () => {
+  const f = etapasDeFabrica();
+  return E.etapas.length === f.length && E.etapas.every((e, i) => e.n === f[i].n && e.plan === f[i].plan);
+};
+
+function archivarEvento() {
+  if (!E.cortes.length) return null;
+  /* si el encabezado ya termina en número, no se le pega otro:
+     «Concurso 1» guardado era «Concurso 1 1» */
+  const base = eventoActivo().replace(/\s+\d+$/, '').trim() || eventoActivo();
+  const n = E.eventos.reduce((mx, v) => (v.base === base && v.n > mx ? v.n : mx), 0) + 1;
+  const v = {
+    id: sigEvento++, base, n, fecha: Date.now(), total: Math.floor(tiempo()),
+    etapas: E.etapas.map(e => ({ n: e.n, plan: e.plan })),
+    cortes: E.cortes.slice()
+  };
+  E.eventos.push(v);
+  while (E.eventos.length > MAX_EVENTOS) E.eventos.shift();
+  return v;
+}
+
+/* el evento que se está mirando: el de ahora, o uno guardado */
+const eventoVisto = () => (E.viendo === null ? null : E.eventos.find(v => v.id === E.viendo) || null);
+const etapasVistas = () => { const v = eventoVisto(); return v ? v.etapas : E.etapas; };
+const tituloVisto = () => { const v = eventoVisto(); return v ? nombreEvento(v) : eventoActivo(); };
+
+function verEvento(id) {
+  E.viendo = id;
+  if (E.ocultas) E.ocultas = false;
+  rehacerFilas();
+  aplicarLista();
+  $etLista.scrollTop = 0;
+  guardar();
+}
+
+function guardarEvento(desdeReinicio) {
+  const v = archivarEvento();
+  if (!v) return null;
+  const antes = { acum: tiempo(), t0: E.t0, cortes: E.cortes.slice(), actual: E.actual, fin: E.fin };
+  /* guardar abre una lista **nueva**, con el estándar de la casa y su
+     nombre: si heredara el reparto y el encabezado del evento recién
+     archivado no se notaría que es otra, y se confunde con la anterior
+     puesta en cero. */
+  E.acum = 0; E.t0 = null; E.cortes = []; E.actual = 0; E.fin = false; E.viendo = null; E.sel = null;
+  E.etapas = etapasDeFabrica();
+  E.encabezado = '';
+  previstoHecho = -1;
+  agotadaAvisada = false;
+  tramoActual = '';
+  /* guardar no pregunta ni ofrece deshacer: lo guardado sigue ahí, en la
+     lista de eventos, y de ahí se elimina si sobra. Deshacer es para lo
+     que desaparece. */
+  void antes;
+  return v;
+}
+
+/* «Borrar todo» barre de verdad: los eventos guardados, el que está en
+   marcha, el reparto, el nombre de la actividad y los ajustes. Queda la
+   herramienta como recién abierta, con el estándar de la casa. Borrar a
+   medias era peor que no borrar: quedaban restos y no se veía cuáles. */
+const AJUSTES_FABRICA = { avisar: true, sonido: false, seguir: false, senal: true, despierta: true, final: false };
+function borrarTodo() {
+  const antes = {
+    eventos: E.eventos.slice(), nombre: E.nombre, encabezado: E.encabezado,
+    etapas: E.etapas.map(e => ({ n: e.n, plan: e.plan })),
+    cortes: E.cortes.slice(), actual: E.actual, fin: E.fin, acum: tiempo(), corria: corre(),
+    avisar: E.avisar, sonido: E.sonido, seguir: E.seguir, senal: E.senal,
+    despierta: E.despierta, final: E.final, ocultas: E.ocultas
+  };
+  cerrarComparar(false);
+  cerrarEtapa(false);
+  if (corre()) { E.acum = tiempo(); E.t0 = null; }
+  E.eventos = []; E.viendo = null; E.sel = null;
+  E.nombre = ''; E.encabezado = '';
+  E.etapas = etapasDeFabrica();
+  E.cortes = []; E.actual = 0; E.fin = false; E.acum = 0; E.t0 = null;
+  E.ocultas = false; E.plegada = false;
+  Object.assign(E, AJUSTES_FABRICA);
+  agotadaAvisada = false; tramoActual = ''; previstoHecho = -1;
+  try { localStorage.removeItem(CLAVE); } catch (e) { /* sin memoria: igual */ }
+  $din.value = '';
+  ajustarDinamica();
+  sincronizarAjustes();
+  rehacerEtapas();
+  avisar('Se borró todo', () => {
+    E.eventos = antes.eventos; E.nombre = antes.nombre; E.encabezado = antes.encabezado;
+    E.etapas = antes.etapas.map(e => nuevaEtapa(e.n, e.plan));
+    E.cortes = antes.cortes; E.actual = antes.actual; E.fin = antes.fin;
+    E.acum = antes.acum; E.t0 = null;
+    E.avisar = antes.avisar; E.sonido = antes.sonido; E.seguir = antes.seguir; E.senal = antes.senal;
+    E.despierta = antes.despierta; E.final = antes.final;
+    E.ocultas = antes.ocultas;
+    agotadaAvisada = false; tramoActual = ''; previstoHecho = -1;
+    $din.value = antes.nombre;
+    ajustarDinamica();
+    sincronizarAjustes();
+    rehacerEtapas();
+  });
+}
+
+/* ── Navegar entre etapas: una clase no va en línea recta ────────────
+   Tocar una etapa ya corrida —o la que corre— la empieza de nuevo: se
+   borra su tiempo y el de las que vinieran después, y el reloj vuelve a
+   donde empezaba. Las que aún no han pasado no se tocan: no se puede
+   rehacer algo que no ocurrió. */
+/* Tocar una etapa la **selecciona**; lo que la reinicia es el botón de
+   Reiniciar, que mientras hay una seleccionada dice su nombre. Así una
+   clase que se tuerce se arregla con los mandos de siempre, sin gestos
+   nuevos que aprender ni avisos que leer. */
+/* Se elige cualquier etapa: la elegida es la que se mueve de sitio con
+   las flechas, y —si ya corrió o está corriendo— la que reinicia el
+   botón de siempre. Una que aún no ha pasado se puede mover pero no
+   rehacer: no se rehace lo que no ocurrió. */
+const reiniciable = i => i !== null && i <= E.actual;
+function seleccionar(i) {
+  if (eventoVisto()) return;
+  E.sel = (E.sel === i || i === null) ? null : i;
+  rehacerFilas();
+  actualizar();
+}
+/* mover una etapa dentro de la columna: se lleva consigo su tiempo ya
+   corrido, para que la lista siga diciendo la verdad */
+function moverEtapa(i, paso) {
+  const j = i + paso;
+  if (eventoVisto() || j < 0 || j >= E.etapas.length) return;
+  cerrarEtapa(true);
+  const dur = k => (k < E.cortes.length ? E.cortes[k] - (k > 0 ? E.cortes[k - 1] || 0 : 0) : null);
+  const duraciones = E.etapas.map((_, k) => dur(k));
+  const corridas = E.cortes.length;
+  [E.etapas[i], E.etapas[j]] = [E.etapas[j], E.etapas[i]];
+  [duraciones[i], duraciones[j]] = [duraciones[j], duraciones[i]];
+  /* los cortes se rehacen de las duraciones: solo tienen sentido las que
+     de verdad se midieron, y esas siguen a su etapa */
+  if (corridas) {
+    const nuevos = [];
+    let suma = 0;
+    for (let k = 0; k < corridas; k++) {
+      if (duraciones[k] === null) break;
+      suma += duraciones[k];
+      nuevos.push(suma);
+    }
+    E.cortes = nuevos;
+    if (E.actual > E.cortes.length) E.actual = E.cortes.length;
+  }
+  E.sel = j;
+  previstoHecho = -1;
+  tramoActual = '';
+  guardar();
+  rehacerFilas();
+  actualizar();
+  const li = $(`li[data-i="${j}"]`, $etLista);
+  if (li) {
+    li.scrollIntoView({ block: 'nearest', behavior: reducido() ? 'auto' : 'smooth' });
+    const b = $(`[data-${paso < 0 ? 'subir' : 'bajar'}]`, li);
+    if (b && !b.disabled) b.focus({ preventScroll: true });
+  }
+}
+function reiniciarEtapa(i) {
+  if (i === null || i < 0 || i >= E.etapas.length) return;
+  const base = i > 0 ? (E.cortes[i - 1] || 0) : 0;
+  E.cortes.length = i;
+  E.actual = i;
+  E.fin = false;
+  E.acum = base;
+  if (corre()) E.t0 = performance.now();
+  E.sel = null;
+  agotadaAvisada = false;
+  tramoActual = '';
+  guardar();
+  rehacerFilas();
+  actualizar();
+  programarEtapa();
+  desplazarAlActual();
+}
+$etLista.addEventListener('click', e => {
+  /* una fila en edición es suya: tocar dentro de ella —el nombre, los
+     minutos, los segundos, sus botones— no vuelve a elegir la etapa.
+     Antes solo se libraba `.et-campo`, así que el clic en los minutos
+     rehacía la lista y cerraba la edición al instante. */
+  if (e.target.closest('li.editando') || e.target.closest('[data-editar]') || e.target.closest('.et-mas')) return;
+  const li = e.target.closest('li[data-i]');
+  if (!li || eventoVisto()) { return; }
+  seleccionar(Number(li.dataset.i));
+});
+$etLista.addEventListener('keydown', e => {
+  /* la fila tiene papel de botón y responde a Enter y al espacio, pero
+     dentro de un campo el espacio es una letra más: sin esta salida,
+     escribir «Trabajo en parejas» elegía la etapa al primer espacio y
+     cerraba la edición, de modo que los nombres no pasaban de una
+     palabra */
+  if (escribiendo(e.target) || (e.target.closest && e.target.closest('li.editando'))) return;
+  const li = e.target.closest && e.target.closest('li[data-i]');
+  if (!li || (e.key !== 'Enter' && e.key !== ' ')) return;
+  e.preventDefault();
+  seleccionar(Number(li.dataset.i));
+});
+
+/* ── Cambiar una etapa sin salir de la lista ─────────────────────────
+   El panel de ajustes sigue estando para repartir de un vistazo, pero a
+   media clase uno cambia una cosa: el nombre de la etapa que corre o su
+   tiempo. Eso se hace aquí mismo, como las marcas del otro cronómetro. */
+let editandoEtapa = null;
+function editarEtapa(i) {
+  if (eventoVisto()) return;
+  cerrarEtapa(true);
+  const e = E.etapas[i];
+  const li = $(`li[data-i="${i}"]`, $etLista);
+  if (!e || !li) return;
+  editandoEtapa = i;
+  E.sel = null;
+  const x = Math.round(e.plan / 1000);
+  li.className = 'et editando';
+  li.removeAttribute('tabindex');
+  li.removeAttribute('role');
+  li.innerHTML =
+    `<span class="et-n" aria-hidden="true">${i + 1}</span>` +
+    `<input type="text" class="et-campo et-campo-n" id="et-n-${i}" maxlength="32" autocomplete="off" spellcheck="false" enterkeyhint="done" aria-label="Nombre de la etapa ${i + 1}">` +
+    `<span class="et-campo-t">` +
+      `<input type="text" class="campo-num" id="et-min-${i}" inputmode="numeric" autocomplete="off" maxlength="3" aria-label="Minutos de la etapa ${i + 1}">` +
+      `<span class="aj-unidad" aria-hidden="true">:</span>` +
+      `<input type="text" class="campo-num" id="et-seg-${i}" inputmode="numeric" autocomplete="off" maxlength="2" aria-label="Segundos de la etapa ${i + 1}">` +
+    `</span>` +
+    `<button type="button" class="et-accion et-quita" data-quita="${i}" aria-label="Quitar la etapa ${i + 1}" title="Quitar">${ico('basura')}</button>` +
+    `<button type="button" class="et-accion et-ok" data-listo="${i}" aria-label="Guardar" title="Guardar">${ico('listo')}</button>`;
+  const n = $('.et-campo-n', li), m = $(`#et-min-${i}`), g = $(`#et-seg-${i}`);
+  n.value = e.n; m.value = String(Math.floor(x / 60)); g.value = dos(x % 60);
+  li.addEventListener('mousedown', ev => { if (ev.target.closest('.et-accion')) ev.preventDefault(); });
+  n.focus({ preventScroll: true });
+  n.select();
+  [n, m, g].forEach(c => {
+    c.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') { ev.preventDefault(); cerrarEtapa(true); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cerrarEtapa(false); }
+    });
+    c.addEventListener('blur', ev => {
+      if (ev.relatedTarget && li.contains(ev.relatedTarget)) return;
+      setTimeout(() => { if (editandoEtapa === i && !li.contains(document.activeElement)) cerrarEtapa(true); }, 0);
+    });
+  });
+  if (m) m.addEventListener('input', () => { if (/\D/.test(m.value)) m.value = m.value.replace(/\D/g, ''); });
+  if (g) g.addEventListener('input', () => { if (/\D/.test(g.value)) g.value = g.value.replace(/\D/g, ''); });
+}
+/* al soltarla se normaliza: el nombre en blanco toma el suyo y un tiempo
+   en cero vuelve al que tenía. Mientras se escribe, nada se rellena. */
+function cerrarEtapa(guardarlo) {
+  if (editandoEtapa === null) return;
+  const i = editandoEtapa;
+  editandoEtapa = null;
+  const e = E.etapas[i];
+  const n = $(`#et-n-${i}`), m = $(`#et-min-${i}`), g = $(`#et-seg-${i}`);
+  if (e && n && m && g && guardarlo) {
+    e.n = n.value.replace(/\s+/g, ' ').trim().slice(0, NOMBRE_MAX) || `Etapa ${i + 1}`;
+    const total = Math.min(ETAPA_MAX, ((parseInt(m.value.replace(/\D/g, ''), 10) || 0) * 60 +
+      (parseInt(g.value.replace(/\D/g, ''), 10) || 0)) * 1000);
+    if (total >= 1000) e.plan = total;
+    previstoHecho = -1;
+    tramoActual = '';
+    agotadaAvisada = enEtapa(tiempo()) >= etapaActual().plan;
+    guardar();
+    programarEtapa();
+  }
+  rehacerFilas();
+  actualizar();
+}
+
+/* Añadir y quitar no esperan a que el reloj esté en cero: si el maestro
+   está editando, es porque la clase se torció y hace falta ahora. Quitar
+   una etapa ya corrida se lleva su tiempo, y el total baja con ella. */
+function anadirEtapa() {
+  if (E.etapas.length >= MAX_ETAPAS) return;
+  E.etapas.push(nuevaEtapa(`Etapa ${E.etapas.length + 1}`, 300000));
+  /* añadir una etapa después de «Terminar» reabre el evento: la etapa
+     nueva no se ha corrido, así que la actividad no está terminada. Sin
+     esto quedaba en la lista pero muerta —ni seguía ni se reiniciaba
+     sola—, que es peor que no dejar añadirla. */
+  if (E.fin && E.cortes.length < E.etapas.length) {
+    E.fin = false;
+    E.actual = E.cortes.length;
+    agotadaAvisada = false;
+    tramoActual = '';
+    E.sel = null;
+  }
+  previstoHecho = -1;
+  guardar();
+  rehacerFilas();
+  actualizar();
+  editarEtapa(E.etapas.length - 1);
+}
+function quitarEtapa(i) {
+  if (E.etapas.length <= MIN_ETAPAS || i < 0 || i >= E.etapas.length) return;
+  cerrarEtapa(false);
+  const antes = { etapas: E.etapas.slice(), cortes: E.cortes.slice(), actual: E.actual, fin: E.fin, acum: E.acum };
+  const dur = i < E.cortes.length ? E.cortes[i] - (i > 0 ? E.cortes[i - 1] || 0 : 0) : 0;
+  const [fuera] = E.etapas.splice(i, 1);
+  if (i < E.cortes.length) {
+    E.cortes.splice(i, 1);
+    for (let k = i; k < E.cortes.length; k++) E.cortes[k] -= dur;
+    E.acum = Math.max(0, E.acum - dur);
+  }
+  if (E.actual > i) E.actual -= 1;
+  if (E.actual >= E.etapas.length) E.actual = E.etapas.length - 1;
+  if (E.cortes.length >= E.etapas.length) E.fin = true;
+  E.sel = null;
+  previstoHecho = -1;
+  tramoActual = '';
+  guardar();
+  rehacerFilas();
+  actualizar();
+  avisar(`Se quitó «${fuera.n}»`, () => {
+    E.etapas = antes.etapas; E.cortes = antes.cortes; E.actual = antes.actual; E.fin = antes.fin; E.acum = antes.acum;
+    previstoHecho = -1; tramoActual = '';
+    guardar();
+    rehacerFilas();
+    actualizar();
+  });
+}
+$etLista.addEventListener('click', e => {
+  const q = e.target.closest('[data-quita]');
+  if (q) { quitarEtapa(Number(q.dataset.quita)); return; }
+  const l = e.target.closest('[data-listo]');
+  if (l) { cerrarEtapa(true); return; }
+  const b = e.target.closest('[data-editar]');
+  if (b) { editarEtapa(Number(b.dataset.editar)); return; }
+  if (e.target.closest('.et-mas')) { anadirEtapa(); return; }
+  const s = e.target.closest('[data-subir]');
+  if (s) { moverEtapa(Number(s.dataset.subir), -1); return; }
+  const j = e.target.closest('[data-bajar]');
+  if (j) moverEtapa(Number(j.dataset.bajar), 1);
+});
+
+/* ── El menú de la cabecera: los eventos ─────────────────────────────
+   Arriba se navega —de un evento a otro y a la comparación—; junto a
+   Reiniciar se actúa. Son dos menús con dos oficios, no el mismo dos
+   veces. */
+function pintarEventosMenu() {
+  /* cada evento se reconoce por su color: el nombre basta, sin explicar
+     cuál es el de ahora más que con su marca de «activo» */
+  /* cada evento guardado lleva su X al final de su renglón: se borra de
+     un clic, ahí mismo donde se le ve, y eso sí ofrece deshacer */
+  const filas = E.eventos.slice().reverse().map(v =>
+    `<li role="none" class="r-fila"><button type="button" role="menuitem" data-evento="${v.id}" style="--c:${colorEvento(E.eventos.indexOf(v))}"${E.viendo === v.id ? ' aria-current="true"' : ''}>` +
+      '<span class="r-color" aria-hidden="true"></span>' +
+      `<span class="r-nombre">${esc(nombreEvento(v))}</span>` +
+      `<span class="r-n">${enReloj(v.total, 0)}</span></button>` +
+      `<button type="button" class="r-quitar" data-quitar-evento="${v.id}" aria-label="Eliminar «${esc(nombreEvento(v))}»" title="Eliminar">${ico('cerrar')}</button></li>`).join('');
+  const hoy = `<li role="none"><button type="button" role="menuitem" data-evento="ahora" style="--c:${colorActivo()}"${E.viendo === null ? ' aria-current="true"' : ''}>` +
+    '<span class="r-color" aria-hidden="true"></span>' +
+    `<span class="r-nombre">${esc(eventoActivo())}</span><span class="r-activo">activo</span>` +
+    `<span class="r-n">${enReloj(Math.floor(tiempo()), 0)}</span></button></li>`;
+  let html = hoy + filas;
+  if (hayComparacion()) {
+    html += '<li role="none" class="r-sep" aria-hidden="true"></li>' +
+      `<li role="none"><button type="button" role="menuitem" data-comparar="1">${ico('ola')}<span>Comparar eventos</span></button></li>`;
+  }
+  /* aquí arriba se navega y se empieza otro; el reparto vive en su propio
+     botón de ajustes, que es donde se va a repartir, no a navegar */
+  if (E.cortes.length && !eventoVisto()) {
+    html += '<li role="none" class="r-sep" aria-hidden="true"></li>' +
+      `<li role="none"><button type="button" role="menuitem" data-nuevo="1">${ico('mas')}<span>Añadir evento</span></button></li>`;
+  }
+  $eventosMenu.innerHTML = html;
+}
+let eventosPorTeclado = false;
+function abrirEventos(porTeclado) {
+  cerrarAjustes(false);
+  cerrarClip(false);
+  pintarEventosMenu();
+  eventosPorTeclado = porTeclado;
+  mostrar($eventosMenu);
+  $listaMenu.setAttribute('aria-expanded', 'true');
+  if (porTeclado) { const b = $('button', $eventosMenu); if (b) b.focus(); }
+}
+function cerrarEventos(devolverFoco) {
+  if (!abierto($eventosMenu)) return;
+  ocultar($eventosMenu);
+  $listaMenu.setAttribute('aria-expanded', 'false');
+  if (devolverFoco && eventosPorTeclado) $listaMenu.focus();
+}
+$listaMenu.addEventListener('click', e => { if (!abierto($eventosMenu)) abrirEventos(e.detail === 0); else cerrarEventos(e.detail === 0); });
+$eventosMenu.addEventListener('click', e => {
+  const q = e.target.closest('[data-quitar-evento]');
+  if (q) { eliminarEvento(Number(q.dataset.quitarEvento)); return; }
+  const b = e.target.closest('[data-evento]');
+  if (b) { cerrarEventos(true); verEvento(b.dataset.evento === 'ahora' ? null : Number(b.dataset.evento)); return; }
+  if (e.target.closest('[data-comparar]')) { cerrarEventos(false); abrirComparar(); return; }
+  if (e.target.closest('[data-nuevo]')) { cerrarEventos(true); nuevoEvento(); }
+});
+/* cerrar el evento de ahora y abrir otro en limpio: es lo que se hace al
+   terminar una tanda, y no tiene por qué pasar por «Reiniciar» */
+function nuevoEvento() {
+  if (!E.cortes.length || eventoVisto()) return;
+  guardarEvento(false);
+  rehacerFilas();
+  actualizar();
+  guardar();
+}
+$listaVolver.addEventListener('click', () => verEvento(null));
+/* eliminar el evento que se está mirando, con su deshacer */
+function eliminarEvento(id) {
+  const i = E.eventos.findIndex(v => v.id === id);
+  if (i < 0) return;
+  const v = E.eventos[i], nombre = nombreEvento(v);
+  cerrarComparar(false);
+  E.eventos.splice(i, 1);
+  if (E.viendo === id) E.viendo = null;
+  guardar();
+  rehacerFilas();
+  actualizar();
+  if (abierto($eventosMenu)) { if (E.eventos.length) pintarEventosMenu(); else cerrarEventos(false); }
+  avisar(`Se eliminó «${nombre}»`, () => {
+    E.eventos.splice(i, 0, v);
+    guardar();
+    rehacerFilas();
+    actualizar();
+    if (abierto($eventosMenu)) pintarEventosMenu();
+  });
+}
+$listaQuitar.addEventListener('click', () => { const v = eventoVisto(); if (v) eliminarEvento(v.id); });
+
+/* ── Comparar eventos: la misma etapa, grupo por grupo ───────────── */
+const eventosComparables = () => {
+  const t = E.eventos.slice();
+  if (E.cortes.length) t.push({ id: 0, base: eventoActivo(), n: 0, ahora: true, total: Math.floor(tiempo()),
+    etapas: E.etapas.map(e => ({ n: e.n, plan: e.plan })), cortes: E.cortes.slice() });
+  return t;
+};
+const hayComparacion = () => eventosComparables().length >= 2;
+const clave = s => s.replace(/\s+/g, ' ').trim().toLocaleLowerCase('es');
+const realEnEvento = (v, i) => (i < v.cortes.length ? v.cortes[i] - (i > 0 ? v.cortes[i - 1] || 0 : 0) : null);
+
+function tablaComparacion() {
+  const eventos = eventosComparables();
+  const filas = new Map();
+  eventos.forEach((v, col) => {
+    v.etapas.forEach((e, i) => {
+      const k = clave(e.n);
+      if (!filas.has(k)) filas.set(k, { nombre: e.n, plan: e.plan, t: new Array(eventos.length).fill(null) });
+      const f = filas.get(k);
+      if (f.t[col] === null) f.t[col] = realEnEvento(v, i);
+    });
+  });
+  const lista = [...filas.values()].map(f => {
+    const vistos = f.t.map((x, i) => (x === null ? -1 : i)).filter(i => i >= 0);
+    const cambio = vistos.length > 1 ? f.t[vistos[vistos.length - 1]] - f.t[vistos[0]] : null;
+    const mejor = f.t.reduce((mj, x, i) => (x !== null && (mj < 0 || x < f.t[mj]) ? i : mj), -1);
+    /* dos que tardaron lo mismo no tienen ganador: empate, y se dice */
+    const empate = mejor >= 0 && f.t.filter(x => x !== null && x === f.t[mejor]).length > 1;
+    return { ...f, cambio, cuantos: vistos.length, mejor, empate };
+  });
+  const totales = eventos.map(v => (v.cortes.length ? v.cortes[v.cortes.length - 1] : null));
+  return { eventos, lista, totales };
+}
+
+function pintarComparacion() {
+  const { eventos, lista, totales } = tablaComparacion();
+  const tit = v => (v.ahora ? v.base : nombreEvento(v));
+  const color = (v, i) => (v.ahora ? colorActivo() : colorEvento(i));
+  $cmpSub.textContent = eventos.length === 2 ? 'Dos eventos, las mismas etapas.' : `${eventos.length} eventos, las mismas etapas.`;
+  if (!lista.length) {
+    $cmpMarco.innerHTML = '<p class="cmp-nada">Todavía no hay etapas corridas que comparar.</p>';
+    $cmpNota.textContent = '';
+    return;
+  }
+  /* La última columna no dice un número más: dice **quién fue más rápido**
+     en esa etapa, con el color del evento. Es la métrica que importa. */
+  const conMejor = lista.some(f => f.cuantos > 1);
+  const cab = '<tr><th class="cmp-quien" scope="col">Etapa</th><th scope="col">Previsto</th>' +
+    eventos.map((v, i) => `<th scope="col" class="cmp-ev" style="--c:${color(v, i)}"><span class="cmp-punto" aria-hidden="true"></span>${esc(tit(v))}</th>`).join('') +
+    (conMejor ? '<th scope="col">Más rápido</th>' : '') + '</tr>';
+  const cuerpo = lista.map(f => {
+    const celdas = f.t.map((x, i) => x === null
+      ? '<td class="cmp-t cmp-vacia">—</td>'
+      : `<td class="cmp-t${f.cuantos > 1 && i === f.mejor ? ' cmp-mejor' : ''}">${enReloj(x, 0)}</td>`).join('');
+    let mejor = '';
+    if (conMejor) {
+      mejor = f.cuantos > 1 && f.mejor >= 0
+        ? (f.empate ? '<td class="cmp-gana cmp-empate">empate</td>'
+          : `<td class="cmp-gana" style="--c:${color(eventos[f.mejor], f.mejor)}"><span class="cmp-punto" aria-hidden="true"></span>${esc(tit(eventos[f.mejor]))}</td>`)
+        : '<td class="cmp-gana cmp-vacia">—</td>';
+    }
+    return `<tr><th class="cmp-quien" scope="row" title="${esc(f.nombre)}">${esc(f.nombre)}</th>` +
+      `<td class="cmp-t cmp-plan">${enReloj(f.plan, 0)}</td>${celdas}${mejor}</tr>`;
+  }).join('');
+  const planTot = lista.reduce((a, f) => a + f.plan, 0);
+  const vistos = totales.map((x, i) => (x === null ? -1 : i)).filter(i => i >= 0);
+  const mejorTot = vistos.reduce((mj, i) => (mj < 0 || totales[i] < totales[mj] ? i : mj), -1);
+  const totCeldas = totales.map((x, i) => x === null ? '<td class="cmp-t cmp-vacia">—</td>'
+    : `<td class="cmp-t${vistos.length > 1 && i === mejorTot ? ' cmp-mejor' : ''}">${enReloj(x, 0)}</td>`).join('');
+  const empateTot = mejorTot >= 0 && totales.filter(x => x !== null && x === totales[mejorTot]).length > 1;
+  const ganaTot = conMejor ? (vistos.length > 1 && mejorTot >= 0
+    ? (empateTot ? '<td class="cmp-gana cmp-empate">empate</td>'
+      : `<td class="cmp-gana" style="--c:${color(eventos[mejorTot], mejorTot)}"><span class="cmp-punto" aria-hidden="true"></span>${esc(tit(eventos[mejorTot]))}</td>`)
+    : '<td class="cmp-gana cmp-vacia">—</td>') : '';
+  const pie = '<tr class="cmp-total"><th class="cmp-quien" scope="row">Total</th>' +
+    `<td class="cmp-t cmp-plan">${enReloj(planTot, 0)}</td>${totCeldas}${ganaTot}</tr>`;
+  $cmpMarco.innerHTML = `<table class="cmp"><thead>${cab}</thead><tbody>${cuerpo}${pie}</tbody></table>`;
+  $cmpNota.textContent = conMejor ? 'En cada etapa gana quien tardó menos.' : '';
+}
+
+let focoPrevio = null;
+function abrirComparar() {
+  if (!hayComparacion()) return;
+  cerrarClip(false);
+  cerrarEventos(false);
+  cerrarAjustes(false);
+  focoPrevio = document.activeElement;
+  pintarComparacion();
+  mostrar($cmpVelo);
+  mostrar($comparar);
+  $cmpCerrar.focus();
+}
+function cerrarComparar(devolverFoco) {
+  if (!abierto($comparar)) return;
+  ocultar($comparar);
+  ocultar($cmpVelo);
+  if (devolverFoco && focoPrevio && document.contains(focoPrevio)) focoPrevio.focus();
+  focoPrevio = null;
+}
+$cmpCerrar.addEventListener('click', () => cerrarComparar(true));
+$cmpVelo.addEventListener('click', () => cerrarComparar(true));
+$comparar.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const f = $$('button, [tabindex="0"]', $comparar).filter(el => el.offsetParent !== null);
+  if (!f.length) return;
+  const pri = f[0], ult = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === pri) { e.preventDefault(); ult.focus(); }
+  else if (!e.shiftKey && document.activeElement === ult) { e.preventDefault(); pri.focus(); }
+});
+
+/* ── El clip de las etapas ──────────────────────────────────────────── */
+let clipPorTeclado = false;
+function abrirClip(porTeclado) {
+  cerrarAjustes(false);
+  clipPorTeclado = porTeclado;
+  mostrar($clipMenu);
+  $btnClip.setAttribute('aria-expanded', 'true');
+  if (porTeclado) { const b = $$('button', $clipMenu).find(x => !x.closest('[hidden]')); if (b) b.focus(); }
+}
+function cerrarClip(devolverFoco) {
+  if (!abierto($clipMenu)) return;
+  ocultar($clipMenu);
+  $btnClip.setAttribute('aria-expanded', 'false');
+  if (devolverFoco && clipPorTeclado) $btnClip.focus();
+}
+$btnClip.addEventListener('click', e => { if (!abierto($clipMenu)) abrirClip(e.detail === 0); else cerrarClip(e.detail === 0); });
+$menuVer.addEventListener('click', e => { const t = e.detail === 0; cerrarClip(t); ocultarEtapas(!E.ocultas); });
+$menuGuardar.addEventListener('click', e => { const t = e.detail === 0; cerrarClip(t); guardarEvento(false); rehacerFilas(); actualizar(); guardar(); });
+$menuVaciar.addEventListener('click', e => { const t = e.detail === 0; cerrarClip(t); borrarTodo(); });
+
+/* ── Señales: la sombra, el halo y la campana ───────────────────────── */
+function sombra(tipo) {
+  if (reducido() || typeof $sombra.animate !== 'function') return;
+  $sombraIco.setAttribute('href', tipo === 'pausa' ? '#i-pausa' : tipo === 'siguiente' ? '#i-siguiente' : '#i-marcha');
+  $sombra.getAnimations().forEach(a => a.cancel());
+  $sombra.animate([
+    { opacity: 0, transform: 'scale(.9)' },
+    { opacity: .12, transform: 'scale(.97)', offset: .1875 },
+    { opacity: .12, transform: 'scale(1)', offset: .4375 },
+    { opacity: 0, transform: 'scale(1.06)' }
+  ], { duration: 800, easing: 'ease-out' });
+}
+let haloT = 0;
+function halo() {
+  if (reducido()) return;
+  $pieza.classList.add('halo');
+  clearTimeout(haloT);
+  haloT = setTimeout(() => $pieza.classList.remove('halo'), 150);
+}
+let audio = null;
+function prepararAudio() {
+  try {
+    if (!audio) { const C = window.AudioContext || window.webkitAudioContext; if (C) audio = new C(); }
+    if (audio && audio.state === 'suspended') audio.resume();
+  } catch (e) { audio = null; }
+}
+/* una campana sintetizada: dos golpes con los parciales de una campana */
+function campana() {
+  if (!audio) return;
+  try {
+    const salida = audio.createGain();
+    salida.gain.value = .9;
+    salida.connect(audio.destination);
+    const golpe = (cuando, f, vol) => {
+      [[1, 1], [2, .5], [2.76, .32], [5.4, .14], [8.93, .06]].forEach(([r, g]) => {
+        const o = audio.createOscillator(), a = audio.createGain(), dur = 1.9 / Math.sqrt(r);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f * r, cuando);
+        a.gain.setValueAtTime(.0001, cuando);
+        a.gain.exponentialRampToValueAtTime(vol * g, cuando + .008);
+        a.gain.exponentialRampToValueAtTime(.0001, cuando + dur);
+        o.connect(a); a.connect(salida);
+        o.start(cuando); o.stop(cuando + dur + .05);
+      });
+    };
+    const t0 = audio.currentTime + .02;
+    golpe(t0, 880, .2);
+    golpe(t0 + .34, 1318.5, .17);
+  } catch (e) { /* sin sonido */ }
+}
+
+
+/* ── Pantalla despierta mientras corre ─────────────────────────────── */
+let candado = null;
+async function despertar(si) {
+  try {
+    if (si && !candado && navigator.wakeLock && document.visibilityState === 'visible') {
+      candado = await navigator.wakeLock.request('screen');
+      candado.addEventListener('release', () => { candado = null; });
+    } else if (!si && candado) {
+      const c = candado; candado = null; await c.release();
+    }
+  } catch (e) { candado = null; }
+}
+
+
+/* ── El aviso que ofrece deshacer ──────────────────────────────────── */
+let avisoT = 0, avisoDeshacer = null;
+function avisar(texto, deshacer) {
+  $avisoTxt.textContent = texto;
+  avisoDeshacer = deshacer;
+  $aviso.hidden = false;
+  clearTimeout(avisoT);
+  avisoT = setTimeout(ocultarAviso, 5000);
+}
+function ocultarAviso() { clearTimeout(avisoT); $aviso.hidden = true; avisoDeshacer = null; }
+$avisoDeshacer.addEventListener('click', () => { const f = avisoDeshacer; ocultarAviso(); if (f) f(); });
+
+
+/* ── La información: sale al abrir y se puede ocultar ───────────────── */
+function aplicarInfo() {
+  $cuerpo.classList.toggle('con-info', E.info);
+  $info.setAttribute('aria-hidden', E.info ? 'false' : 'true');
+  $info.inert = !E.info;
+  $btnInfo.setAttribute('aria-pressed', E.info ? 'true' : 'false');
+  const t = E.info ? 'Ocultar la información' : 'Ver la información';
+  $btnInfo.setAttribute('aria-label', t);
+  $btnInfo.title = t;
+  requestAnimationFrame(bordesInfo);
+}
+function bordesInfo() {
+  if (!$infoInt) return;
+  $infoInt.classList.toggle('hay-arriba', $infoInt.scrollTop > 2);
+  $infoInt.classList.toggle('hay-abajo', $infoInt.scrollHeight - $infoInt.clientHeight - $infoInt.scrollTop > 2);
+}
+$btnInfo.addEventListener('click', () => { E.info = !E.info; aplicarInfo(); guardar(); });
+if ($infoInt) {
+  $infoInt.addEventListener('scroll', bordesInfo, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(bordesInfo).observe($infoInt);
+}
+
+/* ── Entrar y salir sin tirones ──────────────────────────────────────
+   Un panel que aparece con una animación y se va de golpe se siente roto.
+   `mostrar` y `ocultar` le dan a cada uno su salida; con «reducir
+   movimiento» se van al instante. Mientras sale, cuenta como cerrado. */
+const SALIDA = 190;
+const salidas = new WeakMap();
+function abierto(el) { return !el.hidden && !el.classList.contains('saliendo'); }
+function mostrar(el) {
+  const t = salidas.get(el);
+  if (t) { clearTimeout(t); salidas.delete(el); }
+  el.classList.remove('saliendo');
+  el.hidden = false;
+}
+function ocultar(el) {
+  if (el.hidden || el.classList.contains('saliendo')) return;
+  if (reducido()) { el.hidden = true; return; }
+  el.classList.add('saliendo');
+  salidas.set(el, setTimeout(() => {
+    el.hidden = true;
+    el.classList.remove('saliendo');
+    salidas.delete(el);
+  }, SALIDA));
+}
+
+
+/* ── Pantalla completa ──────────────────────────────────────────────── */
+const raiz = document.documentElement;
+let pcRespaldo = false;   /* donde el navegador no la permite, la pieza ocupa la ventana */
+const pcNativa = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+const enPC = () => pcNativa() || pcRespaldo;
+/* Pasar a pantalla completa cambia media pieza de sitio, y **no** se
+   envuelve en una transición de vista. Se hacía, y ahí estaba el tirón:
+   el aviso de pantalla completa llega mientras el navegador todavía está
+   agrandando la ventana, así que la transición congelaba una foto del
+   tamaño viejo encima de la página viva y la soltaba de golpe al acabar.
+   Dos animaciones sobre lo mismo se estorban. La del navegador ya hace
+   el viaje; nosotros solo cambiamos la clase, y lo que se mueve dentro
+   de la pieza lo lleva el CSS. */
+function sincronizarPC() {
+  cerrarClip(false);
+  cerrarEventos(false);
+  cerrarAjustes(false);
+  pintarPC();
+}
+function pintarPC() {
+  const si = enPC();
+  raiz.classList.toggle('pc', si);
+  $pantallaIco.setAttribute('href', si ? '#i-reducir' : '#i-ampliar');
+  $btnPantalla.setAttribute('aria-label', si ? 'Salir de pantalla completa' : 'Pantalla completa');
+  $btnPantalla.title = si ? 'Salir de pantalla completa' : 'Pantalla completa';
+  if (abierto($ajustes)) colocarAjustes();
+  avivarMandos();
+}
+/* En tableta, teléfono o pizarra táctil, la pantalla completa se pide
+   **en horizontal**: la cifra es ancha y de pie se parte en dos líneas o
+   se queda diminuta. Al entrar se bloquea la orientación y al salir se
+   suelta. En un equipo de escritorio la API no existe o rechaza, y no
+   pasa nada: el `catch` se lo come y todo sigue igual. */
+const esTactil = () => window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+function fijarHorizontal() {
+  if (!esTactil() || !screen.orientation || typeof screen.orientation.lock !== 'function') return;
+  try { const r = screen.orientation.lock('landscape'); if (r && r.catch) r.catch(() => {}); } catch (e) { /* no se puede: da igual */ }
+}
+function soltarOrientacion() {
+  if (!esTactil() || !screen.orientation || typeof screen.orientation.unlock !== 'function') return;
+  try { screen.orientation.unlock(); } catch (e) { /* nada */ }
+}
+function entrarPC() {
+  const pedirla = raiz.requestFullscreen || raiz.webkitRequestFullscreen;
+  const respaldo = () => { pcRespaldo = true; sincronizarPC(); };
+  if (!pedirla) { respaldo(); return; }
+  try {
+    const r = pedirla.call(raiz, { navigationUI: 'hide' });
+    if (r && typeof r.then === 'function') { r.then(fijarHorizontal, respaldo); }
+    else fijarHorizontal();
+  } catch (e) { respaldo(); }
+}
+function salirPC() {
+  if (pcNativa()) {
+    const salir = document.exitFullscreen || document.webkitExitFullscreen;
+    try { const r = salir && salir.call(document); if (r && r.catch) r.catch(() => {}); } catch (e) { /* nada */ }
+  }
+  soltarOrientacion();
+  pcRespaldo = false;
+  sincronizarPC();
+}
+const alternarPC = () => (enPC() ? salirPC() : entrarPC());
+document.addEventListener('fullscreenchange', sincronizarPC);
+document.addEventListener('webkitfullscreenchange', sincronizarPC);
+$btnPantalla.addEventListener('click', alternarPC);
+
+/* Pasado un rato en pantalla completa con el reloj corriendo, los mandos
+   que quedan se atenúan solos (ver el CSS de la sección 10): no tapan la
+   vista de la clase. Tocar uno de ellos, cualquier punto de la pantalla o
+   una tecla los despierta y reinicia la espera; en pausa o fuera de
+   pantalla completa se quedan siempre enteros. */
+const ESPERA_LATENTE = 8000;
+let latenteT = 0;
+function avivarMandos() {
+  clearTimeout(latenteT);
+  raiz.classList.remove('latente');
+  if (enPC() && corre()) latenteT = setTimeout(() => raiz.classList.add('latente'), ESPERA_LATENTE);
+}
+document.addEventListener('pointerdown', avivarMandos, true);
+document.addEventListener('pointermove', avivarMandos, true);
+document.addEventListener('keydown', avivarMandos, true);
+
+
+/* ── Ajustes: el editor de etapas ───────────────────────────────────── */
+let ajustesPorTeclado = false;
+/* El panel no lleva pestaña: sale debajo de su botón y con su animación,
+   que ya dice de dónde viene. Un triangulito rotado solo añadía un borde
+   dentado en algunas pantallas. */
+function colocarAjustes() {
+  const r = $btnAjustes.getBoundingClientRect();
+  const alto = Math.max(220, window.innerHeight - r.bottom - 26);
+  $ajustes.style.setProperty('--aj-alto', alto + 'px');
+}
+function abrirAjustes(porTeclado) {
+  cerrarClip(false);
+  ajustesPorTeclado = porTeclado;
+  sincronizarAjustes();
+  mostrar($ajustes);
+  $btnAjustes.setAttribute('aria-expanded', 'true');
+  colocarAjustes();
+  if (porTeclado) $ajAvisar.focus();
+}
+function cerrarAjustes(devolverFoco) {
+  if (!abierto($ajustes)) return;
+  ocultar($ajustes);
+  $btnAjustes.setAttribute('aria-expanded', 'false');
+  if (devolverFoco && ajustesPorTeclado) $btnAjustes.focus();
+}
+$btnAjustes.addEventListener('click', e => { if (!abierto($ajustes)) abrirAjustes(e.detail === 0); else cerrarAjustes(e.detail === 0); });
+$ajCerrar.addEventListener('click', e => cerrarAjustes(e.detail === 0 || ajustesPorTeclado));
+
+function sincronizarAjustes() {
+  $ajAvisar.checked = E.avisar;
+  $ajSenal.checked = E.senal;
+  $ajSonido.checked = E.sonido;
+  $ajSeguir.checked = E.seguir;
+  $ajDespierta.checked = E.despierta;
+  $ajFinal.checked = E.final;
+}
+$ajAvisar.addEventListener('change', () => { E.avisar = $ajAvisar.checked; tramoActual = ''; pintar(); guardar(); });
+$ajSenal.addEventListener('change', () => { E.senal = $ajSenal.checked; tramoActual = ''; pintar(); guardar(); });
+$ajSonido.addEventListener('change', () => { E.sonido = $ajSonido.checked; guardar(); });
+$ajSeguir.addEventListener('change', () => { E.seguir = $ajSeguir.checked; guardar(); });
+$ajDespierta.addEventListener('change', () => { E.despierta = $ajDespierta.checked; despertar(corre() && E.despierta); guardar(); });
+$ajFinal.addEventListener('change', () => { E.final = $ajFinal.checked; if (E.final) campana(); guardar(); });
+
+/* El panel de ajustes ya no edita etapas: eso se hace en la lista, con
+   el lápiz de cada fila. Aquí solo queda lo del sistema —los avisos, la
+   señal, el sonido, pasar sola—, que es lo que no cabe en una fila. */
+function rehacerFilas() {
+  previstoHecho = -1;
+  armarPista();
+  armarFilas();
+  pintar();
+}
+function rehacerEtapas() {
+  previstoHecho = -1;
+  tramoActual = '';
+  armarPista();
+  armarFilas();
+  actualizar();
+  guardar();
+}
+
+/* ── Pestaña oculta, recarga y salida ───────────────────────────────── */
+let ocultoT = 0;
+function relojOculto() {
+  clearTimeout(ocultoT);
+  if (!document.hidden || !corre()) return;
+  pintarTitulo(tiempo());
+  ocultoT = setTimeout(relojOculto, 1005 - (tiempo() % 1000));
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { guardar(); relojOculto(); }
+  else { clearTimeout(ocultoT); if (corre()) { despertar(E.despierta); pintar(); pedir(); } }
+});
+window.addEventListener('pagehide', guardar);
+window.addEventListener('resize', () => { if (abierto($ajustes)) colocarAjustes(); });
+
+
+/* ── La carga de la casa se retira cuando todo está listo ──────────── */
+function fuentesListas() {
+  const link = document.getElementById('fuentes');
+  const hoja = new Promise(res => {
+    if (!link || link.dataset.lista) { res(); return; }
+    link.addEventListener('load', res, { once: true });
+    link.addEventListener('error', res, { once: true });
+  });
+  return hoja.then(() => {
+    if (!document.fonts || typeof document.fonts.load !== 'function') return null;
+    return Promise.all(['700 1em Lora', '800 1em Nunito', '600 1em Nunito', '600 1em "Source Code Pro"']
+      .map(f => document.fonts.load(f).catch(() => null))).then(() => document.fonts.ready);
+  }).catch(() => null);
+}
+function retirarCarga() {
+  const carga = $('#carga');
+  if (!carga) { raiz.classList.add('fuentes-ok'); return; }
+  const t0 = typeof window.S321_CARGA_T0 === 'number' ? window.S321_CARGA_T0 : 0;
+  /* dura al menos lo que tarda en componerse el isotipo: su última pieza
+     se enciende a los 1.16 s de empezar, y nunca menos de 0.8 s */
+  const minimo = reducido() ? 800 : Math.max(800, t0 + 1200);
+  const tope = new Promise(res => setTimeout(res, Math.max(0, 3200 - performance.now())));
+  Promise.race([fuentesListas(), tope]).then(() => {
+    raiz.classList.add('fuentes-ok');      /* ya con su letra: la marca y la carga se muestran sin saltar */
+    setTimeout(() => {
+      carga.classList.add('fuera');
+      carga.setAttribute('aria-hidden', 'true');
+      setTimeout(() => { carga.hidden = true; }, 320);
+    }, Math.max(0, minimo - performance.now()));
+  });
+}
+
+
+/* ── El nombre de la actividad ───────────────────────────────────────── */
+let dinAntes = '';
+function ajustarDinamica() {
+  $din.style.height = 'auto';
+  $din.style.height = $din.scrollHeight + 'px';
+  $dinCampo.classList.toggle('lleno', $din.value.trim() !== '');
+}
+$din.addEventListener('focus', () => { dinAntes = $din.value; });
+$din.addEventListener('input', () => {
+  if (/[\r\n]/.test($din.value)) $din.value = $din.value.replace(/\s*[\r\n]+\s*/g, ' ');
+  E.nombre = $din.value;
+  ajustarDinamica();
+  guardarLuego();
+});
+$din.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); $din.blur(); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); $din.value = dinAntes; E.nombre = dinAntes; ajustarDinamica(); $din.blur(); }
+});
+$din.addEventListener('blur', () => {
+  const limpio = $din.value.replace(/\s+/g, ' ').trim();
+  if (limpio !== $din.value) { $din.value = limpio; ajustarDinamica(); }
+  E.nombre = limpio;
+  guardar();
+});
+/* Sin lápiz: toda la zona activa la edición. Si el toque cae ya sobre el
+   campo, el navegador pone el cursor donde se tocó; si cae en el margen
+   de alrededor, se manda el foco al final del texto. */
+$dinCampo.addEventListener('click', e => {
+  if (e.target === $din) return;
+  $din.focus(); const n = $din.value.length; $din.setSelectionRange(n, n);
+});
+if (window.ResizeObserver) new ResizeObserver(() => ajustarDinamica()).observe($dinCampo);
+
+
+/* ── Mandos ─────────────────────────────────────────────────────────── */
+$btnMarcha.addEventListener('click', alternar);
+$btnSiguiente.addEventListener('click', () => { if (E.fin) nuevoEvento(); else siguiente(false); });
+$btnReiniciar.addEventListener('click', pedirReinicio);
+
+/* ── Teclado ────────────────────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+  const el = e.target;
+  if (e.key === 'Escape') {
+    if (abierto($comparar)) { cerrarComparar(true); e.preventDefault(); return; }
+    if (abierto($eventosMenu)) { cerrarEventos(true); e.preventDefault(); return; }
+    if (abierto($clipMenu)) { cerrarClip(true); e.preventDefault(); return; }
+    if (abierto($ajustes)) { cerrarAjustes(true); e.preventDefault(); return; }
+    if (enPC()) { salirPC(); e.preventDefault(); }
+    return;
+  }
+  if (escribiendo(el) || e.repeat) return;
+  const enMando = el && el !== document.body && el.closest && el.closest('button, a, input, select, summary, [role="menuitem"]');
+  switch (e.key) {
+    case ' ': case 'Spacebar':
+      if (enMando) return;            /* un mando con el foco se activa a sí mismo */
+      e.preventDefault(); alternar(); break;
+    case 'v': case 'V': e.preventDefault(); siguiente(false); break;
+    case 'b': case 'B': e.preventDefault(); atras(); break;
+    case 'r': case 'R': e.preventDefault(); pedirReinicio(); break;
+    case 'p': case 'P': e.preventDefault(); alternarPC(); break;
+    default: break;
+  }
+});
+
+/* Tras un clic o un toque en un botón, el foco vuelve a la página: así
+   Espacio sigue siendo «iniciar o pausar» y no repite el último botón. */
+let ultimoPuntero = -1e9;
+document.addEventListener('pointerdown', e => {
+  ultimoPuntero = performance.now();
+  prepararAudio();
+  if (abierto($ajustes) && !$ajustes.contains(e.target) && !$btnAjustes.contains(e.target) && !$listaMenu.contains(e.target)) cerrarAjustes(false);
+  if (abierto($clipMenu) && !$clipMenu.contains(e.target) && !$btnClip.contains(e.target)) cerrarClip(false);
+  if (abierto($eventosMenu) && !$eventosMenu.contains(e.target) && !$listaMenu.contains(e.target)) cerrarEventos(false);
+}, true);
+document.addEventListener('keydown', prepararAudio, true);
+['click', 'touchend'].forEach(t => document.addEventListener(t, prepararAudio, { capture: true, passive: true }));
+document.addEventListener('click', () => {
+  if (performance.now() - ultimoPuntero > 1200) return;
+  const a = document.activeElement;
+  if (a && a !== document.body && a.matches('button, a, input[type="checkbox"], input[type="radio"]')) a.blur();
+});
+
+/* ── Arranque ───────────────────────────────────────────────────────── */
+cargar();
+$din.value = E.nombre;
+ajustarDinamica();
+aplicarInfo();
+sincronizarAjustes();
+armarPista();
+armarFilas();
+actualizar();
+programarEtapa();
+retirarCarga();
+
+/* para las pruebas: se lee, no se toca */
+window.s321Cronometro = Object.freeze({
+  tiempo: () => tiempo(),
+  estado: () => ({
+    corre: corre(), tramo: tramoActual, fin: E.fin, actual: E.actual, sel: E.sel, acum: E.acum,
+    etapas: E.etapas.map(e => ({ n: e.n, plan: e.plan })),
+    cortes: E.cortes.slice(), info: E.info, ocultas: E.ocultas,
+    eventos: E.eventos.map(v => ({ nombre: v.base + ' ' + v.n, cortes: v.cortes.slice() })), viendo: E.viendo
+  })
+});
+})();
+</script>
+</body>
+</html>
